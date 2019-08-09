@@ -7,9 +7,9 @@ Entangled gives you the materials needed to bind two blocks together, allowing y
 
 What you will need:
 
- - Antangled Binder
+ - Entangled Binder
 
- - Antangled Block
+ - Entangled Block
 
  
 
