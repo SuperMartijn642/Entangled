@@ -2,10 +2,10 @@ package com.supermartijn642.entangled;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.CraftingTableBlock;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.material.MaterialColor;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
@@ -32,17 +32,18 @@ public class EntangledBlock extends Block {
     public static final BooleanProperty ON = BooleanProperty.create("on");
 
     public EntangledBlock(){
-        super(Properties.create(new Material.Builder(MaterialColor.BROWN).doesNotBlockMovement().build()).speedFactor(1.3f).harvestTool(ToolType.PICKAXE).sound(SoundType.STONE).hardnessAndResistance(2f));
+        super(Properties.create(new Material.Builder(MaterialColor.BROWN).doesNotBlockMovement().build()).harvestTool(ToolType.PICKAXE).sound(SoundType.STONE).hardnessAndResistance(2f));
         this.setRegistryName("block");
         this.setDefaultState(this.getDefaultState().with(ON,false));
     }
 
     @Override
-    public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity playerIn, Hand hand, BlockRayTraceResult result) {
+    public boolean onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity playerIn, Hand hand, BlockRayTraceResult result) {
         if(worldIn.isRemote)
-            return ActionResultType.PASS;
+            return true;
+        LivingEntity entity;
         ItemStack stack = playerIn.getHeldItem(hand);
-        if(playerIn.isCrouching() && stack == ItemStack.EMPTY && state.get(ON)){
+        if(playerIn.isSneaking() && stack == ItemStack.EMPTY && state.get(ON)){
             ((EntangledBlockTile)worldIn.getTileEntity(pos)).bind(null,0);
             playerIn.sendMessage(new StringTextComponent(TextFormatting.YELLOW + "Block unbound!"));
             worldIn.setBlockState(pos, state.with(ON, false));
@@ -61,9 +62,9 @@ public class EntangledBlock extends Block {
                     playerIn.sendMessage(new StringTextComponent(TextFormatting.YELLOW + "Block bound!"));
                 }
             }
-            return ActionResultType.SUCCESS;
+            return true;
         }
-        return ActionResultType.PASS;
+        return true;
     }
 
     @Override
