@@ -6,6 +6,7 @@ import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.dimension.DimensionType;
+import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
 
@@ -79,7 +80,7 @@ public class EntangledBlockTile extends TileEntity {
     }
 
     private World getDimension(){
-        return this.world.getServer().getWorld(DimensionType.getById(this.dimension));
+        return DimensionManager.getWorld(this.world.getServer(),DimensionType.getById(this.dimension),false,false);
     }
 
     private boolean checkTile(TileEntity tile){
