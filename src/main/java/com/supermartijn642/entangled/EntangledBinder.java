@@ -48,7 +48,7 @@ public class EntangledBinder extends Item {
         if(playerIn.world.isRemote)
             return super.onItemRightClick(worldIn, playerIn, handIn);
         CompoundNBT compound = playerIn.getHeldItem(handIn).getTag();
-        if(playerIn.isCrouching() && compound != null && compound.getBoolean("bound")){
+        if(playerIn.isSneaking() && compound != null && compound.getBoolean("bound")){
             compound.putBoolean("bound", false);
             playerIn.getHeldItem(handIn).setTag(compound);
             playerIn.sendMessage(new StringTextComponent(TextFormatting.YELLOW + "Connection cleared!"));
