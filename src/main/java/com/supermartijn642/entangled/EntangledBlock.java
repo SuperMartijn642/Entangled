@@ -2,7 +2,6 @@ package com.supermartijn642.entangled;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.CraftingTableBlock;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.material.MaterialColor;
@@ -16,6 +15,8 @@ import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
+import net.minecraft.util.math.shapes.VoxelShape;
+import net.minecraft.util.math.shapes.VoxelShapes;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.IBlockReader;
@@ -32,32 +33,32 @@ public class EntangledBlock extends Block {
     public static final BooleanProperty ON = BooleanProperty.create("on");
 
     public EntangledBlock(){
-        super(Properties.create(new Material.Builder(MaterialColor.BROWN).doesNotBlockMovement().build()).speedFactor(1.3f).harvestTool(ToolType.PICKAXE).sound(SoundType.STONE).hardnessAndResistance(2f));
+        super(Properties.create(new Material.Builder(MaterialColor.BROWN).doesNotBlockMovement().build()).speedFactor(1f).harvestTool(ToolType.PICKAXE).sound(SoundType.STONE).hardnessAndResistance(2f));
         this.setRegistryName("block");
-        this.setDefaultState(this.getDefaultState().with(ON,false));
+        this.setDefaultState(this.getDefaultState().with(ON, false));
     }
 
     @Override
-    public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity playerIn, Hand hand, BlockRayTraceResult result) {
+    public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity playerIn, Hand hand, BlockRayTraceResult result){
         if(worldIn.isRemote)
             return ActionResultType.PASS;
         ItemStack stack = playerIn.getHeldItem(hand);
-        if(playerIn.isCrouching() && stack == ItemStack.EMPTY && state.get(ON)){
-            ((EntangledBlockTile)worldIn.getTileEntity(pos)).bind(null,0);
+        if(playerIn.isCrouching() && stack.isEmpty() && state.get(ON)){
+            ((EntangledBlockTile)worldIn.getTileEntity(pos)).bind(null, 0);
             playerIn.sendMessage(new StringTextComponent(TextFormatting.YELLOW + "Block unbound!"));
             worldIn.setBlockState(pos, state.with(ON, false));
-        }
-        else if(stack.getItem() == Entangled.item){
+        }else if(stack.getItem() == Entangled.item){
             CompoundNBT compound = stack.getTag();
             if(compound == null || !compound.getBoolean("bound"))
                 playerIn.sendMessage(new StringTextComponent(TextFormatting.RED + "No block selected!"));
             else{
-                BlockPos pos2 = new BlockPos(compound.getInt("boundx"),compound.getInt("boundy"),compound.getInt("boundz"));
+                BlockPos pos2 = new BlockPos(compound.getInt("boundx"), compound.getInt("boundy"), compound.getInt("boundz"));
                 if(pos2.equals(pos))
                     playerIn.sendMessage(new StringTextComponent(TextFormatting.RED + "Can't bind a block to itself!"));
                 else{
-                    worldIn.setBlockState(pos, state.with(ON, true));
-                    ((EntangledBlockTile)worldIn.getTileEntity(pos)).bind(pos2,compound.getInt("dimension"));
+                    if(!worldIn.getBlockState(pos).get(ON))
+                        worldIn.setBlockState(pos, state.with(ON, true));
+                    ((EntangledBlockTile)worldIn.getTileEntity(pos)).bind(pos2, compound.getInt("dimension"));
                     playerIn.sendMessage(new StringTextComponent(TextFormatting.YELLOW + "Block bound!"));
                 }
             }
@@ -80,5 +81,10 @@ public class EntangledBlock extends Block {
     @Override
     protected void fillStateContainer(StateContainer.Builder<Block,BlockState> builder){
         builder.add(ON);
+    }
+
+    @Override
+    public VoxelShape getRenderShape(BlockState state, IBlockReader worldIn, BlockPos pos){
+        return state.get(ON) ? VoxelShapes.empty() : VoxelShapes.fullCube();
     }
 }

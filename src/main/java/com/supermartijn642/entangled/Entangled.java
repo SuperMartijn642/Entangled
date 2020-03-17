@@ -8,13 +8,8 @@ import net.minecraft.tileentity.TileEntityType;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.registries.ObjectHolder;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
-// The value here should match an entry in the META-INF/mods.toml file
 @Mod("entangled")
 public class Entangled {
 
@@ -34,7 +29,7 @@ public class Entangled {
 
         @SubscribeEvent
         public static void onTileRegistry(final RegistryEvent.Register<TileEntityType<?>> e){
-            e.getRegistry().register(TileEntityType.Builder.create(EntangledBlockTile::new,block).build(null).setRegistryName("tile"));
+            e.getRegistry().register(TileEntityType.Builder.create(EntangledBlockTile::new, block).build(null).setRegistryName("tile"));
         }
 
         @SubscribeEvent
