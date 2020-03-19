@@ -69,7 +69,7 @@ public class EntangledBlock extends Block implements ITileEntityProvider {
 
     @Override
     public int getMetaFromState(IBlockState state) {
-        return state.getValue(ON).booleanValue() ? 1 : 0;
+        return state.getValue(ON) ? 1 : 0;
     }
 
     @SuppressWarnings("deprecation")
