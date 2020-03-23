@@ -52,7 +52,11 @@ public class EntangledBlockTile extends TileEntity {
     @Nonnull
     @Override
     public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> capability){
+        if(this.world == null)
+            return LazyOptional.empty();
         if(this.bound){
+            if(this.world.isRemote && this.world.getDimension().getType().getId() != this.dimension)
+                return LazyOptional.empty();
             TileEntity tile = this.getDimension().getTileEntity(this.pos);
             if(checkTile(tile))
                 return tile.getCapability(capability);
@@ -63,7 +67,11 @@ public class EntangledBlockTile extends TileEntity {
     @Nonnull
     @Override
     public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> capability, @Nullable Direction facing){
+        if(this.world == null)
+            return LazyOptional.empty();
         if(this.bound){
+            if(this.world.isRemote && this.world.getDimension().getType().getId() != this.dimension)
+                return LazyOptional.empty();
             TileEntity tile = this.getDimension().getTileEntity(this.pos);
             if(checkTile(tile))
                 return tile.getCapability(capability, facing);
@@ -75,12 +83,14 @@ public class EntangledBlockTile extends TileEntity {
         this.pos = pos == null ? null : new BlockPos(pos);
         this.dimension = dimension;
         this.bound = pos != null;
-        if(this.bound)
+        if(this.bound){
             this.world.notifyNeighborsOfStateChange(this.pos, this.getBlockState().getBlock());
+            this.world.notifyBlockUpdate(this.getPos(), this.getBlockState(), this.getBlockState(), 2);
+        }
     }
 
     private World getDimension(){
-        return DimensionManager.getWorld(this.world.getServer(),DimensionType.getById(this.dimension),false,false);
+        return DimensionManager.getWorld(this.world.getServer(), DimensionType.getById(this.dimension), false, false);
     }
 
     private boolean checkTile(TileEntity tile){
