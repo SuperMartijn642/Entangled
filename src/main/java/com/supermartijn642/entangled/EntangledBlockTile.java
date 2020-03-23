@@ -57,7 +57,8 @@ public class EntangledBlockTile extends TileEntity {
         if(this.bound){
             if(this.world.isRemote && this.world.getDimension().getType().getId() != this.dimension)
                 return LazyOptional.empty();
-            TileEntity tile = this.getDimension().getTileEntity(this.pos);
+            World world = this.world.isRemote ? this.world : this.getDimension();
+            TileEntity tile = world.getTileEntity(this.pos);
             if(checkTile(tile))
                 return tile.getCapability(capability);
         }
@@ -72,7 +73,8 @@ public class EntangledBlockTile extends TileEntity {
         if(this.bound){
             if(this.world.isRemote && this.world.getDimension().getType().getId() != this.dimension)
                 return LazyOptional.empty();
-            TileEntity tile = this.getDimension().getTileEntity(this.pos);
+            World world = this.world.isRemote ? this.world : this.getDimension();
+            TileEntity tile = world.getTileEntity(this.pos);
             if(checkTile(tile))
                 return tile.getCapability(capability, facing);
         }
