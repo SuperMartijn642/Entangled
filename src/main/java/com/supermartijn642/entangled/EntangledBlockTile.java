@@ -88,7 +88,11 @@ public class EntangledBlockTile extends TileEntity implements ITickableTileEntit
     @Nonnull
     @Override
     public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> capability){
+        if(this.world == null)
+            return LazyOptional.empty();
         if(this.bound){
+            if(this.world.isRemote && this.world.getDimension().getType().getId() != this.dimension)
+                return LazyOptional.empty();
             TileEntity tile = this.getDimension().getTileEntity(this.pos);
             if(checkTile(tile))
                 return tile.getCapability(capability);
@@ -99,7 +103,11 @@ public class EntangledBlockTile extends TileEntity implements ITickableTileEntit
     @Nonnull
     @Override
     public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> capability, @Nullable Direction facing){
+        if(this.world == null)
+            return LazyOptional.empty();
         if(this.bound){
+            if(this.world.isRemote && this.world.getDimension().getType().getId() != this.dimension)
+                return LazyOptional.empty();
             TileEntity tile = this.getDimension().getTileEntity(this.pos);
             if(checkTile(tile))
                 return tile.getCapability(capability, facing);
