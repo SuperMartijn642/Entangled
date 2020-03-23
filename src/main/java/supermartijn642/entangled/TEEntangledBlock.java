@@ -43,7 +43,7 @@ public class TEEntangledBlock extends TileEntity {
 
     @Override
     public boolean hasCapability(Capability<?> capability, @Nullable EnumFacing facing) {
-        if(this.bound){
+        if(this.bound && !this.world.isRemote){
             TileEntity tile = this.dimension.getTileEntity(this.pos);
             if(tile != null)
                 return tile.hasCapability(capability, facing);
@@ -54,7 +54,7 @@ public class TEEntangledBlock extends TileEntity {
     @Nullable
     @Override
     public <T> T getCapability(Capability<T> capability, @Nullable EnumFacing facing) {
-        if(this.bound){
+        if(this.bound && !this.world.isRemote){
             TileEntity tile = this.dimension.getTileEntity(this.pos);
             if(tile != null)
                 return tile.getCapability(capability, facing);
