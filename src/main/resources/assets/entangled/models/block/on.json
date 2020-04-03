@@ -1,5 +1,5 @@
 {
-	"parent": "block/block",
+	"parent": "block/cube_all",
 	"textures": {
 		"0": "entangled:blocks/off",
 		"particle": "entangled:blocks/off"
