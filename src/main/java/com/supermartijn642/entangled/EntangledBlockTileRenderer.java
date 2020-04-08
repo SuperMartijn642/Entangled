@@ -1,6 +1,7 @@
 package com.supermartijn642.entangled;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
+import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
@@ -39,7 +40,7 @@ public class EntangledBlockTileRenderer extends TileEntityRenderer<EntangledBloc
 
         if(tileEntity != null)
             TileEntityRendererDispatcher.instance.renderTileEntity(tileEntity, partialTicks, matrixStackIn, bufferIn);
-        if(state != null)
+        if(state != null && state.getRenderType() == BlockRenderType.MODEL)
             Minecraft.getInstance().getBlockRendererDispatcher().renderBlock(state, matrixStackIn, bufferIn, combinedLightIn, combinedOverlayIn);
 
         matrixStackIn.pop();

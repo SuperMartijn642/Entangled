@@ -122,9 +122,10 @@ public class EntangledBlockTile extends TileEntity implements ITickableTileEntit
         this.dimension = dimension;
         this.bound = pos != null;
         if(this.bound){
-            this.world.notifyNeighborsOfStateChange(this.pos, this.getBlockState().getBlock());
+            this.world.notifyNeighborsOfStateChange(this.getPos(), this.getBlockState().getBlock());
             this.world.notifyBlockUpdate(this.getPos(), this.getBlockState(), this.getBlockState(), 2);
         }
+        this.markDirty();
     }
 
     private World getDimension(){
@@ -175,13 +176,16 @@ public class EntangledBlockTile extends TileEntity implements ITickableTileEntit
     public CompoundNBT getUpdateTag(){
         CompoundNBT compound = super.getUpdateTag();
         compound.putBoolean("bound", this.bound);
-        if(this.pos != null){
-            compound.putInt("posX", this.pos.getX());
-            compound.putInt("posY", this.pos.getY());
-            compound.putInt("posZ", this.pos.getZ());
+        if(this.bound){
+            if(this.pos != null){
+                compound.putInt("posX", this.pos.getX());
+                compound.putInt("posY", this.pos.getY());
+                compound.putInt("posZ", this.pos.getZ());
+            }
+            compound.putInt("dimension", this.dimension);
+            if(this.blockState != null)
+                compound.putInt("blockstate", Block.getStateId(this.blockState));
         }
-        compound.putInt("dimension", this.dimension);
-        compound.putInt("blockstate", Block.getStateId(this.blockState));
         return compound;
     }
 
@@ -199,6 +203,6 @@ public class EntangledBlockTile extends TileEntity implements ITickableTileEntit
         if(tag.contains("dimension"))
             this.dimension = tag.getInt("dimension");
         if(tag.contains("blockstate"))
-            this.blockState = Block.BLOCK_STATE_IDS.getByValue(tag.getInt("blockstate"));
+            this.blockState = Block.getStateById(tag.getInt("blockstate"));
     }
 }
