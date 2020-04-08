@@ -1,5 +1,6 @@
-package supermartijn642.entangled;
+package com.supermartijn642.entangled;
 
+import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -19,6 +20,7 @@ public class EntangledBinder extends Item {
         this.setMaxStackSize(1);
         this.setRegistryName("item");
         this.setUnlocalizedName(Entangled.MODID + ":item");
+        this.setCreativeTab(CreativeTabs.SEARCH);
     }
 
     @Override
