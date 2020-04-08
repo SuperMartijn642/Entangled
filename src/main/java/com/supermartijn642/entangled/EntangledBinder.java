@@ -24,10 +24,10 @@ public class EntangledBinder extends Item {
     }
 
     @Override
-    public ActionResultType onItemUse(ItemUseContext context) {
+    public ActionResultType onItemUse(ItemUseContext context){
         if(context.getWorld().isRemote)
             return ActionResultType.SUCCESS;
-        ItemStack stack = context.getPlayer().getHeldItem(context.getHand());
+        ItemStack stack = context.getItem();
         CompoundNBT compound = stack.getTag() == null ? new CompoundNBT() : stack.getTag();
         if(compound.getBoolean("bound") && compound.getInt("dimension") == context.getWorld().getDimension().getType().getId() &&
             compound.getInt("boundx") == context.getPos().getX() &&
@@ -44,7 +44,7 @@ public class EntangledBinder extends Item {
     }
 
     @Override
-    public ActionResult<ItemStack> onItemRightClick(World worldIn, PlayerEntity playerIn, Hand handIn) {
+    public ActionResult<ItemStack> onItemRightClick(World worldIn, PlayerEntity playerIn, Hand handIn){
         if(playerIn.world.isRemote)
             return super.onItemRightClick(worldIn, playerIn, handIn);
         CompoundNBT compound = playerIn.getHeldItem(handIn).getTag();
