@@ -9,7 +9,7 @@
   "updateUrl": "",
   "authorList": ["SuperMartijn642"],
   "credits": "",
-  "logoFile": "",
+  "logoFile": "entangled.png",
   "screenshots": [],
   "dependencies": ["forge"]
 }
