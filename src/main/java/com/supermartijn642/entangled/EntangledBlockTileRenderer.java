@@ -1,6 +1,7 @@
 package com.supermartijn642.entangled;
 
 import com.mojang.blaze3d.platform.GlStateManager;
+import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BlockRendererDispatcher;
@@ -49,7 +50,7 @@ public class EntangledBlockTileRenderer extends TileEntityRenderer<EntangledBloc
         if(boundTile != null)
             TileEntityRendererDispatcher.instance.render(boundTile, 0, 0, 0, partialTicks);
 
-        if(state != null){
+        if(state != null && state.getRenderType() == BlockRenderType.MODEL){
             Tessellator tessellator = Tessellator.getInstance();
             BufferBuilder buffer = tessellator.getBuffer();
             buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.BLOCK);
