@@ -121,10 +121,8 @@ public class EntangledBlockTile extends TileEntity implements ITickableTileEntit
         this.pos = pos == null ? null : new BlockPos(pos);
         this.dimension = dimension;
         this.bound = pos != null;
-        if(this.bound){
-            this.world.notifyNeighborsOfStateChange(this.getPos(), this.getBlockState().getBlock());
-            this.world.notifyBlockUpdate(this.getPos(), this.getBlockState(), this.getBlockState(), 2);
-        }
+        this.world.notifyNeighborsOfStateChange(this.getPos(), this.getBlockState().getBlock());
+        this.world.notifyBlockUpdate(this.getPos(), this.getBlockState(), this.getBlockState(), 2);
         this.markDirty();
     }
 
