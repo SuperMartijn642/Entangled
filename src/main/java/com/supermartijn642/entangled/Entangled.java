@@ -17,7 +17,7 @@ public class Entangled {
     public static final String MODID = "entangled";
     public static final String NAME = "Entangled";
     public static final String MC_VERSIONS = "[1.12.2]";
-    public static final String VERSION = "1.2.3";
+    public static final String VERSION = "1.2.4";
 
     @GameRegistry.ObjectHolder(Entangled.MODID + ":block")
     public static EntangledBlock block;
