@@ -1,5 +1,6 @@
 package com.supermartijn642.entangled;
 
+import com.google.common.collect.Lists;
 import net.minecraft.block.Block;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
@@ -7,11 +8,12 @@ import net.minecraft.item.ItemBlock;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 
-@Mod(modid = Entangled.MODID,name = Entangled.NAME,version = Entangled.VERSION,acceptedMinecraftVersions = Entangled.MC_VERSIONS)
+import java.util.List;
+
+@Mod(modid = Entangled.MODID, name = Entangled.NAME, version = Entangled.VERSION, acceptedMinecraftVersions = Entangled.MC_VERSIONS)
 public class Entangled {
 
     public static final String MODID = "entangled";
@@ -38,5 +40,7 @@ public class Entangled {
             e.getRegistry().register(new EntangledBinder());
         }
     }
+
+    public static final List<String> RENDER_BLACKLISTED_MODS = Lists.newArrayList("fluidtank");
 
 }

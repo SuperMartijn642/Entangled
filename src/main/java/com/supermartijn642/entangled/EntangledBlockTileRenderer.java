@@ -1,5 +1,6 @@
 package com.supermartijn642.entangled;
 
+import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BlockRendererDispatcher;
@@ -25,6 +26,7 @@ public class EntangledBlockTileRenderer extends TileEntitySpecialRenderer<Entang
         if(!tile.isBound())
             return;
 
+        Block boundBlock = tile.getWorld().provider.getDimensionType().getId() == tile.getBoundDimension() ? tile.getWorld().getBlockState(tile.getBoundBlockPos()).getBlock() : null;
         TileEntity boundTile = tile.getWorld().provider.getDimensionType().getId() == tile.getBoundDimension() ? tile.getWorld().getTileEntity(tile.getBoundBlockPos()) : null;
         IBlockState state = tile.getBoundBlockState();
 
@@ -43,7 +45,7 @@ public class EntangledBlockTileRenderer extends TileEntitySpecialRenderer<Entang
         GlStateManager.scale(0.6f, 0.6f, 0.6f);
         GlStateManager.translate(-0.5, -0.5, -0.5);
 
-        if(boundTile != null)
+        if(boundBlock != null && boundTile != null && !Entangled.RENDER_BLACKLISTED_MODS.contains(boundBlock.getRegistryName().getResourceDomain()))
             TileEntityRendererDispatcher.instance.render(boundTile, 0, 0, 0, partialTicks);
 
         if(state != null && state.getRenderType() == EnumBlockRenderType.MODEL){
