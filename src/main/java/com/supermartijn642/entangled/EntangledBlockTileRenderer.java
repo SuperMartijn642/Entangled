@@ -1,6 +1,7 @@
 package com.supermartijn642.entangled;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.Minecraft;
@@ -24,7 +25,8 @@ public class EntangledBlockTileRenderer extends TileEntityRenderer<EntangledBloc
         if(!tileEntityIn.isBound())
             return;
 
-        TileEntity tileEntity = tileEntityIn.getWorld().getDimension().getType().getId() == tileEntityIn.getBoundDimension() ? tileEntityIn.getWorld().getTileEntity(tileEntityIn.getBoundBlockPos()) : null;
+        Block boundBlock = tileEntityIn.getWorld().getDimension().getType().getId() == tileEntityIn.getBoundDimension() ? tileEntityIn.getWorld().getBlockState(tileEntityIn.getBoundBlockPos()).getBlock() : null;
+        TileEntity boundTile = tileEntityIn.getWorld().getDimension().getType().getId() == tileEntityIn.getBoundDimension() ? tileEntityIn.getWorld().getTileEntity(tileEntityIn.getBoundBlockPos()) : null;
         BlockState state = tileEntityIn.getBoundBlockState();
 
         matrixStackIn.push();
@@ -38,8 +40,8 @@ public class EntangledBlockTileRenderer extends TileEntityRenderer<EntangledBloc
         matrixStackIn.scale(0.6f, 0.6f, 0.6f);
         matrixStackIn.translate(-0.5, -0.5, -0.5);
 
-        if(tileEntity != null)
-            TileEntityRendererDispatcher.instance.renderTileEntity(tileEntity, partialTicks, matrixStackIn, bufferIn);
+        if(boundBlock != null && boundTile != null && !Entangled.RENDER_BLACKLISTED_MODS.contains(boundBlock.getRegistryName().getNamespace()))
+            TileEntityRendererDispatcher.instance.renderTileEntity(boundTile, partialTicks, matrixStackIn, bufferIn);
         if(state != null && state.getRenderType() == BlockRenderType.MODEL)
             Minecraft.getInstance().getBlockRendererDispatcher().renderBlock(state, matrixStackIn, bufferIn, combinedLightIn, combinedOverlayIn);
 

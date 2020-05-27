@@ -1,5 +1,6 @@
 package com.supermartijn642.entangled;
 
+import com.google.common.collect.Lists;
 import net.minecraft.block.Block;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
@@ -9,6 +10,8 @@ import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.registries.ObjectHolder;
+
+import java.util.List;
 
 @Mod("entangled")
 public class Entangled {
@@ -38,5 +41,7 @@ public class Entangled {
             e.getRegistry().register(new EntangledBinder());
         }
     }
+
+    public static final List<String> RENDER_BLACKLISTED_MODS = Lists.newArrayList();
 
 }
