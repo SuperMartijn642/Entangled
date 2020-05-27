@@ -1,6 +1,7 @@
 package com.supermartijn642.entangled;
 
 import com.mojang.blaze3d.platform.GlStateManager;
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.Minecraft;
@@ -29,6 +30,7 @@ public class EntangledBlockTileRenderer extends TileEntityRenderer<EntangledBloc
         if(!tile.isBound())
             return;
 
+        Block boundBlock = tile.getWorld().getDimension().getType().getId() == tile.getBoundDimension() ? tile.getWorld().getBlockState(tile.getBoundBlockPos()).getBlock() : null;
         TileEntity boundTile = tile.getWorld().getDimension().getType().getId() == tile.getBoundDimension() ? tile.getWorld().getTileEntity(tile.getBoundBlockPos()) : null;
         BlockState state = tile.getBoundBlockState();
 
@@ -47,7 +49,7 @@ public class EntangledBlockTileRenderer extends TileEntityRenderer<EntangledBloc
         GlStateManager.scalef(0.6f, 0.6f, 0.6f);
         GlStateManager.translated(-0.5, -0.5, -0.5);
 
-        if(boundTile != null)
+        if(boundBlock != null && boundTile != null && !Entangled.RENDER_BLACKLISTED_MODS.contains(boundBlock.getRegistryName().getNamespace()))
             TileEntityRendererDispatcher.instance.render(boundTile, 0, 0, 0, partialTicks);
 
         if(state != null && state.getRenderType() == BlockRenderType.MODEL){
