@@ -6,10 +6,10 @@ import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
-import net.minecraft.client.renderer.Quaternion;
 import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
 import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.math.vector.Quaternion;
 
 /**
  * Created 3/16/2020 by SuperMartijn642
@@ -25,8 +25,8 @@ public class EntangledBlockTileRenderer extends TileEntityRenderer<EntangledBloc
         if(!tileEntityIn.isBound())
             return;
 
-        Block boundBlock = tileEntityIn.getWorld().getDimension().getType().getId() == tileEntityIn.getBoundDimension() ? tileEntityIn.getWorld().getBlockState(tileEntityIn.getBoundBlockPos()).getBlock() : null;
-        TileEntity boundTile = tileEntityIn.getWorld().getDimension().getType().getId() == tileEntityIn.getBoundDimension() ? tileEntityIn.getWorld().getTileEntity(tileEntityIn.getBoundBlockPos()) : null;
+        Block boundBlock = tileEntityIn.getWorld().func_234923_W_() == tileEntityIn.getBoundDimension() ? tileEntityIn.getWorld().getBlockState(tileEntityIn.getBoundBlockPos()).getBlock() : null;
+        TileEntity boundTile = tileEntityIn.getWorld().func_234923_W_() == tileEntityIn.getBoundDimension() ? tileEntityIn.getWorld().getTileEntity(tileEntityIn.getBoundBlockPos()) : null;
         BlockState state = tileEntityIn.getBoundBlockState();
 
         matrixStackIn.push();

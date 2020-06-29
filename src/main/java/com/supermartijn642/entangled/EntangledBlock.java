@@ -44,22 +44,22 @@ public class EntangledBlock extends Block {
             return ActionResultType.PASS;
         ItemStack stack = playerIn.getHeldItem(hand);
         if(playerIn.isCrouching() && stack.isEmpty() && state.get(ON)){
-            ((EntangledBlockTile)worldIn.getTileEntity(pos)).bind(null, 0);
-            playerIn.sendMessage(new StringTextComponent(TextFormatting.YELLOW + "Block unbound!"));
+            ((EntangledBlockTile)worldIn.getTileEntity(pos)).bind(null, null);
+            playerIn.sendMessage(new StringTextComponent(TextFormatting.YELLOW + "Block unbound!"), playerIn.getUniqueID());
             worldIn.setBlockState(pos, state.with(ON, false));
         }else if(stack.getItem() == Entangled.item){
             CompoundNBT compound = stack.getTag();
             if(compound == null || !compound.getBoolean("bound"))
-                playerIn.sendMessage(new StringTextComponent(TextFormatting.RED + "No block selected!"));
+                playerIn.sendMessage(new StringTextComponent(TextFormatting.RED + "No block selected!"), playerIn.getUniqueID());
             else{
                 BlockPos pos2 = new BlockPos(compound.getInt("boundx"), compound.getInt("boundy"), compound.getInt("boundz"));
                 if(pos2.equals(pos))
-                    playerIn.sendMessage(new StringTextComponent(TextFormatting.RED + "Can't bind a block to itself!"));
+                    playerIn.sendMessage(new StringTextComponent(TextFormatting.RED + "Can't bind a block to itself!"), playerIn.getUniqueID());
                 else{
                     if(!worldIn.getBlockState(pos).get(ON))
                         worldIn.setBlockState(pos, state.with(ON, true));
-                    ((EntangledBlockTile)worldIn.getTileEntity(pos)).bind(pos2, compound.getInt("dimension"));
-                    playerIn.sendMessage(new StringTextComponent(TextFormatting.YELLOW + "Block bound!"));
+                    ((EntangledBlockTile)worldIn.getTileEntity(pos)).bind(pos2, compound.getString("dimension"));
+                    playerIn.sendMessage(new StringTextComponent(TextFormatting.YELLOW + "Block bound!"), playerIn.getUniqueID());
                 }
             }
             return ActionResultType.SUCCESS;

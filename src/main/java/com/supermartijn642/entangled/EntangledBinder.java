@@ -29,17 +29,17 @@ public class EntangledBinder extends Item {
             return ActionResultType.SUCCESS;
         ItemStack stack = context.getItem();
         CompoundNBT compound = stack.getTag() == null ? new CompoundNBT() : stack.getTag();
-        if(compound.getBoolean("bound") && compound.getInt("dimension") == context.getWorld().getDimension().getType().getId() &&
+        if(compound.getBoolean("bound") && compound.getString("dimension").equals(context.getWorld().func_234923_W_().func_240901_a_().toString()) &&
             compound.getInt("boundx") == context.getPos().getX() &&
             compound.getInt("boundy") == context.getPos().getY() && compound.getInt("boundz") == context.getPos().getZ())
             return ActionResultType.PASS;
         compound.putBoolean("bound", true);
-        compound.putInt("dimension", context.getWorld().getDimension().getType().getId());
+        compound.putString("dimension", context.getWorld().func_234923_W_().func_240901_a_().toString());
         compound.putInt("boundx", context.getPos().getX());
         compound.putInt("boundy", context.getPos().getY());
         compound.putInt("boundz", context.getPos().getZ());
         stack.setTag(compound);
-        context.getPlayer().sendMessage(new StringTextComponent(TextFormatting.YELLOW + "Block selected!"));
+        context.getPlayer().sendMessage(new StringTextComponent(TextFormatting.YELLOW + "Block selected!"), context.getPlayer().getUniqueID());
         return ActionResultType.SUCCESS;
     }
 
@@ -51,7 +51,7 @@ public class EntangledBinder extends Item {
         if(playerIn.isCrouching() && compound != null && compound.getBoolean("bound")){
             compound.putBoolean("bound", false);
             playerIn.getHeldItem(handIn).setTag(compound);
-            playerIn.sendMessage(new StringTextComponent(TextFormatting.YELLOW + "Connection cleared!"));
+            playerIn.sendMessage(new StringTextComponent(TextFormatting.YELLOW + "Connection cleared!"), playerIn.getUniqueID());
         }
         return super.onItemRightClick(worldIn, playerIn, handIn);
     }
