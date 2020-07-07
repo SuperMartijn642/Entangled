@@ -30,7 +30,7 @@ authors="SuperMartijn642" #optional
 # The description text for the mod (multi line!) (#mandatory)
 description='''Entangled gives you the materials needed to bind two blocks together, allowing you to interact with either one as if they were the same block! This will allow you to transfer items, energy, fluids or whatever you want instantly, you can have more than eight sides to work with or you could just hide your messy cables, or whatever you can imagine!'''
 # A dependency - use the . to indicate dependency for a specific modid. Dependencies are optional.
-[[dependencies.examplemod]] #optional
+[[dependencies.entangled]] #optional
     # the modid of the dependency
     modId="forge" #mandatory
     # Does this dependency have to exist - if not, ordering below must be specified
@@ -42,7 +42,7 @@ description='''Entangled gives you the materials needed to bind two blocks toget
     # Side this dependency is applied on - BOTH, CLIENT or SERVER
     side="BOTH"
 # Here's another dependency
-[[dependencies.examplemod]]
+[[dependencies.entangled]]
     modId="minecraft"
     mandatory=true
     versionRange="[1.15,)"
