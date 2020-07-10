@@ -36,7 +36,7 @@ public class Entangled {
 
         @SubscribeEvent
         public static void registerItems(RegistryEvent.Register<Item> e){
-            e.getRegistry().register(new ItemBlock(Entangled.block).setCreativeTab(CreativeTabs.SEARCH).setRegistryName(Entangled.block.getRegistryName()));
+            e.getRegistry().register(new ItemBlock(Entangled.block).setRegistryName(Entangled.block.getRegistryName()));
             e.getRegistry().register(new EntangledBinder());
         }
     }

@@ -9,6 +9,7 @@ import net.minecraft.block.properties.PropertyBool;
 import net.minecraft.block.state.BlockFaceShape;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
@@ -39,6 +40,7 @@ public class EntangledBlock extends Block implements ITileEntityProvider {
         this.setUnlocalizedName(Entangled.MODID + ":block");
         this.setDefaultState(this.blockState.getBaseState().withProperty(ON, false));
 
+        this.setCreativeTab(CreativeTabs.SEARCH);
         this.setSoundType(SoundType.STONE);
         this.setHarvestLevel("pickaxe",0);
         this.setHardness(2f);
