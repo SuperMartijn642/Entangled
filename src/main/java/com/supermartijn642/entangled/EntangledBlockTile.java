@@ -79,12 +79,12 @@ public class EntangledBlockTile extends TileEntity implements ITickableTileEntit
     }
 
     @Override
-    public void func_230337_a_(BlockState state, CompoundNBT compound){
-        super.func_230337_a_(state, compound);
+    public void read(BlockState state, CompoundNBT compound){
+        super.read(state, compound);
         this.bound = compound.getBoolean("bound");
         if(this.bound){
             this.pos = new BlockPos(compound.getInt("boundx"), compound.getInt("boundy"), compound.getInt("boundz"));
-            this.dimension = RegistryKey.func_240903_a_(Registry.field_239699_ae_, new ResourceLocation(compound.getString("dimension")));
+            this.dimension = RegistryKey.func_240903_a_(Registry.WORLD_KEY, new ResourceLocation(compound.getString("dimension")));
         }
     }
 
@@ -122,7 +122,7 @@ public class EntangledBlockTile extends TileEntity implements ITickableTileEntit
 
     public void bind(BlockPos pos, String dimension){
         this.pos = pos == null ? null : new BlockPos(pos);
-        this.dimension = dimension == null ? null : RegistryKey.func_240903_a_(Registry.field_239699_ae_, new ResourceLocation(dimension));
+        this.dimension = dimension == null ? null : RegistryKey.func_240903_a_(Registry.WORLD_KEY, new ResourceLocation(dimension));
         this.bound = pos != null;
         this.world.notifyNeighborsOfStateChange(this.getPos(), this.getBlockState().getBlock());
         this.world.notifyBlockUpdate(this.getPos(), this.getBlockState(), this.getBlockState(), 2);
@@ -202,7 +202,7 @@ public class EntangledBlockTile extends TileEntity implements ITickableTileEntit
         if(tag.contains("posX"))
             this.pos = new BlockPos(tag.getInt("posX"), tag.getInt("posY"), tag.getInt("posZ"));
         if(tag.contains("dimension"))
-            this.dimension = RegistryKey.func_240903_a_(Registry.field_239699_ae_, new ResourceLocation(tag.getString("dimension")));
+            this.dimension = RegistryKey.func_240903_a_(Registry.WORLD_KEY, new ResourceLocation(tag.getString("dimension")));
         if(tag.contains("blockstate"))
             this.blockState = Block.getStateById(tag.getInt("blockstate"));
     }
