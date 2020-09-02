@@ -16,6 +16,8 @@ import net.minecraft.util.math.vector.Quaternion;
  */
 public class EntangledBlockTileRenderer extends TileEntityRenderer<EntangledBlockTile> {
 
+    private static int depth = 0;
+
     public EntangledBlockTileRenderer(TileEntityRendererDispatcher dispatcher){
         super(dispatcher);
     }
@@ -40,8 +42,13 @@ public class EntangledBlockTileRenderer extends TileEntityRenderer<EntangledBloc
         matrixStackIn.scale(0.6f, 0.6f, 0.6f);
         matrixStackIn.translate(-0.5, -0.5, -0.5);
 
-        if(boundBlock != null && boundTile != null && !Entangled.RENDER_BLACKLISTED_MODS.contains(boundBlock.getRegistryName().getNamespace()))
-            TileEntityRendererDispatcher.instance.renderTileEntity(boundTile, partialTicks, matrixStackIn, bufferIn);
+        if(boundBlock != null && boundTile != null && !Entangled.RENDER_BLACKLISTED_MODS.contains(boundBlock.getRegistryName().getNamespace())){
+            if(!(boundTile instanceof EntangledBlockTile) || depth < 10){
+                depth++;
+                TileEntityRendererDispatcher.instance.renderTileEntity(boundTile, partialTicks, matrixStackIn, bufferIn);
+                depth--;
+            }
+        }
         if(state != null && state.getRenderType() == BlockRenderType.MODEL)
             Minecraft.getInstance().getBlockRendererDispatcher().renderBlock(state, matrixStackIn, bufferIn, combinedLightIn, combinedOverlayIn);
 
