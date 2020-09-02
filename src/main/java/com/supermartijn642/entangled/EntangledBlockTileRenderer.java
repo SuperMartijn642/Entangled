@@ -21,6 +21,8 @@ import org.lwjgl.opengl.GL11;
  */
 public class EntangledBlockTileRenderer extends TileEntitySpecialRenderer<EntangledBlockTile> {
 
+    private static int depth = 0;
+
     @Override
     public void render(EntangledBlockTile tile, double x, double y, double z, float partialTicks, int destroyStage, float alpha){
         if(!tile.isBound())
@@ -45,8 +47,13 @@ public class EntangledBlockTileRenderer extends TileEntitySpecialRenderer<Entang
         GlStateManager.scale(0.6f, 0.6f, 0.6f);
         GlStateManager.translate(-0.5, -0.5, -0.5);
 
-        if(boundBlock != null && boundTile != null && !Entangled.RENDER_BLACKLISTED_MODS.contains(boundBlock.getRegistryName().getResourceDomain()))
-            TileEntityRendererDispatcher.instance.render(boundTile, 0, 0, 0, partialTicks);
+        if(boundBlock != null && boundTile != null && !Entangled.RENDER_BLACKLISTED_MODS.contains(boundBlock.getRegistryName().getResourceDomain())){
+            if(!(boundTile instanceof EntangledBlockTile) || depth < 10){
+                depth++;
+                TileEntityRendererDispatcher.instance.render(boundTile, 0, 0, 0, partialTicks);
+                depth--;
+            }
+        }
 
         if(state != null && state.getRenderType() == EnumBlockRenderType.MODEL){
             Tessellator tessellator = Tessellator.getInstance();
