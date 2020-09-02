@@ -25,6 +25,8 @@ import java.util.Random;
  */
 public class EntangledBlockTileRenderer extends TileEntityRenderer<EntangledBlockTile> {
 
+    private static int depth = 0;
+
     @Override
     public void render(EntangledBlockTile tile, double x, double y, double z, float partialTicks, int destroyStage){
         if(!tile.isBound())
@@ -49,8 +51,13 @@ public class EntangledBlockTileRenderer extends TileEntityRenderer<EntangledBloc
         GlStateManager.scalef(0.6f, 0.6f, 0.6f);
         GlStateManager.translated(-0.5, -0.5, -0.5);
 
-        if(boundBlock != null && boundTile != null && !Entangled.RENDER_BLACKLISTED_MODS.contains(boundBlock.getRegistryName().getNamespace()))
-            TileEntityRendererDispatcher.instance.render(boundTile, 0, 0, 0, partialTicks);
+        if(boundBlock != null && boundTile != null && !Entangled.RENDER_BLACKLISTED_MODS.contains(boundBlock.getRegistryName().getNamespace())){
+            if(!(boundTile instanceof EntangledBlockTile) || depth < 10){
+                depth++;
+                TileEntityRendererDispatcher.instance.render(boundTile, 0, 0, 0, partialTicks);
+                depth--;
+            }
+        }
 
         if(state != null && state.getRenderType() == BlockRenderType.MODEL){
             Tessellator tessellator = Tessellator.getInstance();
