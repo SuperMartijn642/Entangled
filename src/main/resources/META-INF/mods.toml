@@ -48,6 +48,6 @@ description='''Entangled gives you the materials needed to bind two blocks toget
 [[dependencies.entangled]]
     modId="minecraft"
     mandatory=true
-    versionRange="[1.16.2,1.17)"
+    versionRange="[1.16.2,1.16.3)"
     ordering="NONE"
     side="BOTH"
