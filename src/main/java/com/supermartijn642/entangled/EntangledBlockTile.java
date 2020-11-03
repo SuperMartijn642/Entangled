@@ -37,7 +37,7 @@ public class EntangledBlockTile extends TileEntity implements ITickableTileEntit
         if(this.world == null || this.world.isRemote)
             return;
         if(this.bound && this.pos != null){
-            this.world.func_234923_W_().func_240901_a_();
+            this.world.getDimensionKey().getRegistryName();
             world.getServer().func_241755_D_();
             World world = this.getDimension();
             if(world != null && (world.isAreaLoaded(this.pos, 1) || this.blockState == null)){
@@ -73,7 +73,7 @@ public class EntangledBlockTile extends TileEntity implements ITickableTileEntit
             compound.putInt("boundx", this.pos.getX());
             compound.putInt("boundy", this.pos.getY());
             compound.putInt("boundz", this.pos.getZ());
-            compound.putString("dimension", this.dimension.func_240901_a_().toString());
+            compound.putString("dimension", this.dimension.getRegistryName().toString());
         }
         return compound;
     }
@@ -84,7 +84,7 @@ public class EntangledBlockTile extends TileEntity implements ITickableTileEntit
         this.bound = compound.getBoolean("bound");
         if(this.bound){
             this.pos = new BlockPos(compound.getInt("boundx"), compound.getInt("boundy"), compound.getInt("boundz"));
-            this.dimension = RegistryKey.func_240903_a_(Registry.WORLD_KEY, new ResourceLocation(compound.getString("dimension")));
+            this.dimension = RegistryKey.getOrCreateKey(Registry.WORLD_KEY, new ResourceLocation(compound.getString("dimension")));
         }
     }
 
@@ -94,7 +94,7 @@ public class EntangledBlockTile extends TileEntity implements ITickableTileEntit
         if(this.world == null)
             return LazyOptional.empty();
         if(this.bound){
-            if(this.world.isRemote && this.world.func_234923_W_() != this.dimension)
+            if(this.world.isRemote && this.world.getDimensionKey() != this.dimension)
                 return LazyOptional.empty();
             World world = this.world.isRemote ? this.world : this.getDimension();
             TileEntity tile = world.getTileEntity(this.pos);
@@ -110,7 +110,7 @@ public class EntangledBlockTile extends TileEntity implements ITickableTileEntit
         if(this.world == null)
             return LazyOptional.empty();
         if(this.bound){
-            if(this.world.isRemote && this.world.func_234923_W_() != this.dimension)
+            if(this.world.isRemote && this.world.getDimensionKey() != this.dimension)
                 return LazyOptional.empty();
             World world = this.world.isRemote ? this.world : this.getDimension();
             TileEntity tile = world.getTileEntity(this.pos);
@@ -122,7 +122,7 @@ public class EntangledBlockTile extends TileEntity implements ITickableTileEntit
 
     public void bind(BlockPos pos, String dimension){
         this.pos = pos == null ? null : new BlockPos(pos);
-        this.dimension = dimension == null ? null : RegistryKey.func_240903_a_(Registry.WORLD_KEY, new ResourceLocation(dimension));
+        this.dimension = dimension == null ? null : RegistryKey.getOrCreateKey(Registry.WORLD_KEY, new ResourceLocation(dimension));
         this.bound = pos != null;
         this.world.notifyNeighborsOfStateChange(this.getPos(), this.getBlockState().getBlock());
         this.world.notifyBlockUpdate(this.getPos(), this.getBlockState(), this.getBlockState(), 2);
@@ -158,7 +158,7 @@ public class EntangledBlockTile extends TileEntity implements ITickableTileEntit
             this.posClient = new BlockPos(this.pos);
         }
         if(this.bound && this.dimensionClient != this.dimension){
-            compound.putString("dimension", this.dimension.func_240901_a_().toString());
+            compound.putString("dimension", this.dimension.getRegistryName().toString());
             this.dimensionClient = this.dimension;
         }
         if(this.bound && this.blockState != this.blockStateClient){
@@ -183,7 +183,7 @@ public class EntangledBlockTile extends TileEntity implements ITickableTileEntit
                 compound.putInt("posY", this.pos.getY());
                 compound.putInt("posZ", this.pos.getZ());
             }
-            compound.putString("dimension", this.dimension.func_240901_a_().toString());
+            compound.putString("dimension", this.dimension.getRegistryName().toString());
             if(this.blockState != null)
                 compound.putInt("blockstate", Block.getStateId(this.blockState));
         }
@@ -202,7 +202,7 @@ public class EntangledBlockTile extends TileEntity implements ITickableTileEntit
         if(tag.contains("posX"))
             this.pos = new BlockPos(tag.getInt("posX"), tag.getInt("posY"), tag.getInt("posZ"));
         if(tag.contains("dimension"))
-            this.dimension = RegistryKey.func_240903_a_(Registry.WORLD_KEY, new ResourceLocation(tag.getString("dimension")));
+            this.dimension = RegistryKey.getOrCreateKey(Registry.WORLD_KEY, new ResourceLocation(tag.getString("dimension")));
         if(tag.contains("blockstate"))
             this.blockState = Block.getStateById(tag.getInt("blockstate"));
     }
