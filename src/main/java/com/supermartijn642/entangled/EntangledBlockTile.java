@@ -84,10 +84,12 @@ public class EntangledBlockTile extends TileEntity implements ITickable {
         if(this.bound){
             if(this.world.isRemote && this.world.provider.getDimensionType().getId() != this.dimension)
                 return false;
-            World world = this.world.isRemote ? this.world : this.getDimension();
-            TileEntity tile = world.getTileEntity(this.pos);
-            if(checkTile(tile))
-                return tile.hasCapability(capability, facing);
+            World world = this.getDimension();
+            if(world != null){
+                TileEntity tile = world.getTileEntity(this.pos);
+                if(checkTile(tile))
+                    return tile.hasCapability(capability, facing);
+            }
         }
         return false;
     }
@@ -100,10 +102,12 @@ public class EntangledBlockTile extends TileEntity implements ITickable {
         if(this.bound){
             if(this.world.isRemote && this.world.provider.getDimensionType().getId() != this.dimension)
                 return null;
-            World world = this.world.isRemote ? this.world : this.getDimension();
-            TileEntity tile = world.getTileEntity(this.pos);
-            if(checkTile(tile))
-                return tile.getCapability(capability, facing);
+            World world = this.getDimension();
+            if(world != null){
+                TileEntity tile = world.getTileEntity(this.pos);
+                if(checkTile(tile))
+                    return tile.getCapability(capability, facing);
+            }
         }
         return null;
     }
@@ -119,7 +123,9 @@ public class EntangledBlockTile extends TileEntity implements ITickable {
     }
 
     private World getDimension(){
-        return DimensionManager.getWorld(this.dimension);
+        return this.world.isRemote ?
+            this.world.provider.getDimensionType().getId() == this.dimension ? this.world : null :
+            DimensionManager.getWorld(this.dimension);
     }
 
     private boolean checkTile(TileEntity tile){
