@@ -94,7 +94,7 @@ public class EntangledBlockTile extends TileEntity implements ITickableTileEntit
         if(this.bound){
             if(this.world.isRemote && this.world.getDimensionKey() != this.dimension)
                 return LazyOptional.empty();
-            World world = this.world.isRemote ? this.world : this.getDimension();
+            World world = this.getDimension();
             if(this.world != null){
                 TileEntity tile = world.getTileEntity(this.pos);
                 if(checkTile(tile))
@@ -112,7 +112,7 @@ public class EntangledBlockTile extends TileEntity implements ITickableTileEntit
         if(this.bound){
             if(this.world.isRemote && this.world.getDimensionKey() != this.dimension)
                 return LazyOptional.empty();
-            World world = this.world.isRemote ? this.world : this.getDimension();
+            World world = this.getDimension();
             if(world != null){
                 TileEntity tile = world.getTileEntity(this.pos);
                 if(checkTile(tile))
