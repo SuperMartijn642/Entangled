@@ -93,10 +93,12 @@ public class EntangledBlockTile extends TileEntity implements ITickableTileEntit
         if(this.bound){
             if(this.world.isRemote && this.world.getDimension().getType().getId() != this.dimension)
                 return LazyOptional.empty();
-            World world = this.world.isRemote ? this.world : this.getDimension();
-            TileEntity tile = world.getTileEntity(this.pos);
-            if(checkTile(tile))
-                return tile.getCapability(capability);
+            World world = this.getDimension();
+            if(this.world != null){
+                TileEntity tile = world.getTileEntity(this.pos);
+                if(checkTile(tile))
+                    return tile.getCapability(capability);
+            }
         }
         return LazyOptional.empty();
     }
@@ -109,10 +111,12 @@ public class EntangledBlockTile extends TileEntity implements ITickableTileEntit
         if(this.bound){
             if(this.world.isRemote && this.world.getDimension().getType().getId() != this.dimension)
                 return LazyOptional.empty();
-            World world = this.world.isRemote ? this.world : this.getDimension();
-            TileEntity tile = world.getTileEntity(this.pos);
-            if(checkTile(tile))
-                return tile.getCapability(capability, facing);
+            World world = this.getDimension();
+            if(world != null){
+                TileEntity tile = world.getTileEntity(this.pos);
+                if(checkTile(tile))
+                    return tile.getCapability(capability, facing);
+            }
         }
         return LazyOptional.empty();
     }
@@ -127,7 +131,9 @@ public class EntangledBlockTile extends TileEntity implements ITickableTileEntit
     }
 
     private World getDimension(){
-        return DimensionManager.getWorld(this.world.getServer(), DimensionType.getById(this.dimension), false, false);
+        return this.world.isRemote ?
+            this.world.getDimension().getType().getId() == this.dimension ? this.world : null :
+            DimensionManager.getWorld(this.world.getServer(), DimensionType.getById(this.dimension), false, false);
     }
 
     private boolean checkTile(TileEntity tile){
