@@ -37,8 +37,6 @@ public class EntangledBlockTile extends TileEntity implements ITickableTileEntit
         if(this.world == null || this.world.isRemote)
             return;
         if(this.bound && this.pos != null){
-            this.world.func_234923_W_().func_240901_a_();
-            world.getServer().func_241755_D_();
             World world = this.getDimension();
             if(world != null && (world.isAreaLoaded(this.pos, 1) || this.blockState == null)){
                 this.blockState = world.getBlockState(this.pos);
@@ -96,10 +94,12 @@ public class EntangledBlockTile extends TileEntity implements ITickableTileEntit
         if(this.bound){
             if(this.world.isRemote && this.world.func_234923_W_() != this.dimension)
                 return LazyOptional.empty();
-            World world = this.world.isRemote ? this.world : this.getDimension();
-            TileEntity tile = world.getTileEntity(this.pos);
-            if(checkTile(tile))
-                return tile.getCapability(capability);
+            World world = this.getDimension();
+            if(this.world != null){
+                TileEntity tile = world.getTileEntity(this.pos);
+                if(checkTile(tile))
+                    return tile.getCapability(capability);
+            }
         }
         return LazyOptional.empty();
     }
@@ -112,10 +112,12 @@ public class EntangledBlockTile extends TileEntity implements ITickableTileEntit
         if(this.bound){
             if(this.world.isRemote && this.world.func_234923_W_() != this.dimension)
                 return LazyOptional.empty();
-            World world = this.world.isRemote ? this.world : this.getDimension();
-            TileEntity tile = world.getTileEntity(this.pos);
-            if(checkTile(tile))
-                return tile.getCapability(capability, facing);
+            World world = this.getDimension();
+            if(world != null){
+                TileEntity tile = world.getTileEntity(this.pos);
+                if(checkTile(tile))
+                    return tile.getCapability(capability, facing);
+            }
         }
         return LazyOptional.empty();
     }
@@ -130,7 +132,11 @@ public class EntangledBlockTile extends TileEntity implements ITickableTileEntit
     }
 
     private World getDimension(){
-        return this.dimension == null ? null : this.world.getServer().getWorld(this.dimension);
+        if(this.dimension == null)
+            return null;
+        return this.world.isRemote ?
+            this.world.func_234923_W_() == this.dimension ? this.world : null :
+            this.world.getServer().getWorld(this.dimension);
     }
 
     private boolean checkTile(TileEntity tile){
