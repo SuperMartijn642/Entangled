@@ -73,7 +73,7 @@ public class EntangledBlockTile extends TileEntity implements ITickableTileEntit
             compound.putInt("boundx", this.pos.getX());
             compound.putInt("boundy", this.pos.getY());
             compound.putInt("boundz", this.pos.getZ());
-            compound.putString("dimension", this.dimension.getRegistryName().toString());
+            compound.putString("dimension", this.dimension.getLocation().toString());
         }
         return compound;
     }
