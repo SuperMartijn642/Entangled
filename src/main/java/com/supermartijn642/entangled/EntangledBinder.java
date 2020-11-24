@@ -29,12 +29,12 @@ public class EntangledBinder extends Item {
             return ActionResultType.SUCCESS;
         ItemStack stack = context.getItem();
         CompoundNBT compound = stack.getTag() == null ? new CompoundNBT() : stack.getTag();
-        if(compound.getBoolean("bound") && compound.getString("dimension").equals(context.getWorld().getDimensionKey().getRegistryName().toString()) &&
+        if(compound.getBoolean("bound") && compound.getString("dimension").equals(context.getWorld().getDimensionKey().getLocation().toString()) &&
             compound.getInt("boundx") == context.getPos().getX() &&
             compound.getInt("boundy") == context.getPos().getY() && compound.getInt("boundz") == context.getPos().getZ())
             return ActionResultType.PASS;
         compound.putBoolean("bound", true);
-        compound.putString("dimension", context.getWorld().getDimensionKey().getRegistryName().toString());
+        compound.putString("dimension", context.getWorld().getDimensionKey().getLocation().toString());
         compound.putInt("boundx", context.getPos().getX());
         compound.putInt("boundy", context.getPos().getY());
         compound.putInt("boundz", context.getPos().getZ());

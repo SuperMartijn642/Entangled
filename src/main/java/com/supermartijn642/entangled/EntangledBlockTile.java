@@ -164,7 +164,7 @@ public class EntangledBlockTile extends TileEntity implements ITickableTileEntit
             this.posClient = new BlockPos(this.pos);
         }
         if(this.bound && this.dimensionClient != this.dimension){
-            compound.putString("dimension", this.dimension.getRegistryName().toString());
+            compound.putString("dimension", this.dimension.getLocation().toString());
             this.dimensionClient = this.dimension;
         }
         if(this.bound && this.blockState != this.blockStateClient){
@@ -189,7 +189,7 @@ public class EntangledBlockTile extends TileEntity implements ITickableTileEntit
                 compound.putInt("posY", this.pos.getY());
                 compound.putInt("posZ", this.pos.getZ());
             }
-            compound.putString("dimension", this.dimension.getRegistryName().toString());
+            compound.putString("dimension", this.dimension.getLocation().toString());
             if(this.blockState != null)
                 compound.putInt("blockstate", Block.getStateId(this.blockState));
         }
