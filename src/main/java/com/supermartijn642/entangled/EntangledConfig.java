@@ -1,7 +1,7 @@
 package com.supermartijn642.entangled;
 
 import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.world.dimension.DimensionType;
+import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.world.WorldEvent;
@@ -39,7 +39,7 @@ public class EntangledConfig {
 
     @SubscribeEvent
     public static void onWorldLoad(WorldEvent.Load e){
-        if(!e.getWorld().isRemote() && e.getWorld().getDimension().getType() == DimensionType.OVERWORLD){
+        if(!e.getWorld().isRemote() && e.getWorld() instanceof World && ((World)e.getWorld()).func_234923_W_() == World.field_234918_g_){
             Entangled.allowDimensional = INSTANCE.allowDimensional.get();
             Entangled.maxDistance = INSTANCE.maxDistance.get();
         }
