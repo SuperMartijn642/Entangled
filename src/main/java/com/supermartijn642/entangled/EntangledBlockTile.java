@@ -71,7 +71,7 @@ public class EntangledBlockTile extends TileEntity implements ITickableTileEntit
             compound.putInt("boundx", this.pos.getX());
             compound.putInt("boundy", this.pos.getY());
             compound.putInt("boundz", this.pos.getZ());
-            compound.putString("dimension", this.dimension.func_240901_a_().toString());
+            compound.putString("dimension", this.dimension.getLocation().toString());
         }
         return compound;
     }
@@ -82,7 +82,7 @@ public class EntangledBlockTile extends TileEntity implements ITickableTileEntit
         this.bound = compound.getBoolean("bound");
         if(this.bound){
             this.pos = new BlockPos(compound.getInt("boundx"), compound.getInt("boundy"), compound.getInt("boundz"));
-            this.dimension = RegistryKey.func_240903_a_(Registry.WORLD_KEY, new ResourceLocation(compound.getString("dimension")));
+            this.dimension = RegistryKey.getOrCreateKey(Registry.WORLD_KEY, new ResourceLocation(compound.getString("dimension")));
         }
     }
 
@@ -92,7 +92,7 @@ public class EntangledBlockTile extends TileEntity implements ITickableTileEntit
         if(this.world == null)
             return LazyOptional.empty();
         if(this.bound){
-            if(this.world.isRemote && this.world.func_234923_W_() != this.dimension)
+            if(this.world.isRemote && this.world.getDimensionKey() != this.dimension)
                 return LazyOptional.empty();
             World world = this.getDimension();
             if(world != null){
@@ -110,7 +110,7 @@ public class EntangledBlockTile extends TileEntity implements ITickableTileEntit
         if(this.world == null)
             return LazyOptional.empty();
         if(this.bound){
-            if(this.world.isRemote && this.world.func_234923_W_() != this.dimension)
+            if(this.world.isRemote && this.world.getDimensionKey() != this.dimension)
                 return LazyOptional.empty();
             World world = this.getDimension();
             if(world != null){
@@ -122,20 +122,29 @@ public class EntangledBlockTile extends TileEntity implements ITickableTileEntit
         return LazyOptional.empty();
     }
 
-    public void bind(BlockPos pos, String dimension){
+    public boolean bind(BlockPos pos, String dimension){
+        if(!canBindTo(pos, dimension))
+            return false;
         this.pos = pos == null ? null : new BlockPos(pos);
-        this.dimension = dimension == null ? null : RegistryKey.func_240903_a_(Registry.WORLD_KEY, new ResourceLocation(dimension));
+        this.dimension = dimension == null ? null : RegistryKey.getOrCreateKey(Registry.WORLD_KEY, new ResourceLocation(dimension));
         this.bound = pos != null;
         this.world.notifyNeighborsOfStateChange(this.getPos(), this.getBlockState().getBlock());
         this.world.notifyBlockUpdate(this.getPos(), this.getBlockState(), this.getBlockState(), 2);
         this.markDirty();
+        return true;
+    }
+
+    public boolean canBindTo(BlockPos pos, String dimension){
+        return dimension.equals(this.world.getDimensionKey().getLocation().toString()) ?
+            Entangled.maxDistance == -1 || super.pos.withinDistance(pos, Entangled.maxDistance + 0.5) :
+            Entangled.allowDimensional;
     }
 
     private World getDimension(){
         if(this.dimension == null)
             return null;
         return this.world.isRemote ?
-            this.world.func_234923_W_() == this.dimension ? this.world : null :
+            this.world.getDimensionKey() == this.dimension ? this.world : null :
             this.world.getServer().getWorld(this.dimension);
     }
 
@@ -164,7 +173,7 @@ public class EntangledBlockTile extends TileEntity implements ITickableTileEntit
             this.posClient = new BlockPos(this.pos);
         }
         if(this.bound && this.dimensionClient != this.dimension){
-            compound.putString("dimension", this.dimension.func_240901_a_().toString());
+            compound.putString("dimension", this.dimension.getLocation().toString());
             this.dimensionClient = this.dimension;
         }
         if(this.bound && this.blockState != this.blockStateClient){
@@ -189,7 +198,7 @@ public class EntangledBlockTile extends TileEntity implements ITickableTileEntit
                 compound.putInt("posY", this.pos.getY());
                 compound.putInt("posZ", this.pos.getZ());
             }
-            compound.putString("dimension", this.dimension.func_240901_a_().toString());
+            compound.putString("dimension", this.dimension.getLocation().toString());
             if(this.blockState != null)
                 compound.putInt("blockstate", Block.getStateId(this.blockState));
         }
@@ -208,7 +217,7 @@ public class EntangledBlockTile extends TileEntity implements ITickableTileEntit
         if(tag.contains("posX"))
             this.pos = new BlockPos(tag.getInt("posX"), tag.getInt("posY"), tag.getInt("posZ"));
         if(tag.contains("dimension"))
-            this.dimension = RegistryKey.func_240903_a_(Registry.WORLD_KEY, new ResourceLocation(tag.getString("dimension")));
+            this.dimension = RegistryKey.getOrCreateKey(Registry.WORLD_KEY, new ResourceLocation(tag.getString("dimension")));
         if(tag.contains("blockstate"))
             this.blockState = Block.getStateById(tag.getInt("blockstate"));
     }

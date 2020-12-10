@@ -27,8 +27,8 @@ public class EntangledBlockTileRenderer extends TileEntityRenderer<EntangledBloc
         if(!tileEntityIn.isBound())
             return;
 
-        Block boundBlock = tileEntityIn.getWorld().func_234923_W_() == tileEntityIn.getBoundDimension() ? tileEntityIn.getWorld().getBlockState(tileEntityIn.getBoundBlockPos()).getBlock() : null;
-        TileEntity boundTile = tileEntityIn.getWorld().func_234923_W_() == tileEntityIn.getBoundDimension() ? tileEntityIn.getWorld().getTileEntity(tileEntityIn.getBoundBlockPos()) : null;
+        Block boundBlock = tileEntityIn.getWorld().getDimensionKey() == tileEntityIn.getBoundDimension() ? tileEntityIn.getWorld().getBlockState(tileEntityIn.getBoundBlockPos()).getBlock() : null;
+        TileEntity boundTile = tileEntityIn.getWorld().getDimensionKey() == tileEntityIn.getBoundDimension() ? tileEntityIn.getWorld().getTileEntity(tileEntityIn.getBoundBlockPos()) : null;
         BlockState state = tileEntityIn.getBoundBlockState();
 
         matrixStackIn.push();
