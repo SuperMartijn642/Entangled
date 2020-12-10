@@ -1,8 +1,10 @@
 package com.supermartijn642.entangled;
 
 import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.world.dimension.DimensionType;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.event.entity.player.PlayerEvent;
+import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.network.PacketDistributor;
@@ -33,6 +35,14 @@ public class EntangledConfig {
         this.maxDistance = builder.worldRestart().comment("What is the max range in which entangled blocks can be bound? Only affects blocks in the same dimension. -1 for infinite range. Previously bound entangled blocks won't be affected.")
             .defineInRange("maxDistance", -1, -1, Integer.MAX_VALUE);
         builder.pop();
+    }
+
+    @SubscribeEvent
+    public static void onWorldLoad(WorldEvent.Load e){
+        if(!e.getWorld().isRemote() && e.getWorld().getDimension().getType() == DimensionType.OVERWORLD){
+            Entangled.allowDimensional = INSTANCE.allowDimensional.get();
+            Entangled.maxDistance = INSTANCE.maxDistance.get();
+        }
     }
 
     @SubscribeEvent
