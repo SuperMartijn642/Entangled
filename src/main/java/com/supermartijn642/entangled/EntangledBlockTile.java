@@ -112,7 +112,9 @@ public class EntangledBlockTile extends TileEntity implements ITickable {
         return null;
     }
 
-    public void bind(BlockPos pos, int dimension){
+    public boolean bind(BlockPos pos, int dimension){
+        if(!canBindTo(pos, dimension))
+            return false;
         this.pos = pos == null ? null : new BlockPos(pos);
         this.dimension = dimension;
         this.bound = pos != null;
@@ -120,6 +122,13 @@ public class EntangledBlockTile extends TileEntity implements ITickable {
         this.world.notifyNeighborsOfStateChange(this.getPos(), state.getBlock(), false);
         this.world.notifyBlockUpdate(this.getPos(), state, state, 2);
         this.markDirty();
+        return true;
+    }
+
+    public boolean canBindTo(BlockPos pos, int dimension){
+        return dimension == this.world.provider.getDimensionType().getId() ?
+            Entangled.maxDistance == -1 || super.pos.distanceSq(pos) <= (Entangled.maxDistance + 0.5) * (Entangled.maxDistance + 0.5) :
+            Entangled.allowDimensional;
     }
 
     private World getDimension(){

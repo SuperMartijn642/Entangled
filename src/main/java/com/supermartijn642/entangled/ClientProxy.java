@@ -2,6 +2,7 @@ package com.supermartijn642.entangled;
 
 import net.minecraft.block.Block;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
+import net.minecraft.client.resources.I18n;
 import net.minecraft.item.Item;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.client.model.ModelLoader;
@@ -23,6 +24,10 @@ public class ClientProxy {
     public static void registerModels(ModelRegistryEvent e){
         ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(Entangled.block), 0, new ModelResourceLocation(Entangled.block.getRegistryName(), "inventory"));
         ModelLoader.setCustomModelResourceLocation(Entangled.item, 0, new ModelResourceLocation(Entangled.item.getRegistryName(), "inventory"));
+    }
+
+    public static String translate(String translationKey, Object... arguments){
+        return I18n.format(translationKey, arguments);
     }
 
 }
