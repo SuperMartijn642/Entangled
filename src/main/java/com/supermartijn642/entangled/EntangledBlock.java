@@ -5,6 +5,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.material.MaterialColor;
+import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
@@ -17,13 +18,15 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.util.math.shapes.VoxelShapes;
-import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ToolType;
 
 import javax.annotation.Nullable;
+import java.util.List;
 
 /**
  * Created 2/6/2020 by SuperMartijn642
@@ -45,21 +48,33 @@ public class EntangledBlock extends Block {
         ItemStack stack = playerIn.getHeldItem(hand);
         if(playerIn.isCrouching() && stack.isEmpty() && state.get(ON)){
             ((EntangledBlockTile)worldIn.getTileEntity(pos)).bind(null, 0);
-            playerIn.sendMessage(new StringTextComponent(TextFormatting.YELLOW + "Block unbound!"));
+            playerIn.sendMessage(new TranslationTextComponent("entangled.entangled_block.unbind").applyTextStyle(TextFormatting.YELLOW));
             worldIn.setBlockState(pos, state.with(ON, false));
         }else if(stack.getItem() == Entangled.item){
             CompoundNBT compound = stack.getTag();
             if(compound == null || !compound.getBoolean("bound"))
-                playerIn.sendMessage(new StringTextComponent(TextFormatting.RED + "No block selected!"));
+                playerIn.sendMessage(new TranslationTextComponent("entangled.entangled_block.no_selection").applyTextStyle(TextFormatting.RED));
             else{
                 BlockPos pos2 = new BlockPos(compound.getInt("boundx"), compound.getInt("boundy"), compound.getInt("boundz"));
                 if(pos2.equals(pos))
-                    playerIn.sendMessage(new StringTextComponent(TextFormatting.RED + "Can't bind a block to itself!"));
+                    playerIn.sendMessage(new TranslationTextComponent("entangled.entangled_block.self").applyTextStyle(TextFormatting.RED));
                 else{
                     if(!worldIn.getBlockState(pos).get(ON))
                         worldIn.setBlockState(pos, state.with(ON, true));
-                    ((EntangledBlockTile)worldIn.getTileEntity(pos)).bind(pos2, compound.getInt("dimension"));
-                    playerIn.sendMessage(new StringTextComponent(TextFormatting.YELLOW + "Block bound!"));
+                    EntangledBlockTile tile = (EntangledBlockTile)worldIn.getTileEntity(pos);
+                    if(compound.getInt("dimension") == worldIn.getDimension().getType().getId()){
+                        if(Entangled.maxDistance == -1 || pos.withinDistance(pos2, Entangled.maxDistance + 0.5)){
+                            tile.bind(pos2, compound.getInt("dimension"));
+                            playerIn.sendMessage(new TranslationTextComponent("entangled.entangled_block.bind").applyTextStyle(TextFormatting.YELLOW));
+                        }else
+                            playerIn.sendMessage(new TranslationTextComponent("entangled.entangled_block.too_far").applyTextStyle(TextFormatting.RED));
+                    }else{
+                        if(Entangled.allowDimensional){
+                            tile.bind(pos2, compound.getInt("dimension"));
+                            playerIn.sendMessage(new TranslationTextComponent("entangled.entangled_block.bind").applyTextStyle(TextFormatting.YELLOW));
+                        }else
+                            playerIn.sendMessage(new TranslationTextComponent("entangled.entangled_block.wrong_dimension").applyTextStyle(TextFormatting.RED));
+                    }
                 }
             }
             return ActionResultType.SUCCESS;
@@ -86,5 +101,13 @@ public class EntangledBlock extends Block {
     @Override
     public VoxelShape getRenderShape(BlockState state, IBlockReader worldIn, BlockPos pos){
         return state.get(ON) ? VoxelShapes.empty() : VoxelShapes.fullCube();
+    }
+
+    @Override
+    public void addInformation(ItemStack stack, IBlockReader worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn){
+        String key = Entangled.allowDimensional ?
+            Entangled.maxDistance == -1 ? "infinite_other_dimension" : "ranged_other_dimension" :
+            Entangled.maxDistance == -1 ? "infinite_same_dimension" : "ranged_same_dimension";
+        tooltip.add(new TranslationTextComponent("entangled.entangled_block.info." + key, Entangled.maxDistance).applyTextStyle(TextFormatting.AQUA));
     }
 }
