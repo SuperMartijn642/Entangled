@@ -30,10 +30,10 @@ public class EntangleWailaPlugin implements IComponentProvider, IWailaPlugin {
                 BlockState boundBlockState = ((EntangledBlockTile)tile).getBoundBlockState();
                 String boundBlock = boundBlockState == null ? "Block" : ClientProxy.translate(boundBlockState.getBlock().getTranslationKey());
                 BlockPos boundPos = ((EntangledBlockTile)tile).getBoundBlockPos();
-                if(((EntangledBlockTile)tile).getBoundDimension() == accessor.getWorld().getDimensionKey())
+                if(((EntangledBlockTile)tile).getBoundDimension() == accessor.getWorld().func_234923_W_())
                     tooltip.add(new TranslationTextComponent("entangled.waila.bound_same_dimension", boundBlock, boundPos.getX(), boundPos.getY(), boundPos.getZ()));
                 else{
-                    String dimension = ((EntangledBlockTile)tile).getBoundDimension().getLocation().getPath();
+                    String dimension = ((EntangledBlockTile)tile).getBoundDimension().func_240901_a_().getPath();
                     dimension = Character.toUpperCase(dimension.charAt(0)) + dimension.substring(1);
                     tooltip.add(new TranslationTextComponent("entangled.waila.bound_other_dimension", boundBlock, boundPos.getX(), boundPos.getY(), boundPos.getZ(), dimension));
                 }
