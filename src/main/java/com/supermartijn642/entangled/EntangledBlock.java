@@ -6,21 +6,18 @@ import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.material.MaterialColor;
 import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.state.BooleanProperty;
 import net.minecraft.state.StateContainer;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.util.math.shapes.VoxelShapes;
 import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.IBlockReader;
@@ -65,13 +62,13 @@ public class EntangledBlock extends Block {
                         worldIn.setBlockState(pos, state.with(ON, true));
                     EntangledBlockTile tile = (EntangledBlockTile)worldIn.getTileEntity(pos);
                     if(compound.getInt("dimension") == worldIn.getDimension().getType().getId()){
-                        if(Entangled.maxDistance == -1 || pos.withinDistance(pos2, Entangled.maxDistance + 0.5)){
+                        if(EntangledConfig.maxDistance.get() == -1 || pos.withinDistance(pos2, EntangledConfig.maxDistance.get() + 0.5)){
                             tile.bind(pos2, compound.getInt("dimension"));
                             playerIn.sendMessage(new TranslationTextComponent("entangled.entangled_block.bind").applyTextStyle(TextFormatting.YELLOW));
                         }else
                             playerIn.sendMessage(new TranslationTextComponent("entangled.entangled_block.too_far").applyTextStyle(TextFormatting.RED));
                     }else{
-                        if(Entangled.allowDimensional){
+                        if(EntangledConfig.allowDimensional.get()){
                             tile.bind(pos2, compound.getInt("dimension"));
                             playerIn.sendMessage(new TranslationTextComponent("entangled.entangled_block.bind").applyTextStyle(TextFormatting.YELLOW));
                         }else
@@ -107,9 +104,9 @@ public class EntangledBlock extends Block {
 
     @Override
     public void addInformation(ItemStack stack, IBlockReader worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn){
-        String key = Entangled.allowDimensional ?
-            Entangled.maxDistance == -1 ? "infinite_other_dimension" : "ranged_other_dimension" :
-            Entangled.maxDistance == -1 ? "infinite_same_dimension" : "ranged_same_dimension";
-        tooltip.add(new TranslationTextComponent("entangled.entangled_block.info." + key, Entangled.maxDistance).applyTextStyle(TextFormatting.AQUA));
+        String key = EntangledConfig.allowDimensional.get() ?
+            EntangledConfig.maxDistance.get() == -1 ? "infinite_other_dimension" : "ranged_other_dimension" :
+            EntangledConfig.maxDistance.get() == -1 ? "infinite_same_dimension" : "ranged_same_dimension";
+        tooltip.add(new TranslationTextComponent("entangled.entangled_block.info." + key, EntangledConfig.maxDistance.get()).applyTextStyle(TextFormatting.AQUA));
     }
 }
