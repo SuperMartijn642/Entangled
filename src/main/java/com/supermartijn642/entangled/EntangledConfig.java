@@ -1,14 +1,12 @@
 package com.supermartijn642.entangled;
 
 import com.supermartijn642.configlib.ModConfigBuilder;
-import net.minecraftforge.fml.common.Mod;
 
 import java.util.function.Supplier;
 
 /**
  * Created 12/10/2020 by SuperMartijn642
  */
-@Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class EntangledConfig {
 
     public static final Supplier<Boolean> renderBlockHighlight;
