@@ -127,8 +127,8 @@ public class EntangledBlockTile extends TileEntity implements ITickable {
 
     public boolean canBindTo(BlockPos pos, int dimension){
         return dimension == this.world.provider.getDimensionType().getId() ?
-            Entangled.maxDistance == -1 || super.pos.distanceSq(pos) <= (Entangled.maxDistance + 0.5) * (Entangled.maxDistance + 0.5) :
-            Entangled.allowDimensional;
+            EntangledConfig.maxDistance.get() == -1 || super.pos.distanceSq(pos) <= (EntangledConfig.maxDistance.get() + 0.5) * (EntangledConfig.maxDistance.get() + 0.5) :
+            EntangledConfig.allowDimensional.get();
     }
 
     private World getDimension(){

@@ -11,7 +11,9 @@ import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.*;
+import net.minecraft.util.text.Style;
+import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.DimensionType;
 import net.minecraft.world.World;
 
@@ -27,13 +29,13 @@ public class EntangledBinder extends Item {
     }
 
     @Override
-    public EnumActionResult onItemUse(EntityPlayer player, World worldIn, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
+    public EnumActionResult onItemUse(EntityPlayer player, World worldIn, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ){
         if(worldIn.isRemote)
             return EnumActionResult.SUCCESS;
         ItemStack stack = player.getHeldItem(hand);
         NBTTagCompound compound = stack.getTagCompound() == null ? new NBTTagCompound() : stack.getTagCompound();
         if(compound.getBoolean("bound") && compound.getInteger("dimension") == worldIn.provider.getDimension() && compound.getInteger("boundx") == pos.getX() &&
-                compound.getInteger("boundy") == pos.getY() && compound.getInteger("boundz") == pos.getZ())
+            compound.getInteger("boundy") == pos.getY() && compound.getInteger("boundz") == pos.getZ())
             return EnumActionResult.PASS;
         compound.setBoolean("bound", true);
         compound.setInteger("dimension", worldIn.provider.getDimension());
@@ -46,7 +48,7 @@ public class EntangledBinder extends Item {
     }
 
     @Override
-    public ActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer playerIn, EnumHand handIn) {
+    public ActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer playerIn, EnumHand handIn){
         if(playerIn.world.isRemote)
             return super.onItemRightClick(worldIn, playerIn, handIn);
         NBTTagCompound compound = playerIn.getHeldItem(handIn).getTagCompound();

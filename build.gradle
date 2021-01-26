@@ -2,18 +2,20 @@ buildscript {
     repositories {
         jcenter()
         maven { url = "https://files.minecraftforge.net/maven" }
+        maven { url = 'https://plugins.gradle.org/m2'}
     }
     dependencies {
         classpath 'net.minecraftforge.gradle:ForgeGradle:2.3-SNAPSHOT'
+        classpath group: 'com.wynprice.cursemaven', name: 'CurseMaven', version: '2.1.4'
     }
 }
 apply plugin: 'net.minecraftforge.gradle.forge'
 //Only edit below this line, the above code adds and enables the necessary things for Forge to be setup.
+apply plugin: 'com.wynprice.cursemaven'
 
-
-version = "1.2.9-mc1.12"
-group = "supermartijn642.entangled" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
-archivesBaseName = "entangled"
+version = '1.2.9-mc1.12'
+group = 'com.supermartijn642.entangled' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
+archivesBaseName = 'entangled'
 
 sourceCompatibility = targetCompatibility = '1.8' // Need this here so eclipse task generates correctly.
 compileJava {
@@ -24,13 +26,35 @@ minecraft {
     version = "1.12.2-14.23.5.2847"
     runDir = "run"
     
-    // the mappings can be changed at any time, and must be in the following format.
-    // snapshot_YYYYMMDD   snapshot are built nightly.
-    // stable_#            stables are built at the discretion of the MCP team.
-    // Use non-default mappings at your own risk. they may not always work.
-    // simply re-run your setup task after changing the mappings to update your workspace.
     mappings = "snapshot_20171003"
     // makeObfSourceJar = false // an Srg named sources jar is made by default. uncomment this to disable.
+}
+
+repositories {
+    maven {
+        // location of the maven that hosts JEI files
+        name = "Progwml6 maven"
+        url = "https://dvs1.progwml6.com/files/maven/"
+    }
+    maven {
+        // location of a maven mirror for JEI files, as a fallback
+        name = "ModMaven"
+        url = "https://modmaven.k-4u.nl"
+    }
+    maven {
+        // Hwyla maven
+        url = "https://maven.tehnut.info"
+    }
+}
+
+dependencies {
+    // Compile against the Hwyla API, but do not include it at runtime
+    provided "mcp.mobius.waila:Hwyla:1.8.26-B41_1.12.2:api"
+    // At runtime, use the full Hwyla jar
+    compile "mcp.mobius.waila:Hwyla:1.8.26-B41_1.12.2"
+
+    // Config Lib
+    provided "curse.maven:supermartijn642s-config-lib:3176333"
 }
 
 processResources {
@@ -52,6 +76,6 @@ processResources {
     }
 }
 
-//sourceSets {
-//    main { output.resourcesDir = output.classesDir }
-//}
+sourceSets {
+    main { output.resourcesDir = output.classesDir }
+}

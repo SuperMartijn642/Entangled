@@ -1,6 +1,0 @@
-{
-    "variants": {
-        "on=false": { "model": "entangled:off" },
-        "on=true": { "model": "entangled:on" }
-    }
-}
