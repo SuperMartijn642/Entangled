@@ -63,13 +63,13 @@ public class EntangledBlock extends Block {
                         worldIn.setBlockState(pos, state.with(ON, true));
                     EntangledBlockTile tile = (EntangledBlockTile)worldIn.getTileEntity(pos);
                     if(compound.getString("dimension").equals(worldIn.func_234923_W_().func_240901_a_().toString())){
-                        if(Entangled.maxDistance == -1 || pos.withinDistance(pos2, Entangled.maxDistance + 0.5)){
+                        if(EntangledConfig.maxDistance.get() == -1 || pos.withinDistance(pos2, EntangledConfig.maxDistance.get() + 0.5)){
                             tile.bind(pos2, compound.getString("dimension"));
                             playerIn.sendMessage(new TranslationTextComponent("entangled.entangled_block.bind").mergeStyle(TextFormatting.YELLOW), playerIn.getUniqueID());
                         }else
                             playerIn.sendMessage(new TranslationTextComponent("entangled.entangled_block.too_far").mergeStyle(TextFormatting.RED), playerIn.getUniqueID());
                     }else{
-                        if(Entangled.allowDimensional){
+                        if(EntangledConfig.allowDimensional.get()){
                             tile.bind(pos2, compound.getString("dimension"));
                             playerIn.sendMessage(new TranslationTextComponent("entangled.entangled_block.bind").mergeStyle(TextFormatting.YELLOW), playerIn.getUniqueID());
                         }else
@@ -105,9 +105,9 @@ public class EntangledBlock extends Block {
 
     @Override
     public void addInformation(ItemStack stack, IBlockReader worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn){
-        String key = Entangled.allowDimensional ?
-            Entangled.maxDistance == -1 ? "infinite_other_dimension" : "ranged_other_dimension" :
-            Entangled.maxDistance == -1 ? "infinite_same_dimension" : "ranged_same_dimension";
-        tooltip.add(new TranslationTextComponent("entangled.entangled_block.info." + key, Entangled.maxDistance).mergeStyle(TextFormatting.AQUA));
+        String key = EntangledConfig.allowDimensional.get() ?
+            EntangledConfig.maxDistance.get() == -1 ? "infinite_other_dimension" : "ranged_other_dimension" :
+            EntangledConfig.maxDistance.get() == -1 ? "infinite_same_dimension" : "ranged_same_dimension";
+        tooltip.add(new TranslationTextComponent("entangled.entangled_block.info." + key, EntangledConfig.maxDistance.get()).mergeStyle(TextFormatting.AQUA));
     }
 }

@@ -1,14 +1,9 @@
 package com.supermartijn642.entangled;
 
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.world.World;
-import net.minecraftforge.common.ForgeConfigSpec;
-import net.minecraftforge.event.entity.player.PlayerEvent;
-import net.minecraftforge.event.world.WorldEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import com.supermartijn642.configlib.ModConfigBuilder;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.network.PacketDistributor;
-import org.apache.commons.lang3.tuple.Pair;
+
+import java.util.function.Supplier;
 
 /**
  * Created 12/10/2020 by SuperMartijn642
@@ -16,37 +11,23 @@ import org.apache.commons.lang3.tuple.Pair;
 @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class EntangledConfig {
 
+    public static final Supplier<Boolean> renderBlockHighlight;
+
+    public static final Supplier<Boolean> allowDimensional;
+    public static final Supplier<Integer> maxDistance;
+
     static{
-        Pair<EntangledConfig,ForgeConfigSpec> pair = new ForgeConfigSpec.Builder().configure(EntangledConfig::new);
-        CONFIG_SPEC = pair.getRight();
-        INSTANCE = pair.getLeft();
-    }
-
-    public static final ForgeConfigSpec CONFIG_SPEC;
-    public static final EntangledConfig INSTANCE;
-
-    public final ForgeConfigSpec.BooleanValue allowDimensional;
-    public final ForgeConfigSpec.IntValue maxDistance;
-
-    private EntangledConfig(ForgeConfigSpec.Builder builder){
-        builder.push("General");
-        this.allowDimensional = builder.worldRestart().comment("Can entangled blocks be bound between different dimensions? Previously bound entangled blocks won't be affected.")
-            .define("allowDimensional", true);
-        this.maxDistance = builder.worldRestart().comment("What is the max range in which entangled blocks can be bound? Only affects blocks in the same dimension. -1 for infinite range. Previously bound entangled blocks won't be affected.")
-            .defineInRange("maxDistance", -1, -1, Integer.MAX_VALUE);
+        ModConfigBuilder builder = new ModConfigBuilder("entangled");
+        builder.push("Client");
+        renderBlockHighlight = builder.dontSync().comment("When looking at an Entangled Block, should its bound block be highlighted?")
+            .define("renderBlockHighlight", true);
         builder.pop();
-    }
-
-    @SubscribeEvent
-    public static void onWorldLoad(WorldEvent.Load e){
-        if(!e.getWorld().isRemote() && e.getWorld() instanceof World && ((World)e.getWorld()).func_234923_W_() == World.field_234918_g_){
-            Entangled.allowDimensional = INSTANCE.allowDimensional.get();
-            Entangled.maxDistance = INSTANCE.maxDistance.get();
-        }
-    }
-
-    @SubscribeEvent
-    public static void onPlayerJoin(PlayerEvent.PlayerLoggedInEvent e){
-        Entangled.CHANNEL.send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity)e.getPlayer()), new EntangledConfigPacket());
+        builder.push("General");
+        allowDimensional = builder.comment("Can entangled blocks be bound between different dimensions? Previously bound entangled blocks won't be affected.")
+            .define("allowDimensional", true);
+        maxDistance = builder.comment("What is the max range in which entangled blocks can be bound? Only affects blocks in the same dimension. -1 for infinite range. Previously bound entangled blocks won't be affected.")
+            .define("maxDistance", -1, -1, Integer.MAX_VALUE);
+        builder.pop();
+        builder.build();
     }
 }
