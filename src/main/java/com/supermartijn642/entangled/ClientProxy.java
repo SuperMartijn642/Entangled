@@ -51,7 +51,7 @@ public class ClientProxy {
             // apparent this can be null
             if(generatorPos != null){
                 TileEntity tile = world.getTileEntity(e.getTarget().getBlockPos());
-                if(tile instanceof EntangledBlockTile){
+                if(tile instanceof EntangledBlockTile && ((EntangledBlockTile)tile).isBound()){
                     GlStateManager.pushMatrix();
                     GlStateManager.enableBlend();
                     GlStateManager.tryBlendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
