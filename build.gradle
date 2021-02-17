@@ -87,7 +87,7 @@ repositories {
 }
 
 dependencies {
-    minecraft 'net.minecraftforge:forge:1.16.4-35.0.1'
+    minecraft 'net.minecraftforge:forge:1.16.4-35.1.37'
 
     // compile against the JEI API but do not include it at runtime
     compileOnly fg.deobf("mezz.jei:jei-1.16.4:7.6.1.65:api")
@@ -101,4 +101,7 @@ dependencies {
 
     // Config Lib
     compile fg.deobf("curse.maven:supermartijn642s-config-lib:3176341")
+
+    // Mekanism
+    runtimeOnly fg.deobf("curse.maven:mekanism:3183270")
 }
