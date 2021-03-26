@@ -39,7 +39,7 @@ public class EntangledBlockTileRenderer extends TileEntityRenderer<EntangledBloc
         float angleZ = System.currentTimeMillis() % 12000 / 12000f * 360f;
         matrixStackIn.rotate(new Quaternion(angleX, angleY, angleZ, true));
 
-        matrixStackIn.scale(0.6f, 0.6f, 0.6f);
+        matrixStackIn.scale(0.55f, 0.55f, 0.55f);
         matrixStackIn.translate(-0.5, -0.5, -0.5);
 
         if(boundBlock != null && boundTile != null && !Entangled.RENDER_BLACKLISTED_MODS.contains(boundBlock.getRegistryName().getNamespace())){
