@@ -44,7 +44,7 @@ public class EntangledBlockTileRenderer extends TileEntitySpecialRenderer<Entang
         GlStateManager.rotate(angleY, 0, 1, 0);
         GlStateManager.rotate(angleZ, 0, 0, 1);
 
-        GlStateManager.scale(0.6f, 0.6f, 0.6f);
+        GlStateManager.scale(0.55f, 0.55f, 0.55f);
         GlStateManager.translate(-0.5, -0.5, -0.5);
 
         if(boundBlock != null && boundTile != null && !Entangled.RENDER_BLACKLISTED_MODS.contains(boundBlock.getRegistryName().getResourceDomain())){
