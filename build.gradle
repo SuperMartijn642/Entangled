@@ -15,7 +15,7 @@ apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'eclipse'
 apply plugin: 'com.wynprice.cursemaven'
 
-version = '1.2.11-mc1.12'
+version = '1.2.12-mc1.12'
 group = 'com.supermartijn642.entangled' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = 'entangled'
 
@@ -83,7 +83,7 @@ dependencies {
     compileOnly "mcp.mobius.waila:Hwyla:1.8.26-B41_1.12.2"
 
     // Config Lib
-    compile fg.deobf("curse.maven:supermartijn642s-config-lib:3176333")
+    compile fg.deobf("curse.maven:supermartijn642s-config-lib:3211007")
 }
 
 //sourceSets {
