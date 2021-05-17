@@ -40,7 +40,7 @@ public class Entangled {
 
         @SubscribeEvent
         public static void onItemRegistry(final RegistryEvent.Register<Item> e){
-            e.getRegistry().register(new BlockItem(block, new Item.Properties().group(ItemGroup.SEARCH)).setRegistryName("block"));
+            e.getRegistry().register(new BlockItem(block, new Item.Properties().group(ItemGroup.SEARCH).setTEISR(() -> () -> EntangledBlockItemStackTileEntityRenderer.INSTANCE)).setRegistryName("block"));
             e.getRegistry().register(new EntangledBinder());
         }
     }
