@@ -70,35 +70,37 @@ minecraft {
 }
 
 repositories {
-    maven {
-        // location of the maven that hosts JEI files
-        name = "Progwml6 maven"
-        url = "https://dvs1.progwml6.com/files/maven/"
-    }
-    maven {
-        // location of a maven mirror for JEI files, as a fallback
-        name = "ModMaven"
-        url = "https://modmaven.k-4u.nl"
-    }
-    maven {
-        // Hwyla maven
-        url = "https://maven.tehnut.info"
-    }
+//    maven {
+//        // location of the maven that hosts JEI files
+//        name = "Progwml6 maven"
+//        url = "https://dvs1.progwml6.com/files/maven/"
+//    }
+//    maven {
+//        // location of a maven mirror for JEI files, as a fallback
+//        name = "ModMaven"
+//        url = "https://modmaven.k-4u.nl"
+//    }
+//    maven {
+//        // Hwyla maven
+//        url = "https://maven.tehnut.info"
+//    }
 }
 
 dependencies {
     minecraft 'net.minecraftforge:forge:1.16.2-33.0.5'
 
     // compile against the JEI API but do not include it at runtime
-    compileOnly fg.deobf("mezz.jei:jei-1.16.2:7.3.2.28:api")
+//    compileOnly fg.deobf("mezz.jei:jei-1.16.2:7.3.2.28:api")
     // at runtime, use the full JEI jar
-    runtimeOnly fg.deobf("mezz.jei:jei-1.16.2:7.3.2.28")
+//    runtimeOnly fg.deobf("mezz.jei:jei-1.16.2:7.3.2.28")
 
     // Compile against the Hwyla API, but do not include it at runtime
-    compileOnly fg.deobf("mcp.mobius.waila:Hwyla:1.10.11-B78_1.16.2:api")
+    compileOnly fg.deobf("curse.maven:hwyla:3033595")
     // At runtime, use the full Hwyla jar
-    runtimeOnly fg.deobf("mcp.mobius.waila:Hwyla:1.10.11-B78_1.16.2")
+    runtimeOnly fg.deobf("curse.maven:hwyla:3033594")
 
     // Config Lib
-    compile fg.deobf("curse.maven:supermartijn642s-config-lib:3176341")
+    compile fg.deobf("curse.maven:supermartijn642s-config-lib:3226128")
+    // Core Lib
+    compile fg.deobf("curse.maven:supermartijn642s-core-lib:3300632")
 }
