@@ -16,7 +16,8 @@ import java.util.List;
  * Created 1/26/2021 by SuperMartijn642
  */
 @WailaPlugin("entangled")
-public class EntangleWailaPlugin implements IComponentProvider, IWailaPlugin {
+public class EntangledWailaPlugin implements IComponentProvider, IWailaPlugin {
+
     @Override
     public void register(IRegistrar registrar){
         registrar.registerComponentProvider(this, TooltipPosition.BODY, EntangledBlock.class);
