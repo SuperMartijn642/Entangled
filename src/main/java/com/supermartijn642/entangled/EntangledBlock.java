@@ -1,12 +1,15 @@
 package com.supermartijn642.entangled;
 
+import com.supermartijn642.core.block.BaseBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.material.MaterialColor;
 import net.minecraft.client.util.ITooltipFlag;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.state.BooleanProperty;
@@ -31,13 +34,12 @@ import java.util.List;
 /**
  * Created 2/6/2020 by SuperMartijn642
  */
-public class EntangledBlock extends Block {
+public class EntangledBlock extends BaseBlock {
 
     public static final BooleanProperty ON = BooleanProperty.create("on");
 
     public EntangledBlock(){
-        super(Properties.create(new Material.Builder(MaterialColor.BROWN).doesNotBlockMovement().build()).speedFactor(1f).harvestTool(ToolType.PICKAXE).sound(SoundType.STONE).hardnessAndResistance(2f));
-        this.setRegistryName("block");
+        super("block", true, Properties.create(new Material.Builder(MaterialColor.BROWN).doesNotBlockMovement().build()).speedFactor(1f).harvestTool(ToolType.PICKAXE).sound(SoundType.STONE).hardnessAndResistance(2f));
         this.setDefaultState(this.getDefaultState().with(ON, false));
     }
 
@@ -109,5 +111,54 @@ public class EntangledBlock extends Block {
             EntangledConfig.maxDistance.get() == -1 ? "infinite_other_dimension" : "ranged_other_dimension" :
             EntangledConfig.maxDistance.get() == -1 ? "infinite_same_dimension" : "ranged_same_dimension";
         tooltip.add(new TranslationTextComponent("entangled.entangled_block.info." + key, EntangledConfig.maxDistance.get()).mergeStyle(TextFormatting.AQUA));
+
+        CompoundNBT tag = stack.getOrCreateTag().getCompound("tileData");
+        if(tag.contains("bound") && tag.getBoolean("bound")){
+            int x = tag.getInt("boundx"), y = tag.getInt("boundy"), z = tag.getInt("boundz");
+            String dimension = tag.getString("dimension");
+            dimension = dimension.substring(dimension.lastIndexOf(":") + 1);
+            dimension = Character.toUpperCase(dimension.charAt(0)) + dimension.substring(1);
+            ITextComponent name = Block.getStateById(tag.getInt("blockstate")).getBlock().getTranslatedName();
+            tooltip.add(new TranslationTextComponent("entangled.entangled_block.info.bound", name, x, y, z, dimension).mergeStyle(TextFormatting.YELLOW));
+        }
+    }
+
+    @Override
+    public void onBlockPlacedBy(World worldIn, BlockPos pos, BlockState state, LivingEntity placer, ItemStack stack){
+        super.onBlockPlacedBy(worldIn, pos, state, placer, stack);
+//        if(state.hasProperty(ON) && !state.get(ON)){
+//            TileEntity tile = worldIn.getTileEntity(pos);
+//            if(tile instanceof EntangledBlockTile && ((EntangledBlockTile)tile).isBound())
+//                worldIn.setBlockState(pos, state.with(ON, true));
+//        }
+    }
+
+    @Nullable
+    @Override
+    public BlockState getStateForPlacement(BlockItemUseContext context){
+        ItemStack stack = context.getItem();
+        CompoundNBT compound = stack.getOrCreateTag().getCompound("tileData");
+        if(compound.getBoolean("bound")){
+            PlayerEntity player = context.getPlayer();
+            BlockPos pos = context.getPos();
+            BlockPos pos2 = new BlockPos(compound.getInt("boundx"), compound.getInt("boundy"), compound.getInt("boundz"));
+            if(compound.getString("dimension").equals(context.getWorld().getDimensionKey().getLocation().toString())){
+                System.out.println("dimension true");
+                if(EntangledConfig.maxDistance.get() >= 0 && !pos.withinDistance(pos2, EntangledConfig.maxDistance.get() + 0.5)){
+                    if(player != null && !context.getWorld().isRemote)
+                        player.sendMessage(new TranslationTextComponent("entangled.entangled_block.too_far").mergeStyle(TextFormatting.RED), player.getUniqueID());
+                    return null;
+                }
+            }else{
+                System.out.println("dimension false " + EntangledConfig.allowDimensional.get());
+                if(!EntangledConfig.allowDimensional.get()){
+                    if(player != null && !context.getWorld().isRemote)
+                        player.sendMessage(new TranslationTextComponent("entangled.entangled_block.wrong_dimension").mergeStyle(TextFormatting.RED), player.getUniqueID());
+                    return null;
+                }
+            }
+            return this.getDefaultState().with(ON, true);
+        }
+        return this.getDefaultState();
     }
 }
