@@ -7,7 +7,6 @@ import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.material.MaterialColor;
 import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.item.ItemStack;
@@ -123,16 +122,6 @@ public class EntangledBlock extends BaseBlock {
         }
     }
 
-    @Override
-    public void onBlockPlacedBy(World worldIn, BlockPos pos, BlockState state, LivingEntity placer, ItemStack stack){
-        super.onBlockPlacedBy(worldIn, pos, state, placer, stack);
-//        if(state.hasProperty(ON) && !state.get(ON)){
-//            TileEntity tile = worldIn.getTileEntity(pos);
-//            if(tile instanceof EntangledBlockTile && ((EntangledBlockTile)tile).isBound())
-//                worldIn.setBlockState(pos, state.with(ON, true));
-//        }
-    }
-
     @Nullable
     @Override
     public BlockState getStateForPlacement(BlockItemUseContext context){
@@ -143,14 +132,12 @@ public class EntangledBlock extends BaseBlock {
             BlockPos pos = context.getPos();
             BlockPos pos2 = new BlockPos(compound.getInt("boundx"), compound.getInt("boundy"), compound.getInt("boundz"));
             if(compound.getString("dimension").equals(context.getWorld().getDimensionKey().getLocation().toString())){
-                System.out.println("dimension true");
                 if(EntangledConfig.maxDistance.get() >= 0 && !pos.withinDistance(pos2, EntangledConfig.maxDistance.get() + 0.5)){
                     if(player != null && !context.getWorld().isRemote)
                         player.sendMessage(new TranslationTextComponent("entangled.entangled_block.too_far").mergeStyle(TextFormatting.RED), player.getUniqueID());
                     return null;
                 }
             }else{
-                System.out.println("dimension false " + EntangledConfig.allowDimensional.get());
                 if(!EntangledConfig.allowDimensional.get()){
                     if(player != null && !context.getWorld().isRemote)
                         player.sendMessage(new TranslationTextComponent("entangled.entangled_block.wrong_dimension").mergeStyle(TextFormatting.RED), player.getUniqueID());
