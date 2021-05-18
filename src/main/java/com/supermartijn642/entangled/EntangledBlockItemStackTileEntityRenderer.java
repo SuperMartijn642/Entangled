@@ -19,11 +19,6 @@ import java.util.Random;
  */
 public class EntangledBlockItemStackTileEntityRenderer extends ItemStackTileEntityRenderer {
 
-    public static final EntangledBlockItemStackTileEntityRenderer INSTANCE = new EntangledBlockItemStackTileEntityRenderer();
-
-    private EntangledBlockItemStackTileEntityRenderer(){
-    }
-
     @Override
     public void render(ItemStack stack, MatrixStack matrixStack, IRenderTypeBuffer buffer, int combinedLight, int combinedOverlay){
         if(!stack.hasTag() || !stack.getTag().contains("tileData") || !stack.getTag().getCompound("tileData").getBoolean("bound")){
