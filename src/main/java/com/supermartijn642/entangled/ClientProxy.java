@@ -40,7 +40,7 @@ public class ClientProxy {
 
     @SubscribeEvent(priority = EventPriority.LOW)
     public static void registerItems(RegistryEvent.Register<Item> e){
-        Item.getItemFromBlock(Entangled.block).setTileEntityItemStackRenderer(EntangledBlockItemStackTileEntityRenderer.INSTANCE);
+        Item.getItemFromBlock(Entangled.block).setTileEntityItemStackRenderer(new EntangledBlockItemStackTileEntityRenderer());
     }
 
     @SubscribeEvent

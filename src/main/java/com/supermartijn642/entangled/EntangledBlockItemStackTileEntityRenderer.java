@@ -21,11 +21,6 @@ import net.minecraft.util.math.BlockPos;
  */
 public class EntangledBlockItemStackTileEntityRenderer extends TileEntityItemStackRenderer {
 
-    public static final EntangledBlockItemStackTileEntityRenderer INSTANCE = new EntangledBlockItemStackTileEntityRenderer();
-
-    private EntangledBlockItemStackTileEntityRenderer(){
-    }
-
     @Override
     public void renderByItem(ItemStack stack, float partialTicks){
         if(!stack.hasTagCompound() || !stack.getTagCompound().hasKey("tileData") || !stack.getTagCompound().getCompoundTag("tileData").getBoolean("bound")){
