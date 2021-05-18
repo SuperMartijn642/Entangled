@@ -80,10 +80,6 @@ repositories {
         name = "ModMaven"
         url = "https://modmaven.k-4u.nl"
     }
-    maven {
-        // Hwyla maven
-        url = "https://maven.tehnut.info"
-    }
 }
 
 dependencies {
@@ -95,9 +91,9 @@ dependencies {
     runtimeOnly fg.deobf("mezz.jei:jei-1.16.1:7.0.1.10")
 
     // Compile against the Hwyla API, but do not include it at runtime
-    compileOnly fg.deobf("mcp.mobius.waila:Hwyla:1.10.10-B77_1.16.1:api")
+    compileOnly fg.deobf("curse.maven:hwyla:3017694")
     // At runtime, use the full Hwyla jar
-    runtimeOnly fg.deobf("mcp.mobius.waila:Hwyla:1.10.10-B77_1.16.1")
+    runtimeOnly fg.deobf("curse.maven:hwyla:3017696")
 
     // Config Lib
     compile fg.deobf("curse.maven:supermartijn642s-config-lib:3312641")
