@@ -19,11 +19,6 @@ import net.minecraft.util.math.BlockPos;
  */
 public class EntangledBlockItemStackTileEntityRenderer extends ItemStackTileEntityRenderer {
 
-    public static final EntangledBlockItemStackTileEntityRenderer INSTANCE = new EntangledBlockItemStackTileEntityRenderer();
-
-    private EntangledBlockItemStackTileEntityRenderer(){
-    }
-
     @Override
     public void func_239207_a_(ItemStack stack, ItemCameraTransforms.TransformType cameraTransforms, MatrixStack matrixStack, IRenderTypeBuffer buffer, int combinedLight, int combinedOverlay){
         if(!stack.hasTag() || !stack.getTag().contains("tileData") || !stack.getTag().getCompound("tileData").getBoolean("bound")){

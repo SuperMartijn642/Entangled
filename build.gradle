@@ -100,7 +100,7 @@ dependencies {
     runtimeOnly fg.deobf("mcp.mobius.waila:Hwyla:1.10.11-B78_1.16.2")
 
     // Config Lib
-    compile fg.deobf("curse.maven:supermartijn642s-config-lib:3226128")
+    compile fg.deobf("curse.maven:supermartijn642s-config-lib:3312641")
     // Core Lib
     compile fg.deobf("curse.maven:supermartijn642s-core-lib:3300632")
 }
