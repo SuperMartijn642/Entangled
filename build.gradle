@@ -91,9 +91,9 @@ dependencies {
     runtimeOnly fg.deobf("mezz.jei:jei-1.14.4:6.0.0.29")
 
     // Compile against the Hwyla API, but do not include it at runtime
-    compileOnly fg.deobf("curse.maven:hwyla:2777880")
+    compileOnly fg.deobf("curse.maven:hwyla:2777882")
     // At runtime, use the full Hwyla jar
-    runtimeOnly fg.deobf("curse.maven:hwyla:2777882")
+    runtimeOnly fg.deobf("curse.maven:hwyla:2777880")
 
     // Config Lib
     compile fg.deobf("curse.maven:supermartijn642s-config-lib:3312639")
