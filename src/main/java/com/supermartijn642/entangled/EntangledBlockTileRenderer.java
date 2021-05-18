@@ -1,8 +1,9 @@
 package com.supermartijn642.entangled;
 
+import com.supermartijn642.core.ClientUtils;
+import com.supermartijn642.core.gui.ScreenUtils;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BlockRendererDispatcher;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
@@ -13,7 +14,10 @@ import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumBlockRenderType;
+import net.minecraft.util.math.BlockPos;
+import net.minecraftforge.client.ForgeHooksClient;
 import org.lwjgl.opengl.GL11;
 
 /**
@@ -56,25 +60,41 @@ public class EntangledBlockTileRenderer extends TileEntitySpecialRenderer<Entang
         }
 
         if(state != null && state.getRenderType() == EnumBlockRenderType.MODEL){
-            Tessellator tessellator = Tessellator.getInstance();
-            BufferBuilder buffer = tessellator.getBuffer();
-            buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.BLOCK);
-
             GlStateManager.disableLighting();
 
-            Minecraft.getMinecraft().getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
+            ScreenUtils.bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
 
-            try{
-                BlockRendererDispatcher brd = Minecraft.getMinecraft().getBlockRendererDispatcher();
-                IBakedModel model = brd.getModelForState(state);
-                brd.getBlockModelRenderer().renderModel(tile.getWorld(), model, state, tile.getPos(), buffer, false);
-            }catch(Exception e){
-                e.printStackTrace();
+            for(BlockRenderLayer layer : BlockRenderLayer.values()){
+                if(state.getBlock().canRenderInLayer(state, layer)){
+                    Tessellator tessellator = Tessellator.getInstance();
+                    BufferBuilder buffer = tessellator.getBuffer();
+                    buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.BLOCK);
+                    buffer.setTranslation(tile.getPos().getX(), tile.getPos().getY() - 300, tile.getPos().getZ());
+
+                    if(layer == BlockRenderLayer.TRANSLUCENT){
+                        GlStateManager.tryBlendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
+                        GlStateManager.enableBlend();
+                    }
+
+                    ForgeHooksClient.setRenderLayer(layer);
+                    try{
+                        BlockRendererDispatcher brd = ClientUtils.getMinecraft().getBlockRendererDispatcher();
+                        IBakedModel model = brd.getModelForState(state);
+                        brd.getBlockModelRenderer().renderModel(tile.getWorld(), model, state, new BlockPos(0, 300, 0), buffer, false);
+                    }catch(Exception e){
+                        e.printStackTrace();
+                    }
+
+                    GlStateManager.translate(-tile.getPos().getX(), -tile.getPos().getY(), -tile.getPos().getZ());
+
+                    buffer.setTranslation(0, 0, 0);
+                    tessellator.draw();
+
+                    if(layer == BlockRenderLayer.TRANSLUCENT){
+                        GlStateManager.disableBlend();
+                    }
+                }
             }
-
-            GlStateManager.translate(-tile.getPos().getX(), -tile.getPos().getY(), -tile.getPos().getZ());
-
-            tessellator.draw();
         }
 
         GlStateManager.popMatrix();

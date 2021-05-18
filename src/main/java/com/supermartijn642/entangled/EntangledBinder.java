@@ -24,7 +24,7 @@ public class EntangledBinder extends Item {
     public EntangledBinder(){
         this.setMaxStackSize(1);
         this.setRegistryName("item");
-        this.setUnlocalizedName(Entangled.MODID + ":item");
+        this.setUnlocalizedName(Entangled.MODID + ".item");
         this.setCreativeTab(CreativeTabs.SEARCH);
     }
 

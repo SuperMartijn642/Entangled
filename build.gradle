@@ -83,7 +83,9 @@ dependencies {
     compileOnly "mcp.mobius.waila:Hwyla:1.8.26-B41_1.12.2"
 
     // Config Lib
-    compile fg.deobf("curse.maven:supermartijn642s-config-lib:3211007")
+    compile fg.deobf("curse.maven:supermartijn642s-config-lib:3312638")
+    // Core Lib
+    compile fg.deobf("curse.maven:supermartijn642s-core-lib:3300627")
 }
 
 //sourceSets {

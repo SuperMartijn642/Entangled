@@ -1,10 +1,10 @@
 package com.supermartijn642.entangled;
 
+import com.supermartijn642.core.block.BaseTileEntity;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.init.Blocks;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.network.NetworkManager;
-import net.minecraft.network.play.server.SPacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ITickable;
@@ -15,11 +15,13 @@ import net.minecraftforge.common.capabilities.Capability;
 
 import javax.annotation.Nullable;
 
-public class EntangledBlockTile extends TileEntity implements ITickable {
+public class EntangledBlockTile extends BaseTileEntity implements ITickable {
 
     private boolean bound = false;
     private BlockPos pos;
     private int dimension;
+    private IBlockState blockState = Blocks.AIR.getDefaultState();
+    private IBlockState lastBlockState = this.blockState;
 
     @Override
     public void update(){
@@ -29,9 +31,9 @@ public class EntangledBlockTile extends TileEntity implements ITickable {
             World world = DimensionManager.getWorld(this.dimension);
             if(world != null && (world.isAreaLoaded(this.pos, 1) || this.blockState == null)){
                 this.blockState = world.getBlockState(this.pos);
-                if(this.blockState != this.blockStateClient){
-                    IBlockState state = this.world.getBlockState(this.getPos());
-                    this.world.notifyBlockUpdate(this.getPos(), state, state, 2);
+                if(this.blockState != this.lastBlockState){
+                    this.lastBlockState = this.blockState;
+                    this.dataChanged();
                 }
             }
         }
@@ -52,29 +54,6 @@ public class EntangledBlockTile extends TileEntity implements ITickable {
 
     public IBlockState getBoundBlockState(){
         return this.blockState;
-    }
-
-    @Override
-    public NBTTagCompound writeToNBT(NBTTagCompound compound){
-        super.writeToNBT(compound);
-        compound.setBoolean("bound", this.bound);
-        if(this.bound){
-            compound.setInteger("boundx", this.pos.getX());
-            compound.setInteger("boundy", this.pos.getY());
-            compound.setInteger("boundz", this.pos.getZ());
-            compound.setInteger("dimension", this.dimension);
-        }
-        return compound;
-    }
-
-    @Override
-    public void readFromNBT(NBTTagCompound compound){
-        super.readFromNBT(compound);
-        this.bound = compound.getBoolean("bound");
-        if(this.bound){
-            this.pos = new BlockPos(compound.getInteger("boundx"), compound.getInteger("boundy"), compound.getInteger("boundz"));
-            this.dimension = compound.getInteger("dimension");
-        }
     }
 
     @Override
@@ -118,10 +97,8 @@ public class EntangledBlockTile extends TileEntity implements ITickable {
         this.pos = pos == null ? null : new BlockPos(pos);
         this.dimension = dimension;
         this.bound = pos != null;
-        IBlockState state = this.world.getBlockState(this.getPos());
-        this.world.notifyNeighborsOfStateChange(this.getPos(), state.getBlock(), false);
-        this.world.notifyBlockUpdate(this.getPos(), state, state, 2);
-        this.markDirty();
+        this.world.notifyNeighborsOfStateChange(this.getPos(), this.getBlockState().getBlock(), false);
+        this.dataChanged();
         return true;
     }
 
@@ -141,73 +118,41 @@ public class EntangledBlockTile extends TileEntity implements ITickable {
         return tile != null && !(tile instanceof EntangledBlockTile);
     }
 
-    private boolean boundClient = false;
-    private BlockPos posClient;
-    private int dimensionClient;
-    private IBlockState blockState;
-    private IBlockState blockStateClient;
-
-    @Nullable
     @Override
-    public SPacketUpdateTileEntity getUpdatePacket(){
+    public void readFromNBT(NBTTagCompound compound){
+        if(compound.hasKey("bound")){ // Saved on an older version
+            NBTTagCompound data = new NBTTagCompound();
+            data.setBoolean("bound", compound.getBoolean("bound"));
+            data.setInteger("boundx", compound.getInteger("boundx"));
+            data.setInteger("boundy", compound.getInteger("boundy"));
+            data.setInteger("boundz", compound.getInteger("boundz"));
+            data.setInteger("dimension", compound.getInteger("dimension"));
+            compound.setTag("data", data);
+        }
+        super.readFromNBT(compound);
+    }
+
+    @Override
+    protected NBTTagCompound writeData(){
         NBTTagCompound compound = new NBTTagCompound();
-        if(this.boundClient != this.bound){
-            compound.setBoolean("bound", this.bound);
-            this.boundClient = this.bound;
-        }
-        if(this.bound && this.pos != null && !this.pos.equals(this.posClient)){
-            compound.setInteger("posX", this.pos.getX());
-            compound.setInteger("posY", this.pos.getY());
-            compound.setInteger("posZ", this.pos.getZ());
-            this.posClient = new BlockPos(this.pos);
-        }
-        if(this.bound && this.dimensionClient != this.dimension){
-            compound.setInteger("dimension", this.dimension);
-            this.dimensionClient = this.dimension;
-        }
-        if(this.bound && this.blockState != this.blockStateClient){
-            compound.setInteger("blockstate", Block.getStateId(this.blockState));
-            this.blockStateClient = this.blockState;
-        }
-        return compound.hasNoTags() ? null : new SPacketUpdateTileEntity(this.getPos(), 0, compound);
-    }
-
-    @Override
-    public void onDataPacket(NetworkManager net, SPacketUpdateTileEntity pkt){
-        this.handleTag(pkt.getNbtCompound());
-    }
-
-    @Override
-    public NBTTagCompound getUpdateTag(){
-        NBTTagCompound compound = super.getUpdateTag();
-        compound.setBoolean("bound", this.bound);
         if(this.bound){
-            if(this.pos != null){
-                compound.setInteger("posX", this.pos.getX());
-                compound.setInteger("posY", this.pos.getY());
-                compound.setInteger("posZ", this.pos.getZ());
-            }
+            compound.setBoolean("bound", true);
+            compound.setInteger("boundx", this.pos.getX());
+            compound.setInteger("boundy", this.pos.getY());
+            compound.setInteger("boundz", this.pos.getZ());
             compound.setInteger("dimension", this.dimension);
-            if(this.blockState != null)
-                compound.setInteger("blockstate", Block.getStateId(this.blockState));
+            compound.setInteger("blockstate", Block.getStateId(this.blockState));
         }
         return compound;
     }
 
     @Override
-    public void handleUpdateTag(NBTTagCompound tag){
-        super.handleUpdateTag(tag);
-        this.handleTag(tag);
-    }
-
-    private void handleTag(NBTTagCompound tag){
-        if(tag.hasKey("bound"))
-            this.bound = tag.getBoolean("bound");
-        if(tag.hasKey("posX"))
-            this.pos = new BlockPos(tag.getInteger("posX"), tag.getInteger("posY"), tag.getInteger("posZ"));
-        if(tag.hasKey("dimension"))
-            this.dimension = tag.getInteger("dimension");
-        if(tag.hasKey("blockstate"))
-            this.blockState = Block.getStateById(tag.getInteger("blockstate"));
+    protected void readData(NBTTagCompound compound){
+        this.bound = compound.getBoolean("bound");
+        if(this.bound){
+            this.pos = new BlockPos(compound.getInteger("boundx"), compound.getInteger("boundy"), compound.getInteger("boundz"));
+            this.dimension = compound.getInteger("dimension");
+            this.blockState = Block.getStateById(compound.getInteger("blockstate"));
+        }
     }
 }

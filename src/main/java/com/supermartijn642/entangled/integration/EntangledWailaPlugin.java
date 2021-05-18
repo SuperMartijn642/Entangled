@@ -17,7 +17,8 @@ import java.util.List;
  * Created 1/26/2021 by SuperMartijn642
  */
 @WailaPlugin("entangled")
-public class EntangleWailaPlugin implements IWailaDataProvider, IWailaPlugin {
+public class EntangledWailaPlugin implements IWailaDataProvider, IWailaPlugin {
+
     @Override
     public void register(IWailaRegistrar registrar){
         registrar.registerBodyProvider(this, EntangledBlock.class);
