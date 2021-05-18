@@ -93,7 +93,7 @@ dependencies {
     // Compile against the Hwyla API, but do not include it at runtime
     compileOnly fg.deobf("curse.maven:hwyla:3033595")
     // At runtime, use the full Hwyla jar
-    runtimeOnly fg.deobf("curse.maven:hwyla:3033594")
+    runtimeOnly fg.deobf("curse.maven:hwyla:3033593")
 
     // Config Lib
     compile fg.deobf("curse.maven:supermartijn642s-config-lib:3312641")
