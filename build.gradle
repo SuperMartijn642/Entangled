@@ -65,10 +65,6 @@ repositories {
         name = "ModMaven"
         url = "https://modmaven.k-4u.nl"
     }
-    maven {
-        // Hwyla maven
-        url = "https://maven.tehnut.info"
-    }
 }
 
 dependencies {
@@ -78,9 +74,9 @@ dependencies {
     minecraft 'net.minecraftforge:forge:1.12.2-14.23.5.2855'
 
     // Compile against the Hwyla API, but do not include it at runtime
-    runtimeOnly "mcp.mobius.waila:Hwyla:1.8.26-B41_1.12.2:api"
+    runtimeOnly fg.deobf("curse.maven:hwyla:2568751")
     // At runtime, use the full Hwyla jar
-    compileOnly "mcp.mobius.waila:Hwyla:1.8.26-B41_1.12.2"
+    compileOnly fg.deobf("curse.maven:hwyla:2568753")
 
     // Config Lib
     compile fg.deobf("curse.maven:supermartijn642s-config-lib:3312638")
