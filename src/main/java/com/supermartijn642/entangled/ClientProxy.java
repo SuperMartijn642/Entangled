@@ -87,7 +87,8 @@ public class ClientProxy {
 
         @SubscribeEvent
         public static void onBlockHighlight(DrawBlockHighlightEvent e){
-            if(!EntangledConfig.renderBlockHighlight.get())
+            // RayTraceResult#getBlockPos() can definitely be null
+            if(!EntangledConfig.renderBlockHighlight.get() || e.getTarget().getBlockPos() == null)
                 return;
 
             World world = ClientUtils.getMinecraft().world;
