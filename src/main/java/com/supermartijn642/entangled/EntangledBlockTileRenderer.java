@@ -16,6 +16,7 @@ import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumBlockRenderType;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.client.ForgeHooksClient;
 import org.lwjgl.opengl.GL11;
@@ -51,7 +52,7 @@ public class EntangledBlockTileRenderer extends TileEntitySpecialRenderer<Entang
         GlStateManager.scale(0.55f, 0.55f, 0.55f);
         GlStateManager.translate(-0.5, -0.5, -0.5);
 
-        if(boundBlock != null && boundTile != null && !Entangled.RENDER_BLACKLISTED_MODS.contains(boundBlock.getRegistryName().getResourceDomain())){
+        if(boundBlock != null && boundTile != null && canRenderTileEntity(boundBlock.getRegistryName())){
             if(!(boundTile instanceof EntangledBlockTile) || depth < 10){
                 depth++;
                 TileEntityRendererDispatcher.instance.render(boundTile, 0, 0, 0, partialTicks);
@@ -59,7 +60,7 @@ public class EntangledBlockTileRenderer extends TileEntitySpecialRenderer<Entang
             }
         }
 
-        if(state != null && state.getRenderType() == EnumBlockRenderType.MODEL){
+        if(state != null && state.getRenderType() == EnumBlockRenderType.MODEL && canRenderBlock(state.getBlock().getRegistryName())){
             GlStateManager.disableLighting();
 
             ScreenUtils.bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
@@ -98,5 +99,13 @@ public class EntangledBlockTileRenderer extends TileEntitySpecialRenderer<Entang
         }
 
         GlStateManager.popMatrix();
+    }
+
+    private static boolean canRenderBlock(ResourceLocation block){
+        return !Entangled.RENDER_BLACKLISTED_MODS.contains(block.getResourceDomain()) && !Entangled.RENDER_BLACKLISTED_BLOCKS.contains(block);
+    }
+
+    private static boolean canRenderTileEntity(ResourceLocation tile){
+        return !Entangled.RENDER_BLACKLISTED_MODS.contains(tile.getResourceDomain()) && !Entangled.RENDER_BLACKLISTED_TILE_ENTITIES.contains(tile);
     }
 }

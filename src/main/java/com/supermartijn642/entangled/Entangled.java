@@ -1,6 +1,6 @@
 package com.supermartijn642.entangled;
 
-import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
@@ -10,7 +10,7 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 
-import java.util.List;
+import java.util.Set;
 
 @Mod(modid = Entangled.MODID, name = Entangled.NAME, version = Entangled.VERSION, dependencies = Entangled.DEPENDENCIES)
 public class Entangled {
@@ -27,6 +27,7 @@ public class Entangled {
 
     @Mod.EventBusSubscriber
     public static class RegistryEvents {
+
         @SubscribeEvent
         public static void registerBlocks(RegistryEvent.Register<Block> e){
             e.getRegistry().register(new EntangledBlock());
@@ -40,6 +41,8 @@ public class Entangled {
         }
     }
 
-    public static final List<String> RENDER_BLACKLISTED_MODS = Lists.newArrayList("fluidtank");
+    public static final Set<String> RENDER_BLACKLISTED_MODS = Sets.newHashSet("fluidtank");
+    public static final Set<ResourceLocation> RENDER_BLACKLISTED_BLOCKS = Sets.newHashSet();
+    public static final Set<ResourceLocation> RENDER_BLACKLISTED_TILE_ENTITIES = Sets.newHashSet();
 
 }
