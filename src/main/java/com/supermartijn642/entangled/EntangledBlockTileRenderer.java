@@ -9,6 +9,7 @@ import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
 import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.vector.Quaternion;
 
 /**
@@ -42,16 +43,24 @@ public class EntangledBlockTileRenderer extends TileEntityRenderer<EntangledBloc
         matrixStackIn.scale(0.55f, 0.55f, 0.55f);
         matrixStackIn.translate(-0.5, -0.5, -0.5);
 
-        if(boundBlock != null && boundTile != null && !Entangled.RENDER_BLACKLISTED_MODS.contains(boundBlock.getRegistryName().getNamespace())){
+        if(boundBlock != null && boundTile != null && canRenderTileEntity(boundBlock.getRegistryName())){
             if(!(boundTile instanceof EntangledBlockTile) || depth < 10){
                 depth++;
                 TileEntityRendererDispatcher.instance.renderTileEntity(boundTile, partialTicks, matrixStackIn, bufferIn);
                 depth--;
             }
         }
-        if(state != null && state.getRenderType() == BlockRenderType.MODEL)
+        if(state != null && state.getRenderType() == BlockRenderType.MODEL && canRenderBlock(state.getBlock().getRegistryName()))
             Minecraft.getInstance().getBlockRendererDispatcher().renderBlock(state, matrixStackIn, bufferIn, combinedLightIn, combinedOverlayIn);
 
         matrixStackIn.pop();
+    }
+
+    private static boolean canRenderBlock(ResourceLocation block){
+        return !Entangled.RENDER_BLACKLISTED_MODS.contains(block.getNamespace()) && !Entangled.RENDER_BLACKLISTED_BLOCKS.contains(block);
+    }
+
+    private static boolean canRenderTileEntity(ResourceLocation tile){
+        return !Entangled.RENDER_BLACKLISTED_MODS.contains(tile.getNamespace()) && !Entangled.RENDER_BLACKLISTED_TILE_ENTITIES.contains(tile);
     }
 }
