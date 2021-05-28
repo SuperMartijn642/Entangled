@@ -16,6 +16,7 @@ import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockRenderLayer;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.client.ForgeHooksClient;
 import net.minecraftforge.client.model.data.EmptyModelData;
@@ -42,20 +43,20 @@ public class EntangledBlockTileRenderer extends TileEntityRenderer<EntangledBloc
 
         GlStateManager.pushMatrix();
 
-        GlStateManager.translated(x,y,z);
+        GlStateManager.translated(x, y, z);
 
         GlStateManager.translated(0.5, 0.5, 0.5);
         float angleX = System.currentTimeMillis() % 10000 / 10000f * 360;
         float angleY = System.currentTimeMillis() % 11000 / 11000f * 360;
         float angleZ = System.currentTimeMillis() % 12000 / 12000f * 360;
-        GlStateManager.rotatef(angleX,1,0,0);
-        GlStateManager.rotatef(angleY,0,1,0);
-        GlStateManager.rotatef(angleZ,0,0,1);
+        GlStateManager.rotatef(angleX, 1, 0, 0);
+        GlStateManager.rotatef(angleY, 0, 1, 0);
+        GlStateManager.rotatef(angleZ, 0, 0, 1);
 
         GlStateManager.scalef(0.55f, 0.55f, 0.55f);
         GlStateManager.translated(-0.5, -0.5, -0.5);
 
-        if(boundBlock != null && boundTile != null && !Entangled.RENDER_BLACKLISTED_MODS.contains(boundBlock.getRegistryName().getNamespace())){
+        if(boundBlock != null && boundTile != null && canRenderTileEntity(boundBlock.getRegistryName())){
             if(!(boundTile instanceof EntangledBlockTile) || depth < 10){
                 depth++;
                 TileEntityRendererDispatcher.instance.render(boundTile, 0, 0, 0, partialTicks);
@@ -63,7 +64,7 @@ public class EntangledBlockTileRenderer extends TileEntityRenderer<EntangledBloc
             }
         }
 
-        if(state != null && state.getRenderType() == BlockRenderType.MODEL){
+        if(state != null && state.getRenderType() == BlockRenderType.MODEL && canRenderBlock(state.getBlock().getRegistryName())){
             GlStateManager.disableLighting();
 
             ScreenUtils.bindTexture(AtlasTexture.LOCATION_BLOCKS_TEXTURE);
@@ -102,5 +103,13 @@ public class EntangledBlockTileRenderer extends TileEntityRenderer<EntangledBloc
         }
 
         GlStateManager.popMatrix();
+    }
+
+    private static boolean canRenderBlock(ResourceLocation block){
+        return !Entangled.RENDER_BLACKLISTED_MODS.contains(block.getNamespace()) && !Entangled.RENDER_BLACKLISTED_BLOCKS.contains(block);
+    }
+
+    private static boolean canRenderTileEntity(ResourceLocation tile){
+        return !Entangled.RENDER_BLACKLISTED_MODS.contains(tile.getNamespace()) && !Entangled.RENDER_BLACKLISTED_TILE_ENTITIES.contains(tile);
     }
 }
