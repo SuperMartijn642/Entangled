@@ -103,7 +103,8 @@ public class EntangledBlockTile extends BaseTileEntity implements ITickable {
     }
 
     public boolean canBindTo(BlockPos pos, int dimension){
-        return dimension == this.world.provider.getDimensionType().getId() ?
+        return (pos == null && dimension == 0) ||
+            dimension == this.world.provider.getDimensionType().getId() ?
             EntangledConfig.maxDistance.get() == -1 || super.pos.distanceSq(pos) <= (EntangledConfig.maxDistance.get() + 0.5) * (EntangledConfig.maxDistance.get() + 0.5) :
             EntangledConfig.allowDimensional.get();
     }
