@@ -78,9 +78,9 @@ dependencies {
     // Config Lib
     compile fg.deobf("curse.maven:supermartijn642s-config-lib:3312638")
     // Core Lib
-    compile fg.deobf("curse.maven:supermartijn642s-core-lib:3300627")
+    compile fg.deobf("curse.maven:supermartijn642s-core-lib:3349593")
 }
 
-//sourceSets {
-//    main { output.resourcesDir = output.classesDir }
-//}
+sourceSets {
+    main { output.resourcesDir = output.classesDir }
+}

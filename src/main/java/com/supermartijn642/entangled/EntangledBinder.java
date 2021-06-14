@@ -1,5 +1,7 @@
 package com.supermartijn642.entangled;
 
+import com.supermartijn642.core.ClientUtils;
+import com.supermartijn642.core.TextComponents;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
@@ -11,8 +13,7 @@ import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.Style;
-import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.DimensionType;
 import net.minecraft.world.World;
@@ -43,7 +44,7 @@ public class EntangledBinder extends Item {
         compound.setInteger("boundy", pos.getY());
         compound.setInteger("boundz", pos.getZ());
         stack.setTagCompound(compound);
-        player.sendMessage(new TextComponentTranslation("entangled.entangled_binder.select").setStyle(new Style().setColor(TextFormatting.YELLOW)));
+        player.sendMessage(TextComponents.translation("entangled.entangled_binder.select").color(TextFormatting.YELLOW).get());
         return EnumActionResult.SUCCESS;
     }
 
@@ -55,22 +56,20 @@ public class EntangledBinder extends Item {
         if(playerIn.isSneaking() && compound != null && compound.getBoolean("bound")){
             compound.setBoolean("bound", false);
             playerIn.getHeldItem(handIn).setTagCompound(compound);
-            playerIn.sendMessage(new TextComponentTranslation("entangled.entangled_binder.clear").setStyle(new Style().setColor(TextFormatting.YELLOW)));
+            playerIn.sendMessage(TextComponents.translation("entangled.entangled_binder.clear").color(TextFormatting.YELLOW).get());
         }
         return super.onItemRightClick(worldIn, playerIn, handIn);
     }
 
     @Override
     public void addInformation(ItemStack stack, World worldIn, List<String> tooltip, ITooltipFlag flagIn){
-        tooltip.add(TextFormatting.AQUA + ClientProxy.translate("entangled.entangled_binder.info"));
+        tooltip.add(TextFormatting.AQUA + ClientUtils.translate("entangled.entangled_binder.info"));
 
         NBTTagCompound tag = stack.getTagCompound();
         if(tag != null && tag.hasKey("bound") && tag.getBoolean("bound")){
             int x = tag.getInteger("boundx"), y = tag.getInteger("boundy"), z = tag.getInteger("boundz");
-            String dimension = DimensionType.getById(tag.getInteger("dimension")).getName();
-            dimension = dimension.substring(dimension.lastIndexOf(":") + 1);
-            dimension = Character.toUpperCase(dimension.charAt(0)) + dimension.substring(1);
-            tooltip.add(TextFormatting.YELLOW + ClientProxy.translate("entangled.entangled_binder.info.target", x, y, z, dimension));
+            ITextComponent dimension = TextComponents.dimension(DimensionType.getById(tag.getInteger("dimension"))).get();
+            tooltip.add(TextFormatting.YELLOW + ClientUtils.translate("entangled.entangled_binder.info.target", x, y, z, dimension));
         }
     }
 }
