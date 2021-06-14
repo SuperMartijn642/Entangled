@@ -2,7 +2,6 @@ package com.supermartijn642.entangled;
 
 import com.supermartijn642.core.ClientUtils;
 import com.supermartijn642.core.gui.ScreenUtils;
-import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.BlockRendererDispatcher;
 import net.minecraft.client.renderer.BufferBuilder;
@@ -17,6 +16,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumBlockRenderType;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.client.ForgeHooksClient;
 import net.minecraftforge.client.MinecraftForgeClient;
@@ -34,26 +34,38 @@ public class EntangledBlockTileRenderer extends TileEntitySpecialRenderer<Entang
         if(!tile.isBound())
             return;
 
-        Block boundBlock = tile.getWorld().provider.getDimensionType().getId() == tile.getBoundDimension() ? tile.getWorld().getBlockState(tile.getBoundBlockPos()).getBlock() : null;
         TileEntity boundTile = tile.getWorld().provider.getDimensionType().getId() == tile.getBoundDimension() ? tile.getWorld().getTileEntity(tile.getBoundBlockPos()) : null;
-        IBlockState state = tile.getBoundBlockState();
+        IBlockState boundState = tile.getBoundBlockState();
+
+        boolean renderTile = boundTile != null && canRenderTileEntity(boundTile.getBlockType().getRegistryName());
+        boolean renderBlock = boundState != null && boundState.getRenderType() == EnumBlockRenderType.MODEL && canRenderBlock(boundState.getBlock().getRegistryName());
+
+        // get the bounding box
+        AxisAlignedBB bounds = new AxisAlignedBB(0, 0, 0, 1, 1, 1);
+        if(renderBlock && tile.getWorld().provider.getDimensionType().getId() == tile.getBoundDimension()){
+            AxisAlignedBB shape = boundState.getBoundingBox(tile.getWorld(), tile.getBoundBlockPos());
+            if(shape.minX != shape.maxX || shape.minY != shape.maxY || shape.minZ != shape.maxZ)
+                bounds = shape;
+        }
 
         GlStateManager.pushMatrix();
 
         GlStateManager.translate(x, y, z);
 
+        // rotate and scale
         GlStateManager.translate(0.5, 0.5, 0.5);
-        float angleX = System.currentTimeMillis() % 10000 / 10000f * 360;
-        float angleY = System.currentTimeMillis() % 11000 / 11000f * 360;
-        float angleZ = System.currentTimeMillis() % 12000 / 12000f * 360;
+        float angleX = System.currentTimeMillis() % 10000 / 10000f * 360f;
+        float angleY = System.currentTimeMillis() % 11000 / 11000f * 360f;
+        float angleZ = System.currentTimeMillis() % 12000 / 12000f * 360f;
         GlStateManager.rotate(angleX, 1, 0, 0);
         GlStateManager.rotate(angleY, 0, 1, 0);
         GlStateManager.rotate(angleZ, 0, 0, 1);
+        double sizeX = bounds.maxX - bounds.minX, sizeY = bounds.maxY - bounds.minY, sizeZ = bounds.maxZ - bounds.minZ;
+        float scale = 0.4763f / (float)Math.sqrt((sizeX * sizeX + sizeY * sizeY + sizeZ * sizeZ) / 4);
+        GlStateManager.scale(scale, scale, scale);
+        GlStateManager.translate(-bounds.getCenter().x, -bounds.getCenter().y, -bounds.getCenter().z);
 
-        GlStateManager.scale(0.55f, 0.55f, 0.55f);
-        GlStateManager.translate(-0.5, -0.5, -0.5);
-
-        if(boundBlock != null && boundTile != null && canRenderTileEntity(boundBlock.getRegistryName())){
+        if(renderTile){
             if(!(boundTile instanceof EntangledBlockTile) || depth < 10){
                 depth++;
                 TileEntityRendererDispatcher.instance.render(boundTile, 0, 0, 0, partialTicks);
@@ -61,7 +73,7 @@ public class EntangledBlockTileRenderer extends TileEntitySpecialRenderer<Entang
             }
         }
 
-        if(state != null && state.getRenderType() == EnumBlockRenderType.MODEL && canRenderBlock(state.getBlock().getRegistryName())){
+        if(renderBlock){
             GlStateManager.disableLighting();
 
             ScreenUtils.bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
@@ -69,7 +81,7 @@ public class EntangledBlockTileRenderer extends TileEntitySpecialRenderer<Entang
             BlockRenderLayer initialLayer = MinecraftForgeClient.getRenderLayer();
 
             for(BlockRenderLayer layer : BlockRenderLayer.values()){
-                if(state.getBlock().canRenderInLayer(state, layer)){
+                if(boundState.getBlock().canRenderInLayer(boundState, layer)){
                     Tessellator tessellator = Tessellator.getInstance();
                     BufferBuilder buffer = tessellator.getBuffer();
                     buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.BLOCK);
@@ -83,8 +95,8 @@ public class EntangledBlockTileRenderer extends TileEntitySpecialRenderer<Entang
                     ForgeHooksClient.setRenderLayer(layer);
                     try{
                         BlockRendererDispatcher brd = ClientUtils.getMinecraft().getBlockRendererDispatcher();
-                        IBakedModel model = brd.getModelForState(state);
-                        brd.getBlockModelRenderer().renderModel(tile.getWorld(), model, state, new BlockPos(0, 300, 0), buffer, false);
+                        IBakedModel model = brd.getModelForState(boundState);
+                        brd.getBlockModelRenderer().renderModel(tile.getWorld(), model, boundState, new BlockPos(0, 300, 0), buffer, false);
                     }catch(Exception e){
                         e.printStackTrace();
                     }
