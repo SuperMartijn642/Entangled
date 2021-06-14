@@ -87,4 +87,7 @@ dependencies {
     compile fg.deobf("curse.maven:supermartijn642s-config-lib:3312641")
     // Core Lib
     compile fg.deobf("com.supermartijn642.core:supermartijn642corelib:1.0.7-dev-mc1.16.5")//fg.deobf("curse.maven:supermartijn642s-core-lib:3300632")
+
+    // Mekanism
+    runtimeOnly fg.deobf("curse.maven:mekanism:3183270")
 }
