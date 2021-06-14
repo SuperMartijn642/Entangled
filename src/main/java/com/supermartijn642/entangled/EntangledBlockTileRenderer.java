@@ -53,7 +53,7 @@ public class EntangledBlockTileRenderer extends TileEntityRenderer<EntangledBloc
         matrixStack.rotate(new Quaternion(angleX, angleY, angleZ, true));
         float scale = 0.4763f / (float)Math.sqrt((bounds.getXSize() * bounds.getXSize() + bounds.getYSize() * bounds.getYSize() + bounds.getZSize() * bounds.getZSize()) / 4);
         matrixStack.scale(scale, scale, scale);
-        matrixStack.translate(-bounds.getXSize() / 2, -bounds.getYSize() / 2, -bounds.getZSize() / 2);
+        matrixStack.translate(-bounds.getCenter().x, -bounds.getCenter().y, -bounds.getCenter().z);
 
         if(renderTile){
             if(!(boundTile instanceof EntangledBlockTile) || depth < 10){
