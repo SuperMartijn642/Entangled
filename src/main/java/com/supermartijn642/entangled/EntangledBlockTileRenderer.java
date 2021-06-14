@@ -19,6 +19,7 @@ import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.client.ForgeHooksClient;
+import net.minecraftforge.client.MinecraftForgeClient;
 import net.minecraftforge.client.model.data.EmptyModelData;
 import net.minecraftforge.client.model.data.IModelData;
 import org.lwjgl.opengl.GL11;
@@ -69,6 +70,8 @@ public class EntangledBlockTileRenderer extends TileEntityRenderer<EntangledBloc
 
             ScreenUtils.bindTexture(AtlasTexture.LOCATION_BLOCKS_TEXTURE);
 
+            BlockRenderLayer initialLayer = MinecraftForgeClient.getRenderLayer();
+
             for(BlockRenderLayer layer : BlockRenderLayer.values()){
                 if(state.getBlock().canRenderInLayer(state, layer)){
                     Tessellator tessellator = Tessellator.getInstance();
@@ -80,6 +83,7 @@ public class EntangledBlockTileRenderer extends TileEntityRenderer<EntangledBloc
                         GlStateManager.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
                         GlStateManager.enableBlend();
                     }
+
                     ForgeHooksClient.setRenderLayer(layer);
                     IModelData data = Minecraft.getInstance().getBlockRendererDispatcher().getModelForState(state).getModelData(tile.getWorld(), tile.getPos(), state, EmptyModelData.INSTANCE);
                     try{
@@ -100,6 +104,8 @@ public class EntangledBlockTileRenderer extends TileEntityRenderer<EntangledBloc
                     }
                 }
             }
+
+            ForgeHooksClient.setRenderLayer(initialLayer);
         }
 
         GlStateManager.popMatrix();
