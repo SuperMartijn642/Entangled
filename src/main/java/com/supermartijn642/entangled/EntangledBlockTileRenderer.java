@@ -19,6 +19,7 @@ import net.minecraft.util.EnumBlockRenderType;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.client.ForgeHooksClient;
+import net.minecraftforge.client.MinecraftForgeClient;
 import org.lwjgl.opengl.GL11;
 
 /**
@@ -65,6 +66,8 @@ public class EntangledBlockTileRenderer extends TileEntitySpecialRenderer<Entang
 
             ScreenUtils.bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
 
+            BlockRenderLayer initialLayer = MinecraftForgeClient.getRenderLayer();
+
             for(BlockRenderLayer layer : BlockRenderLayer.values()){
                 if(state.getBlock().canRenderInLayer(state, layer)){
                     Tessellator tessellator = Tessellator.getInstance();
@@ -96,6 +99,8 @@ public class EntangledBlockTileRenderer extends TileEntitySpecialRenderer<Entang
                     }
                 }
             }
+
+            ForgeHooksClient.setRenderLayer(initialLayer);
         }
 
         GlStateManager.popMatrix();
