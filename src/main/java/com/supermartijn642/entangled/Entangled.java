@@ -18,7 +18,7 @@ public class Entangled {
     public static final String MODID = "entangled";
     public static final String NAME = "Entangled";
     public static final String VERSION = "1.3.4";
-    public static final String DEPENDENCIES = "required-after:supermartijn642configlib@[1.0.8,);required-after:supermartijn642corelib@[1.0.7,)";
+    public static final String DEPENDENCIES = "required-after:supermartijn642configlib@[1.0.7,);required-after:supermartijn642corelib@[1.0.8,)";
 
     @GameRegistry.ObjectHolder(Entangled.MODID + ":block")
     public static EntangledBlock block;
