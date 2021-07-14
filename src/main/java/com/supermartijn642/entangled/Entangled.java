@@ -1,6 +1,7 @@
 package com.supermartijn642.entangled;
 
 import com.google.common.collect.Sets;
+import com.supermartijn642.entangled.integration.TheOneProbePlugin;
 import net.minecraft.block.Block;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
@@ -9,7 +10,10 @@ import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.InterModComms;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.event.lifecycle.InterModEnqueueEvent;
+import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.registries.ObjectHolder;
 
 import java.util.Set;
@@ -25,6 +29,11 @@ public class Entangled {
     public static EntangledBinder item;
 
     public Entangled(){
+        FMLJavaModLoadingContext.get().getModEventBus().addListener(this::interModEnqueue);
+    }
+
+    public void interModEnqueue(InterModEnqueueEvent e){
+        InterModComms.sendTo("theoneprobe", "getTheOneProbe", TheOneProbePlugin::new);
     }
 
     @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD)
