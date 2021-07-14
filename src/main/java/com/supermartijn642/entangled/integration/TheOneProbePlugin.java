@@ -36,9 +36,7 @@ public class TheOneProbePlugin {
         }
 
         @Override
-        public void addProbeInfo(ProbeMode probeMode, IProbeInfo
-            probeInfo, EntityPlayer player, World world, IBlockState
-                                     state, IProbeHitData probeHitData){
+        public void addProbeInfo(ProbeMode probeMode, IProbeInfo probeInfo, EntityPlayer player, World world, IBlockState state, IProbeHitData probeHitData){
             TileEntity tile = world.getTileEntity(probeHitData.getPos());
             if(tile instanceof EntangledBlockTile){
                 if(((EntangledBlockTile)tile).isBound()){
