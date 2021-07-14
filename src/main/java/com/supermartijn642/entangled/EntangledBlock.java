@@ -139,13 +139,13 @@ public class EntangledBlock extends BaseBlock {
             if(compound.getString("dimension").equals(context.getWorld().func_234923_W_().func_240901_a_().toString())){
                 if(EntangledConfig.maxDistance.get() >= 0 && !pos.withinDistance(pos2, EntangledConfig.maxDistance.get() + 0.5)){
                     if(player != null && !context.getWorld().isRemote)
-                        player.sendMessage(TextComponents.translation("entangled.entangled_block.too_far").color(TextFormatting.RED).get(), player.getUniqueID());
+                        player.sendStatusMessage(TextComponents.translation("entangled.entangled_block.too_far").color(TextFormatting.RED).get(), true);
                     return null;
                 }
             }else{
                 if(!EntangledConfig.allowDimensional.get()){
                     if(player != null && !context.getWorld().isRemote)
-                        player.sendMessage(TextComponents.translation("entangled.entangled_block.wrong_dimension").color(TextFormatting.RED).get(), player.getUniqueID());
+                        player.sendStatusMessage(TextComponents.translation("entangled.entangled_block.wrong_dimension").color(TextFormatting.RED).get(), true);
                     return null;
                 }
             }
