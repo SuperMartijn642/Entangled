@@ -20,7 +20,7 @@ import java.util.function.Function;
 public class TheOneProbePlugin {
 
     public static void interModEnqueue(InterModEnqueueEvent e){
-        InterModComms.sendTo("theoneprobe", "getTheOneProbe", TheOneProbePlugin::new); // Don't change this to a lambda
+        InterModComms.sendTo("theoneprobe", "getTheOneProbe", ProbeInfoProvider::new);
     }
 
     public static class ProbeInfoProvider implements IProbeInfoProvider, Function<ITheOneProbe,Void> {
