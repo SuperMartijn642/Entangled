@@ -3,17 +3,14 @@ buildscript {
         maven { url = 'https://files.minecraftforge.net/maven' }
         jcenter()
         mavenCentral()
-        maven { url = 'https://plugins.gradle.org/m2'}
     }
     dependencies {
         classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '3.+', changing: true
-        classpath group: 'com.wynprice.cursemaven', name: 'CurseMaven', version: '2.1.4'
     }
 }
 apply plugin: 'net.minecraftforge.gradle'
 // Only edit below this line, the above code adds and enables the necessary things for Forge to be setup.
 apply plugin: 'eclipse'
-apply plugin: 'com.wynprice.cursemaven'
 
 version = '1.3.4-mc1.16.1'
 group = 'com.supermartijn642.entangled' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
@@ -70,36 +67,24 @@ minecraft {
 }
 
 repositories {
-    maven {
-        // location of the maven that hosts JEI files
-        name = "Progwml6 maven"
-        url = "https://dvs1.progwml6.com/files/maven/"
-    }
-    maven {
-        // location of a maven mirror for JEI files, as a fallback
-        name = "ModMaven"
-        url = "https://modmaven.k-4u.nl"
-    }
     flatDir {
         dirs 'libs'
+    }
+    maven {
+        url "https://www.cursemaven.com"
     }
 }
 
 dependencies {
     minecraft 'net.minecraftforge:forge:1.16.1-32.0.108'
 
-    // compile against the JEI API but do not include it at runtime
-    compileOnly fg.deobf("mezz.jei:jei-1.16.1:7.0.1.10:api")
-    // at runtime, use the full JEI jar
-    runtimeOnly fg.deobf("mezz.jei:jei-1.16.1:7.0.1.10")
-
-    // Compile against the Hwyla API, but do not include it at runtime
-    compileOnly fg.deobf("curse.maven:hwyla:3017696")
-    // At runtime, use the full Hwyla jar
-    runtimeOnly fg.deobf("curse.maven:hwyla:3017694")
-
     // Config Lib
-    compile fg.deobf("curse.maven:supermartijn642s-config-lib:3312641")
+    compile fg.deobf("curse.maven:supermartijn642s-config-lib-438332:3357667")
     // Core Lib
-    compile fg.deobf("com.supermartijn642.core:supermartijn642corelib:1.0.7-dev-mc1.16.1")//fg.deobf("curse.maven:supermartijn642s-core-lib:3300631")
+    compile fg.deobf("curse.maven:supermartijn642s-core-lib-454372:3357862")
+
+    // Hwyla
+    compile fg.deobf("curse.maven:hwyla-253449:3017694")
+    // The One Probe
+    compileOnly fg.deobf("curse.maven:the-one-probe-245211:3008328")
 }
