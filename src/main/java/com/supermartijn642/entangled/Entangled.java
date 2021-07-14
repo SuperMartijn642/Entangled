@@ -1,12 +1,15 @@
 package com.supermartijn642.entangled;
 
 import com.google.common.collect.Sets;
+import com.supermartijn642.entangled.integration.TheOneProbePlugin;
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.event.RegistryEvent;
+import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 
@@ -24,6 +27,12 @@ public class Entangled {
     public static EntangledBlock block;
     @GameRegistry.ObjectHolder(Entangled.MODID + ":item")
     public static Item item;
+
+    @Mod.EventHandler
+    public void preInit(FMLPreInitializationEvent event){
+        if(Loader.isModLoaded("theoneprobe"))
+            TheOneProbePlugin.interModEnqueue();
+    }
 
     @Mod.EventBusSubscriber
     public static class RegistryEvents {

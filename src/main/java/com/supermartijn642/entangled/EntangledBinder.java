@@ -1,7 +1,7 @@
 package com.supermartijn642.entangled;
 
-import com.supermartijn642.core.ClientUtils;
 import com.supermartijn642.core.TextComponents;
+import net.minecraft.block.Block;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
@@ -43,8 +43,9 @@ public class EntangledBinder extends Item {
         compound.setInteger("boundx", pos.getX());
         compound.setInteger("boundy", pos.getY());
         compound.setInteger("boundz", pos.getZ());
+        compound.setInteger("blockstate", Block.getStateId(worldIn.getBlockState(pos)));
         stack.setTagCompound(compound);
-        player.sendMessage(TextComponents.translation("entangled.entangled_binder.select").color(TextFormatting.YELLOW).get());
+        player.sendStatusMessage(TextComponents.translation("entangled.entangled_binder.select").color(TextFormatting.YELLOW).get(), true);
         return EnumActionResult.SUCCESS;
     }
 
@@ -56,20 +57,27 @@ public class EntangledBinder extends Item {
         if(playerIn.isSneaking() && compound != null && compound.getBoolean("bound")){
             compound.setBoolean("bound", false);
             playerIn.getHeldItem(handIn).setTagCompound(compound);
-            playerIn.sendMessage(TextComponents.translation("entangled.entangled_binder.clear").color(TextFormatting.YELLOW).get());
+            playerIn.sendStatusMessage(TextComponents.translation("entangled.entangled_binder.clear").color(TextFormatting.YELLOW).get(), true);
         }
         return super.onItemRightClick(worldIn, playerIn, handIn);
     }
 
     @Override
     public void addInformation(ItemStack stack, World worldIn, List<String> tooltip, ITooltipFlag flagIn){
-        tooltip.add(TextFormatting.AQUA + ClientUtils.translate("entangled.entangled_binder.info"));
+        tooltip.add(TextComponents.translation("entangled.entangled_binder.info").color(TextFormatting.AQUA).format());
 
         NBTTagCompound tag = stack.getTagCompound();
         if(tag != null && tag.hasKey("bound") && tag.getBoolean("bound")){
             int x = tag.getInteger("boundx"), y = tag.getInteger("boundy"), z = tag.getInteger("boundz");
-            ITextComponent dimension = TextComponents.dimension(DimensionType.getById(tag.getInteger("dimension"))).get();
-            tooltip.add(TextFormatting.YELLOW + ClientUtils.translate("entangled.entangled_binder.info.target", x, y, z, dimension));
+            ITextComponent dimension = TextComponents.dimension(DimensionType.getById(tag.getInteger("dimension"))).color(TextFormatting.GOLD).get();
+            ITextComponent xText = TextComponents.string(Integer.toString(x)).color(TextFormatting.GOLD).get();
+            ITextComponent yText = TextComponents.string(Integer.toString(y)).color(TextFormatting.GOLD).get();
+            ITextComponent zText = TextComponents.string(Integer.toString(z)).color(TextFormatting.GOLD).get();
+            if(tag.hasKey("blockstate")){
+                ITextComponent name = TextComponents.blockState(Block.getStateById(tag.getInteger("blockstate"))).color(TextFormatting.GOLD).get();
+                tooltip.add(TextComponents.translation("entangled.entangled_binder.info.target.known", name, xText, yText, zText, dimension).color(TextFormatting.YELLOW).format());
+            }else
+                tooltip.add(TextComponents.translation("entangled.entangled_binder.info.target.unknown", xText, yText, zText, dimension).color(TextFormatting.YELLOW).format());
         }
     }
 }
