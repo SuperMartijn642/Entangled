@@ -1,6 +1,7 @@
 package com.supermartijn642.entangled;
 
 import com.supermartijn642.core.TextComponents;
+import net.minecraft.block.Block;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
@@ -30,7 +31,7 @@ public class EntangledBinder extends Item {
 
     @Override
     public ActionResultType onItemUse(ItemUseContext context){
-        if(context.getWorld().isRemote)
+        if(context.getWorld().isRemote || context.getPlayer() == null)
             return ActionResultType.SUCCESS;
         ItemStack stack = context.getItem();
         CompoundNBT compound = stack.getTag() == null ? new CompoundNBT() : stack.getTag();
@@ -43,8 +44,9 @@ public class EntangledBinder extends Item {
         compound.putInt("boundx", context.getPos().getX());
         compound.putInt("boundy", context.getPos().getY());
         compound.putInt("boundz", context.getPos().getZ());
+        compound.putInt("blockstate", Block.getStateId(context.getWorld().getBlockState(context.getPos())));
         stack.setTag(compound);
-        context.getPlayer().sendMessage(TextComponents.translation("entangled.entangled_binder.select").color(TextFormatting.YELLOW).get());
+        context.getPlayer().sendStatusMessage(TextComponents.translation("entangled.entangled_binder.select").color(TextFormatting.YELLOW).get(), true);
         return ActionResultType.SUCCESS;
     }
 
@@ -56,7 +58,7 @@ public class EntangledBinder extends Item {
         if(playerIn.isSneaking() && compound != null && compound.getBoolean("bound")){
             compound.putBoolean("bound", false);
             playerIn.getHeldItem(handIn).setTag(compound);
-            playerIn.sendMessage(TextComponents.translation("entangled.entangled_binder.clear").color(TextFormatting.YELLOW).get());
+            playerIn.sendStatusMessage(TextComponents.translation("entangled.entangled_binder.clear").color(TextFormatting.YELLOW).get(), true);
         }
         return super.onItemRightClick(worldIn, playerIn, handIn);
     }
@@ -68,8 +70,15 @@ public class EntangledBinder extends Item {
         CompoundNBT tag = stack.getOrCreateTag();
         if(tag.contains("bound") && tag.getBoolean("bound")){
             int x = tag.getInt("boundx"), y = tag.getInt("boundy"), z = tag.getInt("boundz");
-            ITextComponent dimension = TextComponents.dimension(DimensionType.getById(tag.getInt("dimension"))).get();
-            tooltip.add(TextComponents.translation("entangled.entangled_binder.info.target", x, y, z, dimension).color(TextFormatting.YELLOW).get());
+            ITextComponent dimension = TextComponents.dimension(DimensionType.getById(tag.getInt("dimension"))).color(TextFormatting.GOLD).get();
+            ITextComponent xText = TextComponents.string(Integer.toString(x)).color(TextFormatting.GOLD).get();
+            ITextComponent yText = TextComponents.string(Integer.toString(y)).color(TextFormatting.GOLD).get();
+            ITextComponent zText = TextComponents.string(Integer.toString(z)).color(TextFormatting.GOLD).get();
+            if(tag.contains("blockstate")){
+                ITextComponent name = TextComponents.blockState(Block.getStateById(tag.getInt("blockstate"))).color(TextFormatting.GOLD).get();
+                tooltip.add(TextComponents.translation("entangled.entangled_binder.info.target.known", name, xText, yText, zText, dimension).color(TextFormatting.YELLOW).get());
+            }else
+                tooltip.add(TextComponents.translation("entangled.entangled_binder.info.target.unknown", xText, yText, zText, dimension).color(TextFormatting.YELLOW).get());
         }
     }
 }
