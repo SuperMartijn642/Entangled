@@ -1,16 +1,7 @@
 package com.supermartijn642.entangled.integration;
 
-import com.supermartijn642.core.TextComponents;
 import com.supermartijn642.entangled.EntangledBlock;
-import com.supermartijn642.entangled.EntangledBlockTile;
 import mcp.mobius.waila.api.*;
-import net.minecraft.block.BlockState;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextFormatting;
-
-import java.util.List;
 
 /**
  * Created 1/26/2021 by SuperMartijn642
@@ -23,25 +14,25 @@ public class EntangledWailaPlugin implements IComponentProvider, IWailaPlugin {
         registrar.registerComponentProvider(this, TooltipPosition.BODY, EntangledBlock.class);
     }
 
-    @Override
-    public void appendBody(List<ITextComponent> tooltip, IDataAccessor accessor, IPluginConfig config){
-        TileEntity tile = accessor.getTileEntity();
-        if(tile instanceof EntangledBlockTile){
-            if(((EntangledBlockTile)tile).isBound()){
-                BlockState boundBlockState = ((EntangledBlockTile)tile).getBoundBlockState();
-                ITextComponent boundBlock = (boundBlockState == null ? TextComponents.string("Block") : TextComponents.blockState(boundBlockState)).color(TextFormatting.GOLD).get();
-                BlockPos boundPos = ((EntangledBlockTile)tile).getBoundBlockPos();
-                ITextComponent x = TextComponents.string(Integer.toString(boundPos.getX())).color(TextFormatting.GOLD).get();
-                ITextComponent y = TextComponents.string(Integer.toString(boundPos.getY())).color(TextFormatting.GOLD).get();
-                ITextComponent z = TextComponents.string(Integer.toString(boundPos.getZ())).color(TextFormatting.GOLD).get();
-                if(((EntangledBlockTile)tile).getBoundDimension() == accessor.getWorld().dimension())
-                    tooltip.add(TextComponents.translation("entangled.waila.bound_same_dimension", boundBlock, x, y, z).color(TextFormatting.YELLOW).get());
-                else{
-                    ITextComponent dimension = TextComponents.dimension(((EntangledBlockTile)tile).getBoundDimension()).color(TextFormatting.GOLD).get();
-                    tooltip.add(TextComponents.translation("entangled.waila.bound_other_dimension", boundBlock, x, y, z, dimension).color(TextFormatting.YELLOW).get());
-                }
-            }else
-                tooltip.add(TextComponents.translation("entangled.waila.unbound").color(TextFormatting.YELLOW).get());
-        }
-    }
+//    @Override TODO uncomment once hwyla updates
+//    public void appendBody(List<Component> tooltip, IDataAccessor accessor, IPluginConfig config){
+//        BlockEntity tile = accessor.getTileEntity();
+//        if(tile instanceof EntangledBlockTile){
+//            if(((EntangledBlockTile)tile).isBound()){
+//                BlockState boundBlockState = ((EntangledBlockTile)tile).getBoundBlockState();
+//                Component boundBlock = (boundBlockState == null ? TextComponents.string("Block") : TextComponents.blockState(boundBlockState)).color(ChatFormatting.GOLD).get();
+//                BlockPos boundPos = ((EntangledBlockTile)tile).getBoundBlockPos();
+//                Component x = TextComponents.string(Integer.toString(boundPos.getX())).color(ChatFormatting.GOLD).get();
+//                Component y = TextComponents.string(Integer.toString(boundPos.getY())).color(ChatFormatting.GOLD).get();
+//                Component z = TextComponents.string(Integer.toString(boundPos.getZ())).color(ChatFormatting.GOLD).get();
+//                if(((EntangledBlockTile)tile).getBoundDimension() == accessor.getWorld().dimension())
+//                    tooltip.add(TextComponents.translation("entangled.waila.bound_same_dimension", boundBlock, x, y, z).color(ChatFormatting.YELLOW).get());
+//                else{
+//                    Component dimension = TextComponents.dimension(((EntangledBlockTile)tile).getBoundDimension()).color(ChatFormatting.GOLD).get();
+//                    tooltip.add(TextComponents.translation("entangled.waila.bound_other_dimension", boundBlock, x, y, z, dimension).color(ChatFormatting.YELLOW).get());
+//                }
+//            }else
+//                tooltip.add(TextComponents.translation("entangled.waila.unbound").color(ChatFormatting.YELLOW).get());
+//        }
+//    }
 }

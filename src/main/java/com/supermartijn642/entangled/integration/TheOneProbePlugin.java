@@ -3,12 +3,12 @@ package com.supermartijn642.entangled.integration;
 import com.supermartijn642.core.TextComponents;
 import com.supermartijn642.entangled.EntangledBlockTile;
 import mcjty.theoneprobe.api.*;
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.fml.InterModComms;
 import net.minecraftforge.fml.event.lifecycle.InterModEnqueueEvent;
 
@@ -37,12 +37,12 @@ public class TheOneProbePlugin {
         }
 
         @Override
-        public void addProbeInfo(ProbeMode probeMode, IProbeInfo probeInfo, PlayerEntity player, World world, BlockState state, IProbeHitData probeHitData){
-            TileEntity tile = world.getBlockEntity(probeHitData.getPos());
+        public void addProbeInfo(ProbeMode probeMode, IProbeInfo probeInfo, Player player, Level world, BlockState state, IProbeHitData probeHitData){
+            BlockEntity tile = world.getBlockEntity(probeHitData.getPos());
             if(tile instanceof EntangledBlockTile){
                 if(((EntangledBlockTile)tile).isBound()){
                     BlockState boundBlockState = ((EntangledBlockTile)tile).getBoundBlockState();
-                    ITextComponent boundBlock = TextComponents.string(TextStyleClass.HIGHLIGHTED.toString()).append(boundBlockState == null ? TextComponents.string("Block").get() : TextComponents.blockState(boundBlockState).get()).append(TextComponents.string(TextStyleClass.INFO.toString()).get()).get();
+                    Component boundBlock = TextComponents.string(TextStyleClass.HIGHLIGHTED.toString()).append(boundBlockState == null ? TextComponents.string("Block").get() : TextComponents.blockState(boundBlockState).get()).append(TextComponents.string(TextStyleClass.INFO.toString()).get()).get();
                     BlockPos boundPos = ((EntangledBlockTile)tile).getBoundBlockPos();
                     String x = TextStyleClass.HIGHLIGHTED.toString() + boundPos.getX() + TextStyleClass.INFO;
                     String y = TextStyleClass.HIGHLIGHTED.toString() + boundPos.getY() + TextStyleClass.INFO;

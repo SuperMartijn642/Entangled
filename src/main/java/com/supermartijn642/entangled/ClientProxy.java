@@ -3,25 +3,24 @@ package com.supermartijn642.entangled;
 import com.supermartijn642.core.ClientUtils;
 import com.supermartijn642.core.render.RenderUtils;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.model.IBakedModel;
-import net.minecraft.client.renderer.model.ModelResourceLocation;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.Hand;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.world.World;
+import net.minecraft.client.resources.model.BakedModel;
+import net.minecraft.client.resources.model.ModelResourceLocation;
+import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.phys.HitResult;
 import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.client.event.DrawHighlightEvent;
+import net.minecraftforge.client.event.DrawSelectionEvent;
+import net.minecraftforge.client.event.EntityRenderersEvent;
 import net.minecraftforge.client.event.ModelBakeEvent;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 
 /**
  * Created 3/16/2020 by SuperMartijn642
@@ -30,15 +29,15 @@ import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 public class ClientProxy {
 
     @SubscribeEvent
-    public static void setup(FMLClientSetupEvent e){
-        ClientRegistry.bindTileEntityRenderer(Entangled.tile, EntangledBlockTileRenderer::new);
+    public static void setup(EntityRenderersEvent.RegisterRenderers e){
+        e.registerBlockEntityRenderer(Entangled.tile, context -> new EntangledBlockTileRenderer());
     }
 
     @SubscribeEvent
     public static void onModelBake(ModelBakeEvent e){
         // replace the entangled block item model
         ResourceLocation location = new ModelResourceLocation(new ResourceLocation("entangled", "block"), "inventory");
-        IBakedModel model = e.getModelRegistry().get(location);
+        BakedModel model = e.getModelRegistry().get(location);
         if(model != null)
             e.getModelRegistry().put(location, new EntangledBlockBakedItemModel(model));
     }
@@ -48,11 +47,11 @@ public class ClientProxy {
 
         @SubscribeEvent
         public static void onDrawPlayerEvent(RenderWorldLastEvent e){
-            ItemStack stack = ClientUtils.getPlayer().getItemInHand(Hand.MAIN_HAND);
-            World world = ClientUtils.getWorld();
+            ItemStack stack = ClientUtils.getPlayer().getItemInHand(InteractionHand.MAIN_HAND);
+            Level world = ClientUtils.getWorld();
 
             if(stack.getItem() instanceof BlockItem && ((BlockItem)stack.getItem()).getBlock() == Entangled.block && stack.hasTag() && stack.getOrCreateTag().contains("tileData")){
-                CompoundNBT compound = stack.getOrCreateTag().getCompound("tileData");
+                CompoundTag compound = stack.getOrCreateTag().getCompound("tileData");
                 if(compound.getBoolean("bound") && compound.getString("dimension").equals(world.dimension().location().toString())){
                     BlockPos pos = new BlockPos(compound.getInt("boundx"), compound.getInt("boundy"), compound.getInt("boundz"));
                     RenderUtils.disableDepthTest();
@@ -60,7 +59,7 @@ public class ClientProxy {
                     RenderUtils.enableDepthTest();
                 }
             }else if(stack.getItem() == Entangled.item){
-                CompoundNBT compound = stack.getOrCreateTag();
+                CompoundTag compound = stack.getOrCreateTag();
                 if(compound.getBoolean("bound") && compound.getString("dimension").equals(world.dimension().location().toString())){
                     BlockPos pos = new BlockPos(compound.getInt("boundx"), compound.getInt("boundy"), compound.getInt("boundz"));
                     RenderUtils.disableDepthTest();
@@ -71,12 +70,12 @@ public class ClientProxy {
         }
 
         @SubscribeEvent
-        public static void onBlockHighlight(DrawHighlightEvent.HighlightBlock e){
-            if(e.getTarget().getType() != RayTraceResult.Type.BLOCK || e.getTarget().getBlockPos() == null || !EntangledConfig.renderBlockHighlight.get())
+        public static void onBlockHighlight(DrawSelectionEvent.HighlightBlock e){
+            if(e.getTarget().getType() != HitResult.Type.BLOCK || e.getTarget().getBlockPos() == null || !EntangledConfig.renderBlockHighlight.get())
                 return;
 
-            World world = Minecraft.getInstance().level;
-            TileEntity tile = world.getBlockEntity(e.getTarget().getBlockPos());
+            Level world = Minecraft.getInstance().level;
+            BlockEntity tile = world.getBlockEntity(e.getTarget().getBlockPos());
             if(tile instanceof EntangledBlockTile && ((EntangledBlockTile)tile).isBound() && ((EntangledBlockTile)tile).getBoundDimension() == world.dimension()){
                 BlockPos pos = ((EntangledBlockTile)tile).getBoundBlockPos();
                 RenderUtils.disableDepthTest();

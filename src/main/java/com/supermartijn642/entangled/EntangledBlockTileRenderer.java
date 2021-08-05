@@ -1,42 +1,38 @@
 package com.supermartijn642.entangled;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
-import net.minecraft.block.BlockRenderType;
-import net.minecraft.block.BlockState;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.math.Quaternion;
+import com.supermartijn642.core.ClientUtils;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.IRenderTypeBuffer;
-import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
-import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraft.util.math.shapes.VoxelShape;
-import net.minecraft.util.math.vector.Quaternion;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.block.RenderShape;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.shapes.VoxelShape;
 
 /**
  * Created 3/16/2020 by SuperMartijn642
  */
-public class EntangledBlockTileRenderer extends TileEntityRenderer<EntangledBlockTile> {
+public class EntangledBlockTileRenderer implements BlockEntityRenderer<EntangledBlockTile> {
 
     private static int depth = 0;
 
-    public EntangledBlockTileRenderer(TileEntityRendererDispatcher dispatcher){
-        super(dispatcher);
-    }
-
     @Override
-    public void render(EntangledBlockTile tile, float partialTicks, MatrixStack matrixStack, IRenderTypeBuffer buffer, int combinedLight, int combinedOverlay){
+    public void render(EntangledBlockTile tile, float partialTicks, PoseStack matrixStack, MultiBufferSource buffer, int combinedLight, int combinedOverlay){
         if(!tile.isBound())
             return;
 
-        TileEntity boundTile = tile.getLevel().dimension() == tile.getBoundDimension() ? tile.getLevel().getBlockEntity(tile.getBoundBlockPos()) : null;
+        BlockEntity boundTile = tile.getLevel().dimension() == tile.getBoundDimension() ? tile.getLevel().getBlockEntity(tile.getBoundBlockPos()) : null;
         BlockState boundState = tile.getBoundBlockState();
 
         boolean renderTile = boundTile != null && canRenderTileEntity(boundTile.getType().getRegistryName());
-        boolean renderBlock = boundState != null && boundState.getRenderShape() == BlockRenderType.MODEL && canRenderBlock(boundState.getBlock().getRegistryName());
+        boolean renderBlock = boundState != null && boundState.getRenderShape() == RenderShape.MODEL && canRenderBlock(boundState.getBlock().getRegistryName());
 
         // get the bounding box
-        AxisAlignedBB bounds = new AxisAlignedBB(0, 0, 0, 1, 1, 1);
+        AABB bounds = new AABB(0, 0, 0, 1, 1, 1);
         if(renderBlock && tile.getLevel().dimension() == tile.getBoundDimension()){
             VoxelShape shape = boundState.getOcclusionShape(tile.getLevel(), tile.getBoundBlockPos());
             if(!shape.isEmpty())
@@ -58,7 +54,7 @@ public class EntangledBlockTileRenderer extends TileEntityRenderer<EntangledBloc
         if(renderTile){
             if(!(boundTile instanceof EntangledBlockTile) || depth < 10){
                 depth++;
-                TileEntityRendererDispatcher.instance.render(boundTile, partialTicks, matrixStack, buffer);
+                ClientUtils.getMinecraft().getBlockEntityRenderDispatcher().render(boundTile, partialTicks, matrixStack, buffer);
                 depth--;
             }
         }
