@@ -38,7 +38,7 @@ public class TheOneProbePlugin {
 
         @Override
         public void addProbeInfo(ProbeMode probeMode, IProbeInfo probeInfo, PlayerEntity player, World world, BlockState state, IProbeHitData probeHitData){
-            TileEntity tile = world.getTileEntity(probeHitData.getPos());
+            TileEntity tile = world.getBlockEntity(probeHitData.getPos());
             if(tile instanceof EntangledBlockTile){
                 if(((EntangledBlockTile)tile).isBound()){
                     BlockState boundBlockState = ((EntangledBlockTile)tile).getBoundBlockState();
@@ -47,7 +47,7 @@ public class TheOneProbePlugin {
                     String x = TextStyleClass.HIGHLIGHTED.toString() + boundPos.getX() + TextStyleClass.INFO;
                     String y = TextStyleClass.HIGHLIGHTED.toString() + boundPos.getY() + TextStyleClass.INFO;
                     String z = TextStyleClass.HIGHLIGHTED.toString() + boundPos.getZ() + TextStyleClass.INFO;
-                    if(((EntangledBlockTile)tile).getBoundDimension() == world.getDimensionKey())
+                    if(((EntangledBlockTile)tile).getBoundDimension() == world.dimension())
                         probeInfo.vertical().text(TextComponents.translation("entangled.waila.bound_same_dimension", boundBlock, x, y, z).get());
                     else{
                         String dimension = TextStyleClass.HIGHLIGHTED + TextComponents.dimension(((EntangledBlockTile)tile).getBoundDimension()).format() + TextStyleClass.INFO;

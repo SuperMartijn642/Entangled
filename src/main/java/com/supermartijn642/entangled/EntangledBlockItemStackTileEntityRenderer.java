@@ -20,18 +20,18 @@ import net.minecraft.util.math.BlockPos;
 public class EntangledBlockItemStackTileEntityRenderer extends ItemStackTileEntityRenderer {
 
     @Override
-    public void func_239207_a_(ItemStack stack, ItemCameraTransforms.TransformType cameraTransforms, MatrixStack matrixStack, IRenderTypeBuffer buffer, int combinedLight, int combinedOverlay){
+    public void renderByItem(ItemStack stack, ItemCameraTransforms.TransformType cameraTransforms, MatrixStack matrixStack, IRenderTypeBuffer buffer, int combinedLight, int combinedOverlay){
         if(!stack.hasTag() || !stack.getTag().contains("tileData") || !stack.getTag().getCompound("tileData").getBoolean("bound")){
-            IBakedModel model = ClientUtils.getMinecraft().getItemRenderer().getItemModelMesher().getItemModel(stack);
+            IBakedModel model = ClientUtils.getMinecraft().getItemRenderer().getItemModelShaper().getItemModel(stack);
             renderDefaultItem(stack, matrixStack, cameraTransforms, buffer, combinedLight, combinedOverlay, model);
             return;
         }
 
         EntangledBlockTile tile = new EntangledBlockTile();
-        tile.setWorldAndPos(ClientUtils.getMinecraft().world, BlockPos.ZERO);
+        tile.setLevelAndPosition(ClientUtils.getMinecraft().level, BlockPos.ZERO);
         tile.readData(stack.getTag().getCompound("tileData"));
 
-        IBakedModel model = ClientUtils.getMinecraft().getBlockRendererDispatcher().getModelForState(Entangled.block.getDefaultState().with(EntangledBlock.ON, true));
+        IBakedModel model = ClientUtils.getMinecraft().getBlockRenderer().getBlockModel(Entangled.block.defaultBlockState().setValue(EntangledBlock.ON, true));
         renderDefaultItem(stack, matrixStack, cameraTransforms, buffer, combinedLight, combinedOverlay, model);
 
         TileEntityRendererDispatcher.instance.renderItem(tile, matrixStack, buffer, combinedLight, combinedOverlay);
@@ -40,19 +40,19 @@ public class EntangledBlockItemStackTileEntityRenderer extends ItemStackTileEnti
     private static void renderDefaultItem(ItemStack itemStack, MatrixStack matrixStack, ItemCameraTransforms.TransformType cameraTransforms, IRenderTypeBuffer renderTypeBuffer, int combinedLight, int combinedOverlay, IBakedModel model){
         ItemRenderer renderer = ClientUtils.getMinecraft().getItemRenderer();
 
-        matrixStack.push();
+        matrixStack.pushPose();
 
         if(model.isLayered()){
             net.minecraftforge.client.ForgeHooksClient.drawItemLayered(renderer, model, itemStack, matrixStack, renderTypeBuffer, combinedLight, combinedOverlay, true);
         }else{
-            RenderType rendertype = RenderTypeLookup.func_239219_a_(itemStack, true);
+            RenderType rendertype = RenderTypeLookup.getRenderType(itemStack, true);
             IVertexBuilder ivertexbuilder;
 
-            ivertexbuilder = ItemRenderer.getEntityGlintVertexBuilder(renderTypeBuffer, rendertype, true, itemStack.hasEffect());
+            ivertexbuilder = ItemRenderer.getFoilBufferDirect(renderTypeBuffer, rendertype, true, itemStack.hasFoil());
 
-            renderer.renderModel(model, itemStack, combinedLight, combinedOverlay, matrixStack, ivertexbuilder);
+            renderer.renderModelLists(model, itemStack, combinedLight, combinedOverlay, matrixStack, ivertexbuilder);
         }
 
-        matrixStack.pop();
+        matrixStack.popPose();
     }
 }

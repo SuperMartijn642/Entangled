@@ -23,57 +23,57 @@ import java.util.List;
 public class EntangledBinder extends Item {
 
     public EntangledBinder(){
-        super(new Item.Properties().maxStackSize(1).group(ItemGroup.SEARCH));
+        super(new Item.Properties().stacksTo(1).tab(ItemGroup.TAB_SEARCH));
         this.setRegistryName("item");
     }
 
     @Override
-    public ActionResultType onItemUse(ItemUseContext context){
-        if(context.getWorld().isRemote || context.getPlayer() == null)
+    public ActionResultType useOn(ItemUseContext context){
+        if(context.getLevel().isClientSide || context.getPlayer() == null)
             return ActionResultType.SUCCESS;
-        ItemStack stack = context.getItem();
+        ItemStack stack = context.getItemInHand();
         CompoundNBT compound = stack.getTag() == null ? new CompoundNBT() : stack.getTag();
-        if(compound.getBoolean("bound") && compound.getString("dimension").equals(context.getWorld().getDimensionKey().getLocation().toString()) &&
-            compound.getInt("boundx") == context.getPos().getX() &&
-            compound.getInt("boundy") == context.getPos().getY() && compound.getInt("boundz") == context.getPos().getZ())
+        if(compound.getBoolean("bound") && compound.getString("dimension").equals(context.getLevel().dimension().location().toString()) &&
+            compound.getInt("boundx") == context.getClickedPos().getX() &&
+            compound.getInt("boundy") == context.getClickedPos().getY() && compound.getInt("boundz") == context.getClickedPos().getZ())
             return ActionResultType.PASS;
         compound.putBoolean("bound", true);
-        compound.putString("dimension", context.getWorld().getDimensionKey().getLocation().toString());
-        compound.putInt("boundx", context.getPos().getX());
-        compound.putInt("boundy", context.getPos().getY());
-        compound.putInt("boundz", context.getPos().getZ());
-        compound.putInt("blockstate", Block.getStateId(context.getWorld().getBlockState(context.getPos())));
+        compound.putString("dimension", context.getLevel().dimension().location().toString());
+        compound.putInt("boundx", context.getClickedPos().getX());
+        compound.putInt("boundy", context.getClickedPos().getY());
+        compound.putInt("boundz", context.getClickedPos().getZ());
+        compound.putInt("blockstate", Block.getId(context.getLevel().getBlockState(context.getClickedPos())));
         stack.setTag(compound);
-        context.getPlayer().sendStatusMessage(TextComponents.translation("entangled.entangled_binder.select").color(TextFormatting.YELLOW).get(), true);
+        context.getPlayer().displayClientMessage(TextComponents.translation("entangled.entangled_binder.select").color(TextFormatting.YELLOW).get(), true);
         return ActionResultType.SUCCESS;
     }
 
     @Override
-    public ActionResult<ItemStack> onItemRightClick(World worldIn, PlayerEntity playerIn, Hand handIn){
-        if(playerIn.world.isRemote)
-            return super.onItemRightClick(worldIn, playerIn, handIn);
-        CompoundNBT compound = playerIn.getHeldItem(handIn).getTag();
+    public ActionResult<ItemStack> use(World worldIn, PlayerEntity playerIn, Hand handIn){
+        if(playerIn.level.isClientSide)
+            return super.use(worldIn, playerIn, handIn);
+        CompoundNBT compound = playerIn.getItemInHand(handIn).getTag();
         if(playerIn.isCrouching() && compound != null && compound.getBoolean("bound")){
             compound.putBoolean("bound", false);
-            playerIn.getHeldItem(handIn).setTag(compound);
-            playerIn.sendStatusMessage(TextComponents.translation("entangled.entangled_binder.clear").color(TextFormatting.YELLOW).get(), true);
+            playerIn.getItemInHand(handIn).setTag(compound);
+            playerIn.displayClientMessage(TextComponents.translation("entangled.entangled_binder.clear").color(TextFormatting.YELLOW).get(), true);
         }
-        return super.onItemRightClick(worldIn, playerIn, handIn);
+        return super.use(worldIn, playerIn, handIn);
     }
 
     @Override
-    public void addInformation(ItemStack stack, World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn){
+    public void appendHoverText(ItemStack stack, World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn){
         tooltip.add(TextComponents.translation("entangled.entangled_binder.info").color(TextFormatting.AQUA).get());
 
         CompoundNBT tag = stack.getOrCreateTag();
         if(tag.contains("bound") && tag.getBoolean("bound")){
             int x = tag.getInt("boundx"), y = tag.getInt("boundy"), z = tag.getInt("boundz");
-            ITextComponent dimension = TextComponents.dimension(RegistryKey.getOrCreateKey(Registry.WORLD_KEY, new ResourceLocation(tag.getString("dimension")))).color(TextFormatting.GOLD).get();
+            ITextComponent dimension = TextComponents.dimension(RegistryKey.create(Registry.DIMENSION_REGISTRY, new ResourceLocation(tag.getString("dimension")))).color(TextFormatting.GOLD).get();
             ITextComponent xText = TextComponents.string(Integer.toString(x)).color(TextFormatting.GOLD).get();
             ITextComponent yText = TextComponents.string(Integer.toString(y)).color(TextFormatting.GOLD).get();
             ITextComponent zText = TextComponents.string(Integer.toString(z)).color(TextFormatting.GOLD).get();
             if(tag.contains("blockstate")){
-                ITextComponent name = TextComponents.blockState(Block.getStateById(tag.getInt("blockstate"))).color(TextFormatting.GOLD).get();
+                ITextComponent name = TextComponents.blockState(Block.stateById(tag.getInt("blockstate"))).color(TextFormatting.GOLD).get();
                 tooltip.add(TextComponents.translation("entangled.entangled_binder.info.target.known", name, xText, yText, zText, dimension).color(TextFormatting.YELLOW).get());
             }else
                 tooltip.add(TextComponents.translation("entangled.entangled_binder.info.target.unknown", xText, yText, zText, dimension).color(TextFormatting.YELLOW).get());

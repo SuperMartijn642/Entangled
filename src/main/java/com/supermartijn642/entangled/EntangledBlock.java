@@ -41,43 +41,43 @@ public class EntangledBlock extends BaseBlock {
     public static final BooleanProperty ON = BooleanProperty.create("on");
 
     public EntangledBlock(){
-        super("block", true, Properties.create(new Material.Builder(MaterialColor.BROWN).doesNotBlockMovement().build()).speedFactor(1f).harvestTool(ToolType.PICKAXE).sound(SoundType.STONE).hardnessAndResistance(2f));
-        this.setDefaultState(this.getDefaultState().with(ON, false));
+        super("block", true, Properties.of(new Material.Builder(MaterialColor.COLOR_BROWN).noCollider().build()).speedFactor(1f).harvestTool(ToolType.PICKAXE).sound(SoundType.STONE).strength(2f));
+        this.registerDefaultState(this.defaultBlockState().setValue(ON, false));
     }
 
     @Override
-    public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity playerIn, Hand hand, BlockRayTraceResult result){
-        if(worldIn.isRemote)
+    public ActionResultType use(BlockState state, World worldIn, BlockPos pos, PlayerEntity playerIn, Hand hand, BlockRayTraceResult result){
+        if(worldIn.isClientSide)
             return ActionResultType.PASS;
-        ItemStack stack = playerIn.getHeldItem(hand);
-        if(playerIn.isCrouching() && stack.isEmpty() && state.get(ON)){
-            ((EntangledBlockTile)worldIn.getTileEntity(pos)).bind(null, null);
-            playerIn.sendStatusMessage(TextComponents.translation("entangled.entangled_block.unbind").color(TextFormatting.YELLOW).get(), true);
-            worldIn.setBlockState(pos, state.with(ON, false));
+        ItemStack stack = playerIn.getItemInHand(hand);
+        if(playerIn.isCrouching() && stack.isEmpty() && state.getValue(ON)){
+            ((EntangledBlockTile)worldIn.getBlockEntity(pos)).bind(null, null);
+            playerIn.displayClientMessage(TextComponents.translation("entangled.entangled_block.unbind").color(TextFormatting.YELLOW).get(), true);
+            worldIn.setBlockAndUpdate(pos, state.setValue(ON, false));
         }else if(stack.getItem() == Entangled.item){
             CompoundNBT compound = stack.getTag();
             if(compound == null || !compound.getBoolean("bound"))
-                playerIn.sendStatusMessage(TextComponents.translation("entangled.entangled_block.no_selection").color(TextFormatting.RED).get(), true);
+                playerIn.displayClientMessage(TextComponents.translation("entangled.entangled_block.no_selection").color(TextFormatting.RED).get(), true);
             else{
                 BlockPos pos2 = new BlockPos(compound.getInt("boundx"), compound.getInt("boundy"), compound.getInt("boundz"));
                 if(pos2.equals(pos))
-                    playerIn.sendStatusMessage(TextComponents.translation("entangled.entangled_block.self").color(TextFormatting.RED).get(), true);
+                    playerIn.displayClientMessage(TextComponents.translation("entangled.entangled_block.self").color(TextFormatting.RED).get(), true);
                 else{
-                    if(!worldIn.getBlockState(pos).get(ON))
-                        worldIn.setBlockState(pos, state.with(ON, true));
-                    EntangledBlockTile tile = (EntangledBlockTile)worldIn.getTileEntity(pos);
-                    if(compound.getString("dimension").equals(worldIn.getDimensionKey().getLocation().toString())){
-                        if(EntangledConfig.maxDistance.get() == -1 || pos.withinDistance(pos2, EntangledConfig.maxDistance.get() + 0.5)){
+                    if(!worldIn.getBlockState(pos).getValue(ON))
+                        worldIn.setBlockAndUpdate(pos, state.setValue(ON, true));
+                    EntangledBlockTile tile = (EntangledBlockTile)worldIn.getBlockEntity(pos);
+                    if(compound.getString("dimension").equals(worldIn.dimension().location().toString())){
+                        if(EntangledConfig.maxDistance.get() == -1 || pos.closerThan(pos2, EntangledConfig.maxDistance.get() + 0.5)){
                             tile.bind(pos2, compound.getString("dimension"));
-                            playerIn.sendStatusMessage(TextComponents.translation("entangled.entangled_block.bind").color(TextFormatting.YELLOW).get(), true);
+                            playerIn.displayClientMessage(TextComponents.translation("entangled.entangled_block.bind").color(TextFormatting.YELLOW).get(), true);
                         }else
-                            playerIn.sendStatusMessage(TextComponents.translation("entangled.entangled_block.too_far").color(TextFormatting.RED).get(), true);
+                            playerIn.displayClientMessage(TextComponents.translation("entangled.entangled_block.too_far").color(TextFormatting.RED).get(), true);
                     }else{
                         if(EntangledConfig.allowDimensional.get()){
                             tile.bind(pos2, compound.getString("dimension"));
-                            playerIn.sendStatusMessage(TextComponents.translation("entangled.entangled_block.bind").color(TextFormatting.YELLOW).get(), true);
+                            playerIn.displayClientMessage(TextComponents.translation("entangled.entangled_block.bind").color(TextFormatting.YELLOW).get(), true);
                         }else
-                            playerIn.sendStatusMessage(TextComponents.translation("entangled.entangled_block.wrong_dimension").color(TextFormatting.RED).get(), true);
+                            playerIn.displayClientMessage(TextComponents.translation("entangled.entangled_block.wrong_dimension").color(TextFormatting.RED).get(), true);
                     }
                 }
             }
@@ -98,17 +98,17 @@ public class EntangledBlock extends BaseBlock {
     }
 
     @Override
-    protected void fillStateContainer(StateContainer.Builder<Block,BlockState> builder){
+    protected void createBlockStateDefinition(StateContainer.Builder<Block,BlockState> builder){
         builder.add(ON);
     }
 
     @Override
-    public VoxelShape getRenderShape(BlockState state, IBlockReader worldIn, BlockPos pos){
-        return state.get(ON) ? VoxelShapes.empty() : VoxelShapes.fullCube();
+    public VoxelShape getOcclusionShape(BlockState state, IBlockReader worldIn, BlockPos pos){
+        return state.getValue(ON) ? VoxelShapes.empty() : VoxelShapes.block();
     }
 
     @Override
-    public void addInformation(ItemStack stack, IBlockReader worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn){
+    public void appendHoverText(ItemStack stack, IBlockReader worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn){
         String key = EntangledConfig.allowDimensional.get() ?
             EntangledConfig.maxDistance.get() == -1 ? "infinite_other_dimension" : "ranged_other_dimension" :
             EntangledConfig.maxDistance.get() == -1 ? "infinite_same_dimension" : "ranged_same_dimension";
@@ -118,8 +118,8 @@ public class EntangledBlock extends BaseBlock {
         CompoundNBT tag = stack.getOrCreateTag().getCompound("tileData");
         if(tag.contains("bound") && tag.getBoolean("bound")){
             int x = tag.getInt("boundx"), y = tag.getInt("boundy"), z = tag.getInt("boundz");
-            ITextComponent dimension = TextComponents.dimension(RegistryKey.getOrCreateKey(Registry.WORLD_KEY, new ResourceLocation(tag.getString("dimension")))).color(TextFormatting.GOLD).get();
-            ITextComponent name = TextComponents.blockState(Block.getStateById(tag.getInt("blockstate"))).color(TextFormatting.GOLD).get();
+            ITextComponent dimension = TextComponents.dimension(RegistryKey.create(Registry.DIMENSION_REGISTRY, new ResourceLocation(tag.getString("dimension")))).color(TextFormatting.GOLD).get();
+            ITextComponent name = TextComponents.blockState(Block.stateById(tag.getInt("blockstate"))).color(TextFormatting.GOLD).get();
             ITextComponent xText = TextComponents.string(Integer.toString(x)).color(TextFormatting.GOLD).get();
             ITextComponent yText = TextComponents.string(Integer.toString(y)).color(TextFormatting.GOLD).get();
             ITextComponent zText = TextComponents.string(Integer.toString(z)).color(TextFormatting.GOLD).get();
@@ -130,27 +130,27 @@ public class EntangledBlock extends BaseBlock {
     @Nullable
     @Override
     public BlockState getStateForPlacement(BlockItemUseContext context){
-        ItemStack stack = context.getItem();
+        ItemStack stack = context.getItemInHand();
         CompoundNBT compound = stack.getOrCreateTag().getCompound("tileData");
         if(compound.getBoolean("bound")){
             PlayerEntity player = context.getPlayer();
-            BlockPos pos = context.getPos();
+            BlockPos pos = context.getClickedPos();
             BlockPos pos2 = new BlockPos(compound.getInt("boundx"), compound.getInt("boundy"), compound.getInt("boundz"));
-            if(compound.getString("dimension").equals(context.getWorld().getDimensionKey().getLocation().toString())){
-                if(EntangledConfig.maxDistance.get() >= 0 && !pos.withinDistance(pos2, EntangledConfig.maxDistance.get() + 0.5)){
-                    if(player != null && !context.getWorld().isRemote)
-                        player.sendStatusMessage(TextComponents.translation("entangled.entangled_block.too_far").color(TextFormatting.RED).get(), true);
+            if(compound.getString("dimension").equals(context.getLevel().dimension().location().toString())){
+                if(EntangledConfig.maxDistance.get() >= 0 && !pos.closerThan(pos2, EntangledConfig.maxDistance.get() + 0.5)){
+                    if(player != null && !context.getLevel().isClientSide)
+                        player.displayClientMessage(TextComponents.translation("entangled.entangled_block.too_far").color(TextFormatting.RED).get(), true);
                     return null;
                 }
             }else{
                 if(!EntangledConfig.allowDimensional.get()){
-                    if(player != null && !context.getWorld().isRemote)
-                        player.sendStatusMessage(TextComponents.translation("entangled.entangled_block.wrong_dimension").color(TextFormatting.RED).get(), true);
+                    if(player != null && !context.getLevel().isClientSide)
+                        player.displayClientMessage(TextComponents.translation("entangled.entangled_block.wrong_dimension").color(TextFormatting.RED).get(), true);
                     return null;
                 }
             }
-            return this.getDefaultState().with(ON, true);
+            return this.defaultBlockState().setValue(ON, true);
         }
-        return this.getDefaultState();
+        return this.defaultBlockState();
     }
 }

@@ -34,7 +34,7 @@ public class EntangledWailaPlugin implements IComponentProvider, IWailaPlugin {
                 ITextComponent x = TextComponents.string(Integer.toString(boundPos.getX())).color(TextFormatting.GOLD).get();
                 ITextComponent y = TextComponents.string(Integer.toString(boundPos.getY())).color(TextFormatting.GOLD).get();
                 ITextComponent z = TextComponents.string(Integer.toString(boundPos.getZ())).color(TextFormatting.GOLD).get();
-                if(((EntangledBlockTile)tile).getBoundDimension() == accessor.getWorld().getDimensionKey())
+                if(((EntangledBlockTile)tile).getBoundDimension() == accessor.getWorld().dimension())
                     tooltip.add(TextComponents.translation("entangled.waila.bound_same_dimension", boundBlock, x, y, z).color(TextFormatting.YELLOW).get());
                 else{
                     ITextComponent dimension = TextComponents.dimension(((EntangledBlockTile)tile).getBoundDimension()).color(TextFormatting.GOLD).get();
