@@ -31,7 +31,6 @@ import net.minecraft.world.level.material.MaterialColor;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.minecraftforge.common.ToolType;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -44,7 +43,7 @@ public class EntangledBlock extends BaseBlock implements EntityBlock {
     public static final BooleanProperty ON = BooleanProperty.create("on");
 
     public EntangledBlock(){
-        super("block", true, Properties.of(new Material.Builder(MaterialColor.COLOR_BROWN).noCollider().build()).speedFactor(1f).harvestTool(ToolType.PICKAXE).sound(SoundType.STONE).strength(2f));
+        super("block", true, Properties.of(new Material.Builder(MaterialColor.COLOR_BROWN).noCollider().build()).speedFactor(1f).sound(SoundType.STONE).strength(2f));
         this.registerDefaultState(this.defaultBlockState().setValue(ON, false));
     }
 
