@@ -90,5 +90,5 @@ dependencies {
     // Hwyla
     compileOnly fg.deobf("curse.maven:hwyla-253449:3033593")
     // The One Probe
-    implementation fg.deobf("curse.maven:the-one-probe-245211:3402482")
+    implementation fg.deobf("curse.maven:the-one-probe-245211:3430022")
 }

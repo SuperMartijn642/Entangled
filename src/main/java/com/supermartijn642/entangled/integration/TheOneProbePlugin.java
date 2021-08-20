@@ -5,6 +5,7 @@ import com.supermartijn642.entangled.EntangledBlockTile;
 import mcjty.theoneprobe.api.*;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -32,8 +33,8 @@ public class TheOneProbePlugin {
         }
 
         @Override
-        public String getID(){
-            return "entangled";
+        public ResourceLocation getID(){
+            return new ResourceLocation("entangled", "entangled_block");
         }
 
         @Override
