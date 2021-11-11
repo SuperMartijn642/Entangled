@@ -48,7 +48,7 @@ public class ClientProxy {
 
         @SubscribeEvent
         public static void onDrawPlayerEvent(RenderWorldLastEvent e){
-            ItemStack stack = ClientUtils.getPlayer().getHeldItem(Hand.MAIN_HAND);
+            ItemStack stack = ClientUtils.getPlayer().getItemInHand(Hand.MAIN_HAND);
             World world = ClientUtils.getWorld();
 
             if(stack.getItem() instanceof BlockItem && ((BlockItem)stack.getItem()).getBlock() == Entangled.block && stack.hasTag() && stack.getOrCreateTag().contains("tileData")){
@@ -56,7 +56,7 @@ public class ClientProxy {
                 if(compound.getBoolean("bound") && compound.getInt("dimension") == world.getDimension().getType().getId()){
                     BlockPos pos = new BlockPos(compound.getInt("boundx"), compound.getInt("boundy"), compound.getInt("boundz"));
                     RenderUtils.disableDepthTest();
-                    RenderUtils.renderShape(world.getBlockState(pos).getRenderShape(world, pos), pos, 86 / 255f, 0 / 255f, 156 / 255f);
+                    RenderUtils.renderShape(world.getBlockState(pos).getOcclusionShape(world, pos), pos, 86 / 255f, 0 / 255f, 156 / 255f);
                     RenderUtils.enableDepthTest();
                 }
             }else if(stack.getItem() == Entangled.item){
@@ -64,7 +64,7 @@ public class ClientProxy {
                 if(compound.getBoolean("bound") && compound.getInt("dimension") == world.getDimension().getType().getId()){
                     BlockPos pos = new BlockPos(compound.getInt("boundx"), compound.getInt("boundy"), compound.getInt("boundz"));
                     RenderUtils.disableDepthTest();
-                    RenderUtils.renderShape(world.getBlockState(pos).getRenderShape(world, pos), pos, 235 / 255f, 210 / 255f, 52 / 255f);
+                    RenderUtils.renderShape(world.getBlockState(pos).getOcclusionShape(world, pos), pos, 235 / 255f, 210 / 255f, 52 / 255f);
                     RenderUtils.enableDepthTest();
                 }
             }
@@ -72,15 +72,15 @@ public class ClientProxy {
 
         @SubscribeEvent
         public static void onBlockHighlight(DrawBlockHighlightEvent.HighlightBlock e){
-            if(e.getTarget().getType() != RayTraceResult.Type.BLOCK || e.getTarget().getPos() == null || !EntangledConfig.renderBlockHighlight.get())
+            if(e.getTarget().getType() != RayTraceResult.Type.BLOCK || e.getTarget().getBlockPos() == null || !EntangledConfig.renderBlockHighlight.get())
                 return;
 
-            World world = Minecraft.getInstance().world;
-            TileEntity tile = world.getTileEntity(e.getTarget().getPos());
+            World world = Minecraft.getInstance().level;
+            TileEntity tile = world.getBlockEntity(e.getTarget().getBlockPos());
             if(tile instanceof EntangledBlockTile && ((EntangledBlockTile)tile).isBound() && ((EntangledBlockTile)tile).getBoundDimension() == world.getDimension().getType().getId()){
                 BlockPos pos = ((EntangledBlockTile)tile).getBoundBlockPos();
                 RenderUtils.disableDepthTest();
-                RenderUtils.renderShape(world.getBlockState(pos).getRenderShape(world, pos), pos, 86 / 255f, 0 / 255f, 156 / 255f);
+                RenderUtils.renderShape(world.getBlockState(pos).getOcclusionShape(world, pos), pos, 86 / 255f, 0 / 255f, 156 / 255f);
                 RenderUtils.enableDepthTest();
             }
         }

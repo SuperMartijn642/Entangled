@@ -39,18 +39,18 @@ public class EntangledBlockTileRenderer extends TileEntityRenderer<EntangledBloc
         if(!tile.isBound())
             return;
 
-        TileEntity boundTile = tile.getWorld().getDimension().getType().getId() == tile.getBoundDimension() ? tile.getWorld().getTileEntity(tile.getBoundBlockPos()) : null;
+        TileEntity boundTile = tile.getLevel().getDimension().getType().getId() == tile.getBoundDimension() ? tile.getLevel().getBlockEntity(tile.getBoundBlockPos()) : null;
         BlockState boundState = tile.getBoundBlockState();
 
         boolean renderTile = boundTile != null && canRenderTileEntity(boundTile.getType().getRegistryName());
-        boolean renderBlock = boundState != null && boundState.getRenderType() == BlockRenderType.MODEL && canRenderBlock(boundState.getBlock().getRegistryName());
+        boolean renderBlock = boundState != null && boundState.getRenderShape() == BlockRenderType.MODEL && canRenderBlock(boundState.getBlock().getRegistryName());
 
         // get the bounding box
         AxisAlignedBB bounds = new AxisAlignedBB(0, 0, 0, 1, 1, 1);
-        if(renderBlock && tile.getWorld().getDimension().getType().getId() == tile.getBoundDimension()){
-            VoxelShape shape = boundState.getRenderShape(tile.getWorld(), tile.getBoundBlockPos());
+        if(renderBlock && tile.getLevel().getDimension().getType().getId() == tile.getBoundDimension()){
+            VoxelShape shape = boundState.getOcclusionShape(tile.getLevel(), tile.getBoundBlockPos());
             if(!shape.isEmpty())
-                bounds = shape.getBoundingBox();
+                bounds = shape.bounds();
         }
 
         GlStateManager.pushMatrix();
@@ -65,7 +65,7 @@ public class EntangledBlockTileRenderer extends TileEntityRenderer<EntangledBloc
         GlStateManager.rotatef(angleX, 1, 0, 0);
         GlStateManager.rotatef(angleY, 0, 1, 0);
         GlStateManager.rotatef(angleZ, 0, 0, 1);
-        float scale = 0.4763f / (float)Math.sqrt((bounds.getXSize() * bounds.getXSize() + bounds.getYSize() * bounds.getYSize() + bounds.getZSize() * bounds.getZSize()) / 4);
+        float scale = 0.4763f / (float)Math.sqrt((bounds.getXsize() * bounds.getXsize() + bounds.getYsize() * bounds.getYsize() + bounds.getZsize() * bounds.getZsize()) / 4);
         GlStateManager.scalef(scale, scale, scale);
         GlStateManager.translated(-bounds.getCenter().x, -bounds.getCenter().y, -bounds.getCenter().z);
 
@@ -80,16 +80,16 @@ public class EntangledBlockTileRenderer extends TileEntityRenderer<EntangledBloc
         if(renderBlock){
             GlStateManager.disableLighting();
 
-            ScreenUtils.bindTexture(AtlasTexture.LOCATION_BLOCKS_TEXTURE);
+            ScreenUtils.bindTexture(AtlasTexture.LOCATION_BLOCKS);
 
             BlockRenderLayer initialLayer = MinecraftForgeClient.getRenderLayer();
 
             for(BlockRenderLayer layer : BlockRenderLayer.values()){
                 if(boundState.getBlock().canRenderInLayer(boundState, layer)){
                     Tessellator tessellator = Tessellator.getInstance();
-                    BufferBuilder buffer = tessellator.getBuffer();
+                    BufferBuilder buffer = tessellator.getBuilder();
                     buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.BLOCK);
-                    buffer.setTranslation(tile.getPos().getX(), tile.getPos().getY() - 300, tile.getPos().getZ());
+                    buffer.offset(tile.getBlockPos().getX(), tile.getBlockPos().getY() - 300, tile.getBlockPos().getZ());
 
                     if(layer == BlockRenderLayer.TRANSLUCENT){
                         GlStateManager.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
@@ -97,19 +97,19 @@ public class EntangledBlockTileRenderer extends TileEntityRenderer<EntangledBloc
                     }
 
                     ForgeHooksClient.setRenderLayer(layer);
-                    IModelData data = Minecraft.getInstance().getBlockRendererDispatcher().getModelForState(boundState).getModelData(tile.getWorld(), tile.getPos(), boundState, EmptyModelData.INSTANCE);
+                    IModelData data = Minecraft.getInstance().getBlockRenderer().getBlockModel(boundState).getModelData(tile.getLevel(), tile.getBlockPos(), boundState, EmptyModelData.INSTANCE);
                     try{
-                        BlockRendererDispatcher brd = Minecraft.getInstance().getBlockRendererDispatcher();
-                        IBakedModel model = brd.getModelForState(boundState);
-                        brd.getBlockModelRenderer().renderModel(tile.getWorld(), model, boundState, new BlockPos(0, 300, 0), buffer, false, new Random(), 0, data);
+                        BlockRendererDispatcher brd = Minecraft.getInstance().getBlockRenderer();
+                        IBakedModel model = brd.getBlockModel(boundState);
+                        brd.getModelRenderer().renderModel(tile.getLevel(), model, boundState, new BlockPos(0, 300, 0), buffer, false, new Random(), 0, data);
                     }catch(Exception e){
                         e.printStackTrace();
                     }
 
-                    GlStateManager.translated(-tile.getPos().getX(), -tile.getPos().getY(), -tile.getPos().getZ());
+                    GlStateManager.translated(-tile.getBlockPos().getX(), -tile.getBlockPos().getY(), -tile.getBlockPos().getZ());
 
-                    buffer.setTranslation(0, 0, 0);
-                    tessellator.draw();
+                    buffer.offset(0, 0, 0);
+                    tessellator.end();
 
                     if(layer == BlockRenderLayer.TRANSLUCENT){
                         GlStateManager.disableBlend();

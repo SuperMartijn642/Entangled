@@ -40,12 +40,12 @@ public class Entangled {
 
         @SubscribeEvent
         public static void onTileRegistry(final RegistryEvent.Register<TileEntityType<?>> e){
-            e.getRegistry().register(TileEntityType.Builder.create(EntangledBlockTile::new, block).build(null).setRegistryName("tile"));
+            e.getRegistry().register(TileEntityType.Builder.of(EntangledBlockTile::new, block).build(null).setRegistryName("tile"));
         }
 
         @SubscribeEvent
         public static void onItemRegistry(final RegistryEvent.Register<Item> e){
-            e.getRegistry().register(new BlockItem(block, new Item.Properties().group(ItemGroup.SEARCH).setTEISR(() -> EntangledBlockItemStackTileEntityRenderer::new)).setRegistryName("block"));
+            e.getRegistry().register(new BlockItem(block, new Item.Properties().tab(ItemGroup.TAB_SEARCH).setTEISR(() -> EntangledBlockItemStackTileEntityRenderer::new)).setRegistryName("block"));
             e.getRegistry().register(new EntangledBinder());
         }
     }

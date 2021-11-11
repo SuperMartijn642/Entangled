@@ -22,26 +22,26 @@ public class EntangledBlockItemStackTileEntityRenderer extends ItemStackTileEnti
     @Override
     public void renderByItem(ItemStack stack){
         if(!stack.hasTag() || !stack.getTag().contains("tileData") || !stack.getTag().getCompound("tileData").getBoolean("bound")){
-            IBakedModel model = ClientUtils.getMinecraft().getItemRenderer().getItemModelMesher().getItemModel(stack);
+            IBakedModel model = ClientUtils.getMinecraft().getItemRenderer().getItemModelShaper().getItemModel(stack);
             renderDefaultItem(stack, model);
             return;
         }
 
         EntangledBlockTile tile = new EntangledBlockTile();
-        tile.setWorld(ClientUtils.getMinecraft().world);
-        tile.setPos(BlockPos.ZERO);
+        tile.setLevel(ClientUtils.getMinecraft().level);
+        tile.setPosition(BlockPos.ZERO);
         tile.readData(stack.getTag().getCompound("tileData"));
 
-        IBakedModel model = ClientUtils.getMinecraft().getBlockRendererDispatcher().getModelForState(Entangled.block.getDefaultState().with(EntangledBlock.ON, true));
+        IBakedModel model = ClientUtils.getMinecraft().getBlockRenderer().getBlockModel(Entangled.block.defaultBlockState().setValue(EntangledBlock.ON, true));
         renderDefaultItem(stack, model);
 
-        TileEntityRendererDispatcher.instance.renderAsItem(tile);
+        TileEntityRendererDispatcher.instance.renderItem(tile);
     }
 
     private static void renderDefaultItem(ItemStack itemStack, IBakedModel model){
         renderModel(model, -1, itemStack);
-        if(itemStack.hasEffect()){
-            ItemRenderer.renderEffect(ClientUtils.getTextureManager(), () -> {
+        if(itemStack.hasFoil()){
+            ItemRenderer.renderFoilLayer(ClientUtils.getTextureManager(), () -> {
                 renderModel(model, -8372020, ItemStack.EMPTY);
             }, 8);
         }
@@ -53,17 +53,17 @@ public class EntangledBlockItemStackTileEntityRenderer extends ItemStackTileEnti
             return;
         }
         Tessellator tessellator = Tessellator.getInstance();
-        BufferBuilder bufferbuilder = tessellator.getBuffer();
-        bufferbuilder.begin(7, DefaultVertexFormats.ITEM);
+        BufferBuilder bufferbuilder = tessellator.getBuilder();
+        bufferbuilder.begin(7, DefaultVertexFormats.BLOCK_NORMALS);
         Random random = new Random();
 
         for(Direction direction : Direction.values()){
             random.setSeed(42L);
-            ClientUtils.getMinecraft().getItemRenderer().renderQuads(bufferbuilder, model.getQuads(null, direction, random), color, stack);
+            ClientUtils.getMinecraft().getItemRenderer().renderQuadList(bufferbuilder, model.getQuads(null, direction, random), color, stack);
         }
 
         random.setSeed(42L);
-        ClientUtils.getMinecraft().getItemRenderer().renderQuads(bufferbuilder, model.getQuads(null, null, random), color, stack);
-        tessellator.draw();
+        ClientUtils.getMinecraft().getItemRenderer().renderQuadList(bufferbuilder, model.getQuads(null, null, random), color, stack);
+        tessellator.end();
     }
 }
