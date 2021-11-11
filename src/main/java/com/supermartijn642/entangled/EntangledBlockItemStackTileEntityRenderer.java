@@ -20,18 +20,18 @@ import java.util.Random;
 public class EntangledBlockItemStackTileEntityRenderer extends ItemStackTileEntityRenderer {
 
     @Override
-    public void render(ItemStack stack, MatrixStack matrixStack, IRenderTypeBuffer buffer, int combinedLight, int combinedOverlay){
+    public void renderByItem(ItemStack stack, MatrixStack matrixStack, IRenderTypeBuffer buffer, int combinedLight, int combinedOverlay){
         if(!stack.hasTag() || !stack.getTag().contains("tileData") || !stack.getTag().getCompound("tileData").getBoolean("bound")){
-            IBakedModel model = ClientUtils.getMinecraft().getItemRenderer().getItemModelMesher().getItemModel(stack);
+            IBakedModel model = ClientUtils.getMinecraft().getItemRenderer().getItemModelShaper().getItemModel(stack);
             renderDefaultItem(stack, matrixStack, buffer, combinedLight, combinedOverlay, model);
             return;
         }
 
         EntangledBlockTile tile = new EntangledBlockTile();
-        tile.setWorldAndPos(ClientUtils.getMinecraft().world, BlockPos.ZERO);
+        tile.setLevelAndPosition(ClientUtils.getMinecraft().level, BlockPos.ZERO);
         tile.readData(stack.getTag().getCompound("tileData"));
 
-        IBakedModel model = ClientUtils.getMinecraft().getBlockRendererDispatcher().getModelForState(Entangled.block.getDefaultState().with(EntangledBlock.ON, true));
+        IBakedModel model = ClientUtils.getMinecraft().getBlockRenderer().getBlockModel(Entangled.block.defaultBlockState().setValue(EntangledBlock.ON, true));
         renderDefaultItem(stack, matrixStack, buffer, combinedLight, combinedOverlay, model);
 
         TileEntityRendererDispatcher.instance.renderItem(tile, matrixStack, buffer, combinedLight, combinedOverlay);
@@ -40,13 +40,13 @@ public class EntangledBlockItemStackTileEntityRenderer extends ItemStackTileEnti
     private static void renderDefaultItem(ItemStack itemStack, MatrixStack matrixStack, IRenderTypeBuffer renderTypeBuffer, int combinedLight, int combinedOverlay, IBakedModel model){
         RenderType rendertype = RenderTypeLookup.getRenderType(itemStack);
         RenderType rendertype1;
-        if (Objects.equals(rendertype, Atlases.getTranslucentBlockType())) {
-            rendertype1 = Atlases.getTranslucentCullBlockType();
+        if (Objects.equals(rendertype, Atlases.translucentBlockSheet())) {
+            rendertype1 = Atlases.translucentCullBlockSheet();
         } else {
             rendertype1 = rendertype;
         }
 
-        IVertexBuilder ivertexbuilder = ItemRenderer.getBuffer(renderTypeBuffer, rendertype1, true, itemStack.hasEffect());
+        IVertexBuilder ivertexbuilder = ItemRenderer.getFoilBuffer(renderTypeBuffer, rendertype1, true, itemStack.hasFoil());
         renderModel(model, itemStack, combinedLight, combinedOverlay, matrixStack, ivertexbuilder);
     }
 
@@ -55,10 +55,10 @@ public class EntangledBlockItemStackTileEntityRenderer extends ItemStackTileEnti
 
         for(Direction direction : Direction.values()) {
             random.setSeed(42L);
-            ClientUtils.getMinecraft().getItemRenderer().renderQuads(matrixStackIn, bufferIn, modelIn.getQuads(null, direction, random), stack, combinedLightIn, combinedOverlayIn);
+            ClientUtils.getMinecraft().getItemRenderer().renderQuadList(matrixStackIn, bufferIn, modelIn.getQuads(null, direction, random), stack, combinedLightIn, combinedOverlayIn);
         }
 
         random.setSeed(42L);
-        ClientUtils.getMinecraft().getItemRenderer().renderQuads(matrixStackIn, bufferIn, modelIn.getQuads(null, null, random), stack, combinedLightIn, combinedOverlayIn);
+        ClientUtils.getMinecraft().getItemRenderer().renderQuadList(matrixStackIn, bufferIn, modelIn.getQuads(null, null, random), stack, combinedLightIn, combinedOverlayIn);
     }
 }

@@ -15,7 +15,7 @@ public class EntangledBlockBakedItemModel extends BakedModelWrapper<IBakedModel>
     }
 
     @Override
-    public boolean isBuiltInRenderer(){
+    public boolean isCustomRenderer(){
         return true;
     }
 
