@@ -15,10 +15,7 @@ import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.state.BooleanProperty;
 import net.minecraft.state.StateContainer;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.Hand;
-import net.minecraft.util.RegistryKey;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.*;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.shapes.VoxelShape;
@@ -152,5 +149,33 @@ public class EntangledBlock extends BaseBlock {
             return this.defaultBlockState().setValue(ON, true);
         }
         return this.defaultBlockState();
+    }
+
+    @Override
+    public boolean hasAnalogOutputSignal(BlockState state){
+        return true;
+    }
+
+    @Override
+    public int getAnalogOutputSignal(BlockState state, World world, BlockPos pos){
+        TileEntity entity = world.getBlockEntity(pos);
+        return entity instanceof EntangledBlockTile ? ((EntangledBlockTile)entity).getAnalogOutputSignal() : 0;
+    }
+
+    @Override
+    public boolean isSignalSource(BlockState p_60571_){
+        return true;
+    }
+
+    @Override
+    public int getSignal(BlockState state, IBlockReader world, BlockPos pos, Direction direction){
+        TileEntity entity = world.getBlockEntity(pos);
+        return entity instanceof EntangledBlockTile ? ((EntangledBlockTile)entity).getRedstoneSignal(direction) : 0;
+    }
+
+    @Override
+    public int getDirectSignal(BlockState state, IBlockReader world, BlockPos pos, Direction direction){
+        TileEntity entity = world.getBlockEntity(pos);
+        return entity instanceof EntangledBlockTile ? ((EntangledBlockTile)entity).getDirectRedstoneSignal(direction) : 0;
     }
 }

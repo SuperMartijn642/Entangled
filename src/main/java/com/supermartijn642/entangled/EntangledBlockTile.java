@@ -27,7 +27,9 @@ public class EntangledBlockTile extends BaseTileEntity implements ITickableTileE
     private BlockPos pos;
     private RegistryKey<World> dimension;
     private BlockState blockState;
-    private BlockState lastBlockState;
+    private final int[] redstoneSignal = new int[]{0, 0, 0, 0, 0, 0};
+    private final int[] directRedstoneSignal = new int[]{0, 0, 0, 0, 0, 0};
+    private int analogOutputSignal = -1;
 
     public EntangledBlockTile(){
         super(Entangled.tile);
@@ -39,11 +41,29 @@ public class EntangledBlockTile extends BaseTileEntity implements ITickableTileE
             return;
         if(this.bound && this.pos != null){
             World world = this.getDimension();
-            if(world != null && (world.isAreaLoaded(this.pos, 1) || this.blockState == null)){
-                this.blockState = world.getBlockState(this.pos);
-                if(this.blockState != this.lastBlockState){
-                    this.lastBlockState = this.blockState;
+            if(world != null && (world.isAreaLoaded(this.pos, 1) || this.blockState == null || this.analogOutputSignal == -1)){
+                BlockState state = world.getBlockState(this.pos);
+                int analogOutputSignal = state.hasAnalogOutputSignal() ?
+                    state.getAnalogOutputSignal(world, this.pos) : 0;
+
+                boolean signalChanged = false;
+                for(Direction direction : Direction.values()){
+                    int redstoneSignal = state.getSignal(world, this.pos, direction);
+                    int directRedstoneSignal = state.getDirectSignal(world, this.pos, direction);
+                    if(redstoneSignal != this.redstoneSignal[direction.get3DDataValue()]
+                        || directRedstoneSignal != this.directRedstoneSignal[direction.get3DDataValue()]){
+                        signalChanged = true;
+                        this.redstoneSignal[direction.get3DDataValue()] = redstoneSignal;
+                        this.directRedstoneSignal[direction.get3DDataValue()] = directRedstoneSignal;
+                    }
+                }
+
+                if(state != this.blockState || analogOutputSignal != this.analogOutputSignal || signalChanged){
+                    this.blockState = state;
+                    this.analogOutputSignal = analogOutputSignal;
                     this.dataChanged();
+                    this.level.updateNeighbourForOutputSignal(this.worldPosition, this.getBlockState().getBlock());
+                    this.level.updateNeighborsAt(this.worldPosition, this.getBlockState().getBlock());
                 }
             }
         }
@@ -77,7 +97,7 @@ public class EntangledBlockTile extends BaseTileEntity implements ITickableTileE
             World world = this.getDimension();
             if(world != null){
                 TileEntity tile = world.getBlockEntity(this.pos);
-                if(checkTile(tile))
+                if(this.checkTile(tile))
                     return tile.getCapability(capability);
             }
         }
@@ -95,7 +115,7 @@ public class EntangledBlockTile extends BaseTileEntity implements ITickableTileE
             World world = this.getDimension();
             if(world != null){
                 TileEntity tile = world.getBlockEntity(this.pos);
-                if(checkTile(tile))
+                if(this.checkTile(tile))
                     return tile.getCapability(capability, facing);
             }
         }
@@ -103,7 +123,7 @@ public class EntangledBlockTile extends BaseTileEntity implements ITickableTileE
     }
 
     public boolean bind(BlockPos pos, String dimension){
-        if(!canBindTo(pos, dimension))
+        if(!this.canBindTo(pos, dimension))
             return false;
         this.pos = pos == null ? null : new BlockPos(pos);
         this.dimension = dimension == null ? null : RegistryKey.create(Registry.DIMENSION_REGISTRY, new ResourceLocation(dimension));
@@ -126,6 +146,44 @@ public class EntangledBlockTile extends BaseTileEntity implements ITickableTileE
         return this.level.isClientSide ?
             this.level.dimension() == this.dimension ? this.level : null :
             this.level.getServer().getLevel(this.dimension);
+    }
+
+    private boolean isTargetLoaded(){
+        if(this.level.isClientSide || !this.bound)
+            return false;
+        World world = this.level.dimension() == this.dimension ?
+            this.level : this.level.getServer().getLevel(this.dimension);
+        return world != null && world.isLoaded(this.pos);
+    }
+
+    public int getRedstoneSignal(Direction side){
+        if(!this.bound)
+            return 0;
+        if(this.isTargetLoaded()){
+            World world = this.getDimension();
+            return world.getBlockState(this.pos).getSignal(world, this.pos, side);
+        }
+        return Math.max(this.redstoneSignal[side.get3DDataValue()], 0);
+    }
+
+    public int getDirectRedstoneSignal(Direction side){
+        if(!this.bound)
+            return 0;
+        if(this.isTargetLoaded()){
+            World world = this.getDimension();
+            return world.getBlockState(this.pos).getDirectSignal(world, this.pos, side);
+        }
+        return Math.max(this.directRedstoneSignal[side.get3DDataValue()], 0);
+    }
+
+    public int getAnalogOutputSignal(){
+        if(!this.bound)
+            return 0;
+        if(this.isTargetLoaded()){
+            World world = this.getDimension();
+            return world.getBlockState(this.pos).getAnalogOutputSignal(world, this.pos);
+        }
+        return Math.max(this.analogOutputSignal, 0);
     }
 
     private boolean checkTile(TileEntity tile){
@@ -156,6 +214,12 @@ public class EntangledBlockTile extends BaseTileEntity implements ITickableTileE
             compound.putInt("boundz", this.pos.getZ());
             compound.putString("dimension", this.dimension.location().toString());
             compound.putInt("blockstate", Block.getId(this.blockState));
+            for(Direction direction : Direction.values()){
+                int index = direction.get3DDataValue();
+                compound.putInt("redstoneSignal" + index, this.redstoneSignal[index]);
+                compound.putInt("directRedstoneSignal" + index, this.directRedstoneSignal[index]);
+            }
+            compound.putInt("analogOutputSignal", this.analogOutputSignal);
         }
         return compound;
     }
@@ -167,6 +231,12 @@ public class EntangledBlockTile extends BaseTileEntity implements ITickableTileE
             this.pos = new BlockPos(compound.getInt("boundx"), compound.getInt("boundy"), compound.getInt("boundz"));
             this.dimension = RegistryKey.create(Registry.DIMENSION_REGISTRY, new ResourceLocation(compound.getString("dimension")));
             this.blockState = Block.stateById(compound.getInt("blockstate"));
+            for(Direction direction : Direction.values()){
+                int index = direction.get3DDataValue();
+                this.redstoneSignal[index] = compound.getInt("redstoneSignal" + index);
+                this.directRedstoneSignal[index] = compound.getInt("directRedstoneSignal" + index);
+            }
+            this.analogOutputSignal = compound.getInt("analogOutputSignal");
         }
     }
 }
