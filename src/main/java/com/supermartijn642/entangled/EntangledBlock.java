@@ -4,6 +4,7 @@ import com.supermartijn642.core.TextComponents;
 import com.supermartijn642.core.block.BaseBlock;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.core.Registry;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -156,5 +157,33 @@ public class EntangledBlock extends BaseBlock implements EntityBlock {
             return this.defaultBlockState().setValue(ON, true);
         }
         return this.defaultBlockState();
+    }
+
+    @Override
+    public boolean hasAnalogOutputSignal(BlockState state){
+        return true;
+    }
+
+    @Override
+    public int getAnalogOutputSignal(BlockState state, Level world, BlockPos pos){
+        BlockEntity entity = world.getBlockEntity(pos);
+        return entity instanceof EntangledBlockTile ? ((EntangledBlockTile)entity).getAnalogOutputSignal() : 0;
+    }
+
+    @Override
+    public boolean isSignalSource(BlockState p_60571_){
+        return true;
+    }
+
+    @Override
+    public int getSignal(BlockState state, BlockGetter world, BlockPos pos, Direction direction){
+        BlockEntity entity = world.getBlockEntity(pos);
+        return entity instanceof EntangledBlockTile ? ((EntangledBlockTile)entity).getRedstoneSignal(direction) : 0;
+    }
+
+    @Override
+    public int getDirectSignal(BlockState state, BlockGetter world, BlockPos pos, Direction direction){
+        BlockEntity entity = world.getBlockEntity(pos);
+        return entity instanceof EntangledBlockTile ? ((EntangledBlockTile)entity).getDirectRedstoneSignal(direction) : 0;
     }
 }
