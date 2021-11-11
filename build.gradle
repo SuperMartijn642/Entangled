@@ -2,15 +2,17 @@ buildscript {
     repositories {
         maven { url = 'https://maven.minecraftforge.net' }
         mavenCentral()
+        maven { url = 'https://maven.parchmentmc.org' }
     }
     dependencies {
         classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '5.1.+', changing: true
+        classpath 'org.parchmentmc:librarian:1.+'
     }
 }
 apply plugin: 'net.minecraftforge.gradle'
 // Only edit below this line, the above code adds and enables the necessary things for Forge to be setup.
 apply plugin: 'eclipse'
-apply from: 'https://raw.githubusercontent.com/SizableShrimp/Forge-Class-Remapper/main/classremapper.gradle'
+apply plugin: 'org.parchmentmc.librarian.forgegradle'
 
 version = '1.3.6a-mc1.17'
 group = 'com.supermartijn642.entangled' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
@@ -22,7 +24,7 @@ java.toolchain.languageVersion = JavaLanguageVersion.of(16)
 println('Java: ' + System.getProperty('java.version') + ' JVM: ' + System.getProperty('java.vm.version') + '(' + System.getProperty('java.vendor') + ') Arch: ' + System.getProperty('os.arch'))
 
 minecraft {
-    mappings channel: 'official', version: '1.17.1'
+    mappings channel: 'parchment', version: '2021.10.31-1.17.1'
 
     // accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg') // Currently, this location cannot be changed from the default.
 
@@ -80,7 +82,7 @@ repositories {
 }
 
 dependencies {
-    minecraft 'net.minecraftforge:forge:1.17.1-37.0.40'
+    minecraft 'net.minecraftforge:forge:1.17.1-37.0.104'
 
     // Config Lib
     implementation fg.deobf("curse.maven:supermartijn642s-config-lib-438332:3413424")
