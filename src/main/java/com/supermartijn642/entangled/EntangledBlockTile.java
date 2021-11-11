@@ -21,19 +21,39 @@ public class EntangledBlockTile extends BaseTileEntity implements ITickable {
     private BlockPos pos;
     private int dimension;
     private IBlockState blockState = Blocks.AIR.getDefaultState();
-    private IBlockState lastBlockState = this.blockState;
+    private final int[] redstoneSignal = new int[]{0, 0, 0, 0, 0, 0};
+    private final int[] directRedstoneSignal = new int[]{0, 0, 0, 0, 0, 0};
+    private int analogOutputSignal = -1;
 
     @Override
     public void update(){
         if(this.world == null || this.world.isRemote)
             return;
         if(this.bound && this.pos != null){
-            World world = DimensionManager.getWorld(this.dimension);
-            if(world != null && (world.isAreaLoaded(this.pos, 1) || this.blockState == null)){
-                this.blockState = world.getBlockState(this.pos);
-                if(this.blockState != this.lastBlockState){
-                    this.lastBlockState = this.blockState;
+            World world = this.getDimension();
+            if(world != null && (world.isAreaLoaded(this.pos, 1) || this.blockState == null || this.analogOutputSignal == -1)){
+                IBlockState state = world.getBlockState(this.pos);
+                int analogOutputSignal = state.hasComparatorInputOverride() ?
+                    state.getComparatorInputOverride(world, this.pos) : 0;
+
+                boolean signalChanged = false;
+                for(EnumFacing direction : EnumFacing.values()){
+                    int redstoneSignal = state.getWeakPower(world, this.pos, direction);
+                    int directRedstoneSignal = state.getStrongPower(world, this.pos, direction);
+                    if(redstoneSignal != this.redstoneSignal[direction.getIndex()]
+                        || directRedstoneSignal != this.directRedstoneSignal[direction.getIndex()]){
+                        signalChanged = true;
+                        this.redstoneSignal[direction.getIndex()] = redstoneSignal;
+                        this.directRedstoneSignal[direction.getIndex()] = directRedstoneSignal;
+                    }
+                }
+
+                if(state != this.blockState || analogOutputSignal != this.analogOutputSignal || signalChanged){
+                    this.blockState = state;
+                    this.analogOutputSignal = analogOutputSignal;
                     this.dataChanged();
+                    this.world.updateComparatorOutputLevel(this.getPos(), this.getBlockState().getBlock());
+                    this.world.notifyNeighborsOfStateChange(this.getPos(), this.getBlockState().getBlock(), false);
                 }
             }
         }
@@ -92,7 +112,7 @@ public class EntangledBlockTile extends BaseTileEntity implements ITickable {
     }
 
     public boolean bind(BlockPos pos, int dimension){
-        if(!canBindTo(pos, dimension))
+        if(!this.canBindTo(pos, dimension))
             return false;
         this.pos = pos == null ? null : new BlockPos(pos);
         this.dimension = dimension;
@@ -113,6 +133,44 @@ public class EntangledBlockTile extends BaseTileEntity implements ITickable {
         return this.world.isRemote ?
             this.world.provider.getDimensionType().getId() == this.dimension ? this.world : null :
             DimensionManager.getWorld(this.dimension);
+    }
+
+    private boolean isTargetLoaded(){
+        if(this.world.isRemote || !this.bound)
+            return false;
+        World world = this.world.provider.getDimensionType().getId() == this.dimension ?
+            this.world : DimensionManager.getWorld(this.dimension);
+        return world != null && world.isBlockLoaded(this.pos);
+    }
+
+    public int getRedstoneSignal(EnumFacing side){
+        if(!this.bound)
+            return 0;
+        if(this.isTargetLoaded()){
+            World world = this.getDimension();
+            return world.getBlockState(this.pos).getWeakPower(world, this.pos, side);
+        }
+        return Math.max(this.redstoneSignal[side.getIndex()], 0);
+    }
+
+    public int getDirectRedstoneSignal(EnumFacing side){
+        if(!this.bound)
+            return 0;
+        if(this.isTargetLoaded()){
+            World world = this.getDimension();
+            return world.getBlockState(this.pos).getStrongPower(world, this.pos, side);
+        }
+        return Math.max(this.directRedstoneSignal[side.getIndex()], 0);
+    }
+
+    public int getAnalogOutputSignal(){
+        if(!this.bound)
+            return 0;
+        if(this.isTargetLoaded()){
+            World world = this.getDimension();
+            return world.getBlockState(this.pos).getComparatorInputOverride(world, this.pos);
+        }
+        return Math.max(this.analogOutputSignal, 0);
     }
 
     private boolean checkTile(TileEntity tile){
@@ -143,6 +201,12 @@ public class EntangledBlockTile extends BaseTileEntity implements ITickable {
             compound.setInteger("boundz", this.pos.getZ());
             compound.setInteger("dimension", this.dimension);
             compound.setInteger("blockstate", Block.getStateId(this.blockState));
+            for(EnumFacing direction : EnumFacing.values()){
+                int index = direction.getIndex();
+                compound.setInteger("redstoneSignal" + index, this.redstoneSignal[index]);
+                compound.setInteger("directRedstoneSignal" + index, this.directRedstoneSignal[index]);
+            }
+            compound.setInteger("analogOutputSignal", this.analogOutputSignal);
         }
         return compound;
     }
@@ -154,6 +218,12 @@ public class EntangledBlockTile extends BaseTileEntity implements ITickable {
             this.pos = new BlockPos(compound.getInteger("boundx"), compound.getInteger("boundy"), compound.getInteger("boundz"));
             this.dimension = compound.getInteger("dimension");
             this.blockState = Block.getStateById(compound.getInteger("blockstate"));
+            for(EnumFacing direction : EnumFacing.values()){
+                int index = direction.getIndex();
+                this.redstoneSignal[index] = compound.getInteger("redstoneSignal" + index);
+                this.directRedstoneSignal[index] = compound.getInteger("directRedstoneSignal" + index);
+            }
+            this.analogOutputSignal = compound.getInteger("analogOutputSignal");
         }
     }
 }
