@@ -24,6 +24,8 @@ public class EntangledBlockTile extends BaseTileEntity implements ITickable {
     private final int[] redstoneSignal = new int[]{0, 0, 0, 0, 0, 0};
     private final int[] directRedstoneSignal = new int[]{0, 0, 0, 0, 0, 0};
     private int analogOutputSignal = -1;
+    // Make sure we don't get in infinite loop when entangled blocks are linked to each other
+    private int callDepth = 0;
 
     @Override
     public void update(){
@@ -81,13 +83,17 @@ public class EntangledBlockTile extends BaseTileEntity implements ITickable {
         if(this.world == null)
             return false;
         if(this.bound){
-            if(this.world.isRemote && this.world.provider.getDimensionType().getId() != this.dimension)
+            if((this.world.isRemote && this.world.provider.getDimensionType().getId() != this.dimension) || this.callDepth >= 10)
                 return false;
             World world = this.getDimension();
             if(world != null){
                 TileEntity tile = world.getTileEntity(this.pos);
-                if(checkTile(tile))
-                    return tile.hasCapability(capability, facing);
+                if(tile != null){
+                    this.callDepth++;
+                    boolean value = tile.hasCapability(capability, facing);
+                    this.callDepth--;
+                    return value;
+                }
             }
         }
         return false;
@@ -99,13 +105,17 @@ public class EntangledBlockTile extends BaseTileEntity implements ITickable {
         if(this.world == null)
             return null;
         if(this.bound){
-            if(this.world.isRemote && this.world.provider.getDimensionType().getId() != this.dimension)
+            if((this.world.isRemote && this.world.provider.getDimensionType().getId() != this.dimension) || this.callDepth >= 10)
                 return null;
             World world = this.getDimension();
             if(world != null){
                 TileEntity tile = world.getTileEntity(this.pos);
-                if(checkTile(tile))
-                    return tile.getCapability(capability, facing);
+                if(tile != null){
+                    this.callDepth++;
+                    T value = tile.getCapability(capability, facing);
+                    this.callDepth--;
+                    return value;
+                }
             }
         }
         return null;
@@ -146,9 +156,12 @@ public class EntangledBlockTile extends BaseTileEntity implements ITickable {
     public int getRedstoneSignal(EnumFacing side){
         if(!this.bound)
             return 0;
-        if(this.isTargetLoaded()){
+        if(this.isTargetLoaded() && this.callDepth < 10){
+            this.callDepth++;
             World world = this.getDimension();
-            return world.getBlockState(this.pos).getWeakPower(world, this.pos, side);
+            this.redstoneSignal[side.getIndex()] = world.getBlockState(this.pos).getWeakPower(world, this.pos, side);
+            this.callDepth--;
+            return Math.max(this.redstoneSignal[side.getIndex()], 0);
         }
         return Math.max(this.redstoneSignal[side.getIndex()], 0);
     }
@@ -156,9 +169,12 @@ public class EntangledBlockTile extends BaseTileEntity implements ITickable {
     public int getDirectRedstoneSignal(EnumFacing side){
         if(!this.bound)
             return 0;
-        if(this.isTargetLoaded()){
+        if(this.isTargetLoaded() && this.callDepth < 10){
+            this.callDepth++;
             World world = this.getDimension();
-            return world.getBlockState(this.pos).getStrongPower(world, this.pos, side);
+            this.directRedstoneSignal[side.getIndex()] = world.getBlockState(this.pos).getStrongPower(world, this.pos, side);
+            this.callDepth--;
+            return Math.max(this.directRedstoneSignal[side.getIndex()], 0);
         }
         return Math.max(this.directRedstoneSignal[side.getIndex()], 0);
     }
@@ -166,15 +182,14 @@ public class EntangledBlockTile extends BaseTileEntity implements ITickable {
     public int getAnalogOutputSignal(){
         if(!this.bound)
             return 0;
-        if(this.isTargetLoaded()){
+        if(this.isTargetLoaded() && this.callDepth < 10){
+            this.callDepth++;
             World world = this.getDimension();
-            return world.getBlockState(this.pos).getComparatorInputOverride(world, this.pos);
+            this.analogOutputSignal = world.getBlockState(this.pos).getComparatorInputOverride(world, this.pos);
+            this.callDepth--;
+            return Math.max(this.analogOutputSignal, 0);
         }
         return Math.max(this.analogOutputSignal, 0);
-    }
-
-    private boolean checkTile(TileEntity tile){
-        return tile != null && !(tile instanceof EntangledBlockTile);
     }
 
     @Override
