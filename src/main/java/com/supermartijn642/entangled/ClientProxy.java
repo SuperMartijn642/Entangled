@@ -3,6 +3,7 @@ package com.supermartijn642.entangled;
 import com.supermartijn642.core.ClientUtils;
 import com.supermartijn642.core.render.RenderUtils;
 import net.minecraft.block.Block;
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.item.Item;
@@ -14,6 +15,7 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraftforge.client.event.DrawBlockHighlightEvent;
 import net.minecraftforge.client.event.ModelBakeEvent;
@@ -67,17 +69,33 @@ public class ClientProxy {
                 NBTTagCompound compound = stack.getTagCompound().getCompoundTag("tileData");
                 if(compound.getBoolean("bound") && compound.getInteger("dimension") == world.provider.getDimensionType().getId()){
                     BlockPos pos = new BlockPos(compound.getInteger("boundx"), compound.getInteger("boundy"), compound.getInteger("boundz"));
+
+                    GlStateManager.pushMatrix();
+                    Vec3d camera = RenderUtils.getCameraPosition();
+                    GlStateManager.translate(-camera.x, -camera.y, -camera.z);
+
                     RenderUtils.disableDepthTest();
                     RenderUtils.renderBox(world.getBlockState(pos).getSelectedBoundingBox(world, pos), 86 / 255f, 0 / 255f, 156 / 255f);
-                    RenderUtils.enableDepthTest();
+                    RenderUtils.renderBoxSides(world.getBlockState(pos).getSelectedBoundingBox(world, pos), 86 / 255f, 0 / 255f, 156 / 255f, 30 / 255f);
+                    RenderUtils.resetState();
+
+                    GlStateManager.popMatrix();
                 }
             }else if(stack.getItem() == Entangled.item && stack.hasTagCompound()){
                 NBTTagCompound compound = stack.getTagCompound();
                 if(compound.getBoolean("bound") && compound.getInteger("dimension") == world.provider.getDimensionType().getId()){
                     BlockPos pos = new BlockPos(compound.getInteger("boundx"), compound.getInteger("boundy"), compound.getInteger("boundz"));
+
+                    GlStateManager.pushMatrix();
+                    Vec3d camera = RenderUtils.getCameraPosition();
+                    GlStateManager.translate(-camera.x, -camera.y, -camera.z);
+
                     RenderUtils.disableDepthTest();
                     RenderUtils.renderBox(world.getBlockState(pos).getSelectedBoundingBox(world, pos), 235 / 255f, 210 / 255f, 52 / 255f);
-                    RenderUtils.enableDepthTest();
+                    RenderUtils.renderBoxSides(world.getBlockState(pos).getSelectedBoundingBox(world, pos), 235 / 255f, 210 / 255f, 52 / 255f, 30 / 255f);
+                    RenderUtils.resetState();
+
+                    GlStateManager.popMatrix();
                 }
             }
         }
@@ -91,9 +109,17 @@ public class ClientProxy {
             TileEntity tile = world.getTileEntity(e.getTarget().getBlockPos());
             if(tile instanceof EntangledBlockTile && ((EntangledBlockTile)tile).isBound() && ((EntangledBlockTile)tile).getBoundDimension() == world.provider.getDimensionType().getId()){
                 BlockPos pos = ((EntangledBlockTile)tile).getBoundBlockPos();
+
+                GlStateManager.pushMatrix();
+                Vec3d camera = RenderUtils.getCameraPosition();
+                GlStateManager.translate(-camera.x, -camera.y, -camera.z);
+
                 RenderUtils.disableDepthTest();
                 RenderUtils.renderBox(world.getBlockState(pos).getSelectedBoundingBox(world, pos), 86 / 255f, 0 / 255f, 156 / 255f);
-                RenderUtils.enableDepthTest();
+                RenderUtils.renderBoxSides(world.getBlockState(pos).getSelectedBoundingBox(world, pos), 86 / 255f, 0 / 255f, 156 / 255f, 30 / 255f);
+                RenderUtils.resetState();
+
+                GlStateManager.popMatrix();
             }
         }
     }
