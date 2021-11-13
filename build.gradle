@@ -79,10 +79,11 @@ repositories {
 dependencies {
     minecraft 'net.minecraftforge:forge:1.15.2-31.2.55'
 
-    // Config Lib
-    implementation fg.deobf("curse.maven:supermartijn642s-config-lib-438332:3357666")
     // Core Lib
-    implementation fg.deobf("curse.maven:supermartijn642s-core-lib-454372:3357861")
+//    implementation fg.deobf("curse.maven:supermartijn642s-core-lib-454372:3357861")
+    implementation fg.deobf('com.supermartijn642.core:supermartijn642corelib:1.0.12-dev-mc1.15')
+    // Config Lib
+    implementation fg.deobf("curse.maven:supermartijn642s-config-lib-438332:3413935")
 
     // Hwyla
     implementation fg.deobf("curse.maven:hwyla-253449:2880069")
