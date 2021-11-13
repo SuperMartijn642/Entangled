@@ -1,5 +1,6 @@
 package com.supermartijn642.entangled;
 
+import com.mojang.blaze3d.platform.GlStateManager;
 import com.supermartijn642.core.ClientUtils;
 import com.supermartijn642.core.render.RenderUtils;
 import net.minecraft.client.Minecraft;
@@ -13,6 +14,7 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.DrawBlockHighlightEvent;
@@ -55,17 +57,35 @@ public class ClientProxy {
                 CompoundNBT compound = stack.getOrCreateTag().getCompound("tileData");
                 if(compound.getBoolean("bound") && compound.getInt("dimension") == world.getDimension().getType().getId()){
                     BlockPos pos = new BlockPos(compound.getInt("boundx"), compound.getInt("boundy"), compound.getInt("boundz"));
+
+                    GlStateManager.pushMatrix();
+                    Vec3d camera = RenderUtils.getCameraPosition();
+                    GlStateManager.translated(-camera.x, -camera.y, -camera.z);
+                    GlStateManager.translated(pos.getX(), pos.getY(), pos.getZ());
+
                     RenderUtils.disableDepthTest();
-                    RenderUtils.renderShape(world.getBlockState(pos).getOcclusionShape(world, pos), pos, 86 / 255f, 0 / 255f, 156 / 255f);
-                    RenderUtils.enableDepthTest();
+                    RenderUtils.renderShape(world.getBlockState(pos).getOcclusionShape(world, pos), 86 / 255f, 0 / 255f, 156 / 255f);
+                    RenderUtils.renderShapeSides(world.getBlockState(pos).getOcclusionShape(world, pos), 86 / 255f, 0 / 255f, 156 / 255f, 30 / 255f);
+                    RenderUtils.resetState();
+
+                    GlStateManager.popMatrix();
                 }
             }else if(stack.getItem() == Entangled.item){
                 CompoundNBT compound = stack.getOrCreateTag();
                 if(compound.getBoolean("bound") && compound.getInt("dimension") == world.getDimension().getType().getId()){
                     BlockPos pos = new BlockPos(compound.getInt("boundx"), compound.getInt("boundy"), compound.getInt("boundz"));
+
+                    GlStateManager.pushMatrix();
+                    Vec3d camera = RenderUtils.getCameraPosition();
+                    GlStateManager.translated(-camera.x, -camera.y, -camera.z);
+                    GlStateManager.translated(pos.getX(), pos.getY(), pos.getZ());
+
                     RenderUtils.disableDepthTest();
-                    RenderUtils.renderShape(world.getBlockState(pos).getOcclusionShape(world, pos), pos, 235 / 255f, 210 / 255f, 52 / 255f);
-                    RenderUtils.enableDepthTest();
+                    RenderUtils.renderShape(world.getBlockState(pos).getOcclusionShape(world, pos), 235 / 255f, 210 / 255f, 52 / 255f);
+                    RenderUtils.renderShapeSides(world.getBlockState(pos).getOcclusionShape(world, pos), 235 / 255f, 210 / 255f, 52 / 255f, 30 / 255f);
+                    RenderUtils.resetState();
+
+                    GlStateManager.popMatrix();
                 }
             }
         }
@@ -79,9 +99,18 @@ public class ClientProxy {
             TileEntity tile = world.getBlockEntity(e.getTarget().getBlockPos());
             if(tile instanceof EntangledBlockTile && ((EntangledBlockTile)tile).isBound() && ((EntangledBlockTile)tile).getBoundDimension() == world.getDimension().getType().getId()){
                 BlockPos pos = ((EntangledBlockTile)tile).getBoundBlockPos();
+
+                GlStateManager.pushMatrix();
+                Vec3d camera = RenderUtils.getCameraPosition();
+                GlStateManager.translated(-camera.x, -camera.y, -camera.z);
+                GlStateManager.translated(pos.getX(), pos.getY(), pos.getZ());
+
                 RenderUtils.disableDepthTest();
-                RenderUtils.renderShape(world.getBlockState(pos).getOcclusionShape(world, pos), pos, 86 / 255f, 0 / 255f, 156 / 255f);
-                RenderUtils.enableDepthTest();
+                RenderUtils.renderShape(world.getBlockState(pos).getOcclusionShape(world, pos), 86 / 255f, 0 / 255f, 156 / 255f);
+                RenderUtils.renderShapeSides(world.getBlockState(pos).getOcclusionShape(world, pos), 86 / 255f, 0 / 255f, 156 / 255f, 30 / 255f);
+                RenderUtils.resetState();
+
+                GlStateManager.popMatrix();
             }
         }
     }
