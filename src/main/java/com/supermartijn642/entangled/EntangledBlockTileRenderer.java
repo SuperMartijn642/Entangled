@@ -54,12 +54,14 @@ public class EntangledBlockTileRenderer extends TileEntitySpecialRenderer<Entang
 
         // rotate and scale
         GlStateManager.translate(0.5, 0.5, 0.5);
-        float angleX = System.currentTimeMillis() % 10000 / 10000f * 360f;
-        float angleY = System.currentTimeMillis() % 11000 / 11000f * 360f;
-        float angleZ = System.currentTimeMillis() % 12000 / 12000f * 360f;
-        GlStateManager.rotate(angleX, 1, 0, 0);
-        GlStateManager.rotate(angleY, 0, 1, 0);
-        GlStateManager.rotate(angleZ, 0, 0, 1);
+        if(EntangledConfig.rotateRenderedBlock.get()){
+            float angleX = System.currentTimeMillis() % 10000 / 10000f * 360f;
+            float angleY = System.currentTimeMillis() % 11000 / 11000f * 360f;
+            float angleZ = System.currentTimeMillis() % 12000 / 12000f * 360f;
+            GlStateManager.rotate(angleX, 1, 0, 0);
+            GlStateManager.rotate(angleY, 0, 1, 0);
+            GlStateManager.rotate(angleZ, 0, 0, 1);
+        }
         double sizeX = bounds.maxX - bounds.minX, sizeY = bounds.maxY - bounds.minY, sizeZ = bounds.maxZ - bounds.minZ;
         float scale = 0.4763f / (float)Math.sqrt((sizeX * sizeX + sizeY * sizeY + sizeZ * sizeZ) / 4);
         GlStateManager.scale(scale, scale, scale);
