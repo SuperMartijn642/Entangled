@@ -43,10 +43,12 @@ public class EntangledBlockTileRenderer implements BlockEntityRenderer<Entangled
 
         // rotate and scale
         matrixStack.translate(0.5, 0.5, 0.5);
-        float angleX = System.currentTimeMillis() % 10000 / 10000f * 360f;
-        float angleY = System.currentTimeMillis() % 11000 / 11000f * 360f;
-        float angleZ = System.currentTimeMillis() % 12000 / 12000f * 360f;
-        matrixStack.mulPose(new Quaternion(angleX, angleY, angleZ, true));
+        if(EntangledConfig.rotateRenderedBlock.get()){
+            float angleX = System.currentTimeMillis() % 10000 / 10000f * 360f;
+            float angleY = System.currentTimeMillis() % 11000 / 11000f * 360f;
+            float angleZ = System.currentTimeMillis() % 12000 / 12000f * 360f;
+            matrixStack.mulPose(new Quaternion(angleX, angleY, angleZ, true));
+        }
         float scale = 0.4763f / (float)Math.sqrt((bounds.getXsize() * bounds.getXsize() + bounds.getYsize() * bounds.getYsize() + bounds.getZsize() * bounds.getZsize()) / 4);
         matrixStack.scale(scale, scale, scale);
         matrixStack.translate(-bounds.getCenter().x, -bounds.getCenter().y, -bounds.getCenter().z);
