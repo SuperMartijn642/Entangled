@@ -48,7 +48,7 @@ description='''Entangled gives you the materials needed to bind two blocks toget
 [[dependencies.entangled]]
     modId="minecraft"
     mandatory=true
-    versionRange="[1.17,1.18)"
+    versionRange="[1.18,1.19)"
     ordering="NONE"
     side="BOTH"
 # Add a dependency on SuperMartijn642's Config Lib
@@ -62,6 +62,6 @@ description='''Entangled gives you the materials needed to bind two blocks toget
 [[dependencies.entangled]]
     modId="supermartijn642corelib"
     mandatory=true
-    versionRange="[1.0.14,1.1.0)"
+    versionRange="[1.0.15,1.1.0)"
     ordering="NONE"
     side="BOTH"
