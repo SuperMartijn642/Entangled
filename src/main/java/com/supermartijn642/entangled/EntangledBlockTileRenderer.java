@@ -6,6 +6,7 @@ import com.supermartijn642.core.ClientUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
+import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -28,8 +29,8 @@ public class EntangledBlockTileRenderer implements BlockEntityRenderer<Entangled
         BlockEntity boundTile = tile.getLevel().dimension() == tile.getBoundDimension() ? tile.getLevel().getBlockEntity(tile.getBoundBlockPos()) : null;
         BlockState boundState = tile.getBoundBlockState();
 
-        boolean renderTile = boundTile != null && canRenderTileEntity(boundTile.getType().getRegistryName());
-        boolean renderBlock = boundState != null && boundState.getRenderShape() == RenderShape.MODEL && canRenderBlock(boundState.getBlock().getRegistryName());
+        boolean renderTile = boundTile != null && canRenderTileEntity(Registry.BLOCK_ENTITY_TYPE.getKey(boundTile.getType()));
+        boolean renderBlock = boundState != null && boundState.getRenderShape() == RenderShape.MODEL && canRenderBlock(Registry.BLOCK.getKey(boundState.getBlock()));
 
         // get the bounding box
         AABB bounds = new AABB(0, 0, 0, 1, 1, 1);

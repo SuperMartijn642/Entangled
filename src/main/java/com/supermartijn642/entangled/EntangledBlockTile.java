@@ -9,12 +9,8 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.util.LazyOptional;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 /**
@@ -30,7 +26,7 @@ public class EntangledBlockTile extends BaseTileEntity {
     private final int[] directRedstoneSignal = new int[]{0, 0, 0, 0, 0, 0};
     private int analogOutputSignal = -1;
     // Make sure we don't get in infinite loop when entangled blocks are linked to each other
-    private int callDepth = 0;
+    int callDepth = 0;
 
     public EntangledBlockTile(BlockPos pos, BlockState state){
         super(Entangled.tile, pos, state);
@@ -41,7 +37,7 @@ public class EntangledBlockTile extends BaseTileEntity {
             return;
         if(this.bound && this.pos != null){
             Level world = this.getDimension();
-            if(world != null && (world.isAreaLoaded(this.pos, 1) || this.blockState == null || this.analogOutputSignal == -1)){
+            if(world != null && (world.isLoaded(this.pos) || this.blockState == null || this.analogOutputSignal == -1)){
                 BlockState state = world.getBlockState(this.pos);
                 int analogOutputSignal = state.hasAnalogOutputSignal() ?
                     state.getAnalogOutputSignal(world, this.pos) : 0;
@@ -84,50 +80,6 @@ public class EntangledBlockTile extends BaseTileEntity {
 
     public BlockState getBoundBlockState(){
         return this.blockState;
-    }
-
-    @Nonnull
-    @Override
-    public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> capability){
-        if(this.level == null)
-            return LazyOptional.empty();
-        if(this.bound){
-            if((this.level.isClientSide && this.level.dimension() != this.dimension) || this.callDepth >= 10)
-                return LazyOptional.empty();
-            Level world = this.getDimension();
-            if(world != null){
-                BlockEntity tile = world.getBlockEntity(this.pos);
-                if(tile != null){
-                    this.callDepth++;
-                    LazyOptional<T> value = tile.getCapability(capability);
-                    this.callDepth--;
-                    return value;
-                }
-            }
-        }
-        return LazyOptional.empty();
-    }
-
-    @Nonnull
-    @Override
-    public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> capability, @Nullable Direction facing){
-        if(this.level == null)
-            return LazyOptional.empty();
-        if(this.bound){
-            if((this.level.isClientSide && this.level.dimension() != this.dimension) || this.callDepth >= 10)
-                return LazyOptional.empty();
-            Level world = this.getDimension();
-            if(world != null){
-                BlockEntity tile = world.getBlockEntity(this.pos);
-                if(tile != null){
-                    this.callDepth++;
-                    LazyOptional<T> value = tile.getCapability(capability, facing);
-                    this.callDepth--;
-                    return value;
-                }
-            }
-        }
-        return LazyOptional.empty();
     }
 
     public boolean bind(BlockPos pos, String dimension){

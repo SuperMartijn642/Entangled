@@ -44,7 +44,7 @@ public class EntangledBlock extends BaseBlock implements EntityBlock {
     public static final BooleanProperty ON = BooleanProperty.create("on");
 
     public EntangledBlock(){
-        super("block", true, Properties.of(new Material.Builder(MaterialColor.COLOR_BROWN).noCollider().build()).speedFactor(1f).sound(SoundType.STONE).strength(2f));
+        super(true, Properties.of(new Material.Builder(MaterialColor.COLOR_BROWN).noCollider().build()).speedFactor(1f).sound(SoundType.STONE).strength(2f));
         this.registerDefaultState(this.defaultBlockState().setValue(ON, false));
     }
 
