@@ -3,23 +3,29 @@ package com.supermartijn642.entangled.integration;
 import com.supermartijn642.core.TextComponents;
 import com.supermartijn642.entangled.EntangledBlock;
 import com.supermartijn642.entangled.EntangledBlockTile;
-import mcp.mobius.waila.api.*;
-import mcp.mobius.waila.api.config.IPluginConfig;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import snownee.jade.api.*;
+import snownee.jade.api.config.IPluginConfig;
 
 /**
  * Created 1/26/2021 by SuperMartijn642
  */
 @WailaPlugin("entangled")
-public class EntangledWailaPlugin implements IComponentProvider, IWailaPlugin {
+public class EntangledWailaPlugin implements IBlockComponentProvider, IWailaPlugin {
 
     @Override
-    public void register(IRegistrar registrar){
-        registrar.registerComponentProvider(this, TooltipPosition.BODY, EntangledBlock.class);
+    public ResourceLocation getUid(){
+        return new ResourceLocation("entangled", "entangled_block_component");
+    }
+
+    @Override
+    public void registerClient(IWailaClientRegistration registration){
+        registration.registerBlockComponent(this, EntangledBlock.class);
     }
 
     @Override
