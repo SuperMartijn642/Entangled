@@ -37,7 +37,7 @@ dependencies {
     implementation fg.deobf("curse.maven:supermartijn642s-config-lib-438332:${project.config_library_file}")
 
     // Jade
-    implementation fg.deobf("curse.maven:jade-324717:${project.jade_file}")
+    compileOnly fg.deobf("curse.maven:jade-324717:${project.jade_file}")
     // The One Probe
     compileOnly fg.deobf("curse.maven:the-one-probe-245211:${project.the_one_probe_file}")
 
@@ -55,8 +55,8 @@ processResources {
         expand project.properties
     }
 
-    rename "modid.mixins.json", "${project.mod_id}.mixins.json"
-    rename "icon.png", "${project.mod_id}.png"
+    rename "^modid.mixins.json\$", "${project.mod_id}.mixins.json"
+    rename "^icon.png\$", "${project.mod_id}.png"
 }
 
 minecraft {
@@ -90,7 +90,7 @@ minecraft {
 
             property "forge.logging.markers", "REGISTRIES"
 
-            args "--mod", project.mod_id, "--all", "--output", file("src/generated/resources/"), "--existing", file("src/main/resources/")
+            args "--mod", project.mod_id, "--all", "--output", file("src/generated/resources/"), "--existing", file("build/resources/main/")
 
             mods {
                 source sourceSets.main

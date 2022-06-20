@@ -12,6 +12,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import net.minecraftforge.registries.ForgeRegistries;
 
 /**
  * Created 3/16/2020 by SuperMartijn642
@@ -28,8 +29,8 @@ public class EntangledBlockTileRenderer implements BlockEntityRenderer<Entangled
         BlockEntity boundTile = tile.getLevel().dimension() == tile.getBoundDimension() ? tile.getLevel().getBlockEntity(tile.getBoundBlockPos()) : null;
         BlockState boundState = tile.getBoundBlockState();
 
-        boolean renderTile = boundTile != null && canRenderTileEntity(boundTile.getType().getRegistryName());
-        boolean renderBlock = boundState != null && boundState.getRenderShape() == RenderShape.MODEL && canRenderBlock(boundState.getBlock().getRegistryName());
+        boolean renderTile = boundTile != null && canRenderTileEntity(ForgeRegistries.BLOCK_ENTITIES.getKey(boundTile.getType()));
+        boolean renderBlock = boundState != null && boundState.getRenderShape() == RenderShape.MODEL && canRenderBlock(ForgeRegistries.BLOCKS.getKey(boundState.getBlock()));
 
         // get the bounding box
         AABB bounds = new AABB(0, 0, 0, 1, 1, 1);
