@@ -5,7 +5,6 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.supermartijn642.core.ClientUtils;
 import net.minecraft.client.model.geom.EntityModelSet;
 import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
-import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.block.model.ItemTransforms;
@@ -36,7 +35,7 @@ public class EntangledBlockItemStackTileEntityRenderer extends BlockEntityWithou
         }
 
         EntangledBlockTile tile = new EntangledBlockTile(BlockPos.ZERO, Entangled.block.defaultBlockState());
-        tile.setLevel(ClientUtils.getMinecraft().level);
+        tile.setLevel(ClientUtils.getWorld());
         tile.readData(stack.getTag().getCompound("tileData"));
 
         BakedModel model = ClientUtils.getMinecraft().getBlockRenderer().getBlockModel(Entangled.block.defaultBlockState().setValue(EntangledBlock.ON, true));
@@ -48,19 +47,11 @@ public class EntangledBlockItemStackTileEntityRenderer extends BlockEntityWithou
     private static void renderDefaultItem(ItemStack itemStack, PoseStack matrixStack, ItemTransforms.TransformType cameraTransforms, MultiBufferSource renderTypeBuffer, int combinedLight, int combinedOverlay, BakedModel model){
         ItemRenderer renderer = ClientUtils.getMinecraft().getItemRenderer();
 
-        matrixStack.pushPose();
-
-        if(model.isLayered()){
-            net.minecraftforge.client.ForgeHooksClient.drawItemLayered(renderer, model, itemStack, matrixStack, renderTypeBuffer, combinedLight, combinedOverlay, true);
-        }else{
-            RenderType rendertype = ItemBlockRenderTypes.getRenderType(itemStack, true);
-            VertexConsumer ivertexbuilder;
-
-            ivertexbuilder = ItemRenderer.getFoilBufferDirect(renderTypeBuffer, rendertype, true, itemStack.hasFoil());
-
-            renderer.renderModelLists(model, itemStack, combinedLight, combinedOverlay, matrixStack, ivertexbuilder);
+        for(BakedModel passModel : model.getRenderPasses(itemStack, true)){
+            for(RenderType renderType : passModel.getRenderTypes(itemStack, true)){
+                VertexConsumer vertexConsumer = ItemRenderer.getFoilBufferDirect(renderTypeBuffer, renderType, true, itemStack.hasFoil());
+                renderer.renderModelLists(passModel, itemStack, combinedLight, combinedOverlay, matrixStack, vertexConsumer);
+            }
         }
-
-        matrixStack.popPose();
     }
 }

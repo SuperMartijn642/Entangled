@@ -20,8 +20,8 @@ public class EntangledBlockBakedItemModel extends BakedModelWrapper<BakedModel> 
     }
 
     @Override
-    public BakedModel handlePerspective(ItemTransforms.TransformType cameraTransformType, PoseStack mat){
-        super.handlePerspective(cameraTransformType, mat);
+    public BakedModel applyTransform(ItemTransforms.TransformType cameraTransformType, PoseStack poseStack, boolean applyLeftHandTransform){
+        super.applyTransform(cameraTransformType, poseStack, applyLeftHandTransform);
         return this;
     }
 }
