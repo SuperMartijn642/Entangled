@@ -29,7 +29,7 @@ public class EntangledBlockTileRenderer implements BlockEntityRenderer<Entangled
         BlockEntity boundTile = tile.getLevel().dimension() == tile.getBoundDimension() ? tile.getLevel().getBlockEntity(tile.getBoundBlockPos()) : null;
         BlockState boundState = tile.getBoundBlockState();
 
-        boolean renderTile = boundTile != null && canRenderTileEntity(ForgeRegistries.BLOCK_ENTITIES.getKey(boundTile.getType()));
+        boolean renderTile = boundTile != null && canRenderTileEntity(ForgeRegistries.BLOCK_ENTITY_TYPES.getKey(boundTile.getType()));
         boolean renderBlock = boundState != null && boundState.getRenderShape() == RenderShape.MODEL && canRenderBlock(ForgeRegistries.BLOCKS.getKey(boundState.getBlock()));
 
         // get the bounding box
