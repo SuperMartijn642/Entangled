@@ -1,13 +1,13 @@
 package com.supermartijn642.entangled;
 
 import com.supermartijn642.core.ClientUtils;
+import com.supermartijn642.core.registry.ClientRegistrationHandler;
+import com.supermartijn642.core.render.CustomRendererBakedModelWrapper;
 import com.supermartijn642.core.render.RenderUtils;
+import com.supermartijn642.core.render.RenderWorldEvent;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.resources.model.BakedModel;
-import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
@@ -17,9 +17,6 @@ import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.DrawSelectionEvent;
-import net.minecraftforge.client.event.EntityRenderersEvent;
-import net.minecraftforge.client.event.ModelBakeEvent;
-import net.minecraftforge.client.event.RenderLevelLastEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
@@ -27,27 +24,23 @@ import net.minecraftforge.fml.common.Mod;
  * Created 3/16/2020 by SuperMartijn642
  */
 @Mod.EventBusSubscriber(value = Dist.CLIENT, bus = Mod.EventBusSubscriber.Bus.MOD)
-public class ClientProxy {
+public class EntangledClient {
 
-    @SubscribeEvent
-    public static void setup(EntityRenderersEvent.RegisterRenderers e){
-        e.registerBlockEntityRenderer(Entangled.tile, context -> new EntangledBlockTileRenderer());
-    }
+    public static void register(){
+        ClientRegistrationHandler handler = ClientRegistrationHandler.get("entangled");
 
-    @SubscribeEvent
-    public static void onModelBake(ModelBakeEvent e){
-        // replace the entangled block item model
-        ResourceLocation location = new ModelResourceLocation(new ResourceLocation("entangled", "block"), "inventory");
-        BakedModel model = e.getModelRegistry().get(location);
-        if(model != null)
-            e.getModelRegistry().put(location, new EntangledBlockBakedItemModel(model));
+        // Entangled block renderer
+        handler.registerBlockEntityRenderer(() -> Entangled.tile, EntangledBlockTileRenderer::new);
+        handler.registerCustomItemRenderer(() -> Entangled.block.asItem(), EntangledBlockItemStackTileEntityRenderer::new);
+        // Entangled block item model
+        handler.registerModelOverwrite("entangled", "block", "inventory", CustomRendererBakedModelWrapper::new);
     }
 
     @Mod.EventBusSubscriber(value = Dist.CLIENT, bus = Mod.EventBusSubscriber.Bus.FORGE)
     public static class Events {
 
         @SubscribeEvent
-        public static void onDrawPlayerEvent(RenderLevelLastEvent e){
+        public static void onDrawPlayerEvent(RenderWorldEvent e){
             ItemStack stack = ClientUtils.getPlayer().getItemInHand(InteractionHand.MAIN_HAND);
             Level world = ClientUtils.getWorld();
 
@@ -61,10 +54,8 @@ public class ClientProxy {
                     e.getPoseStack().translate(-camera.x, -camera.y, -camera.z);
                     e.getPoseStack().translate(pos.getX(), pos.getY(), pos.getZ());
 
-                    RenderUtils.disableDepthTest();
-                    RenderUtils.renderShape(e.getPoseStack(), world.getBlockState(pos).getOcclusionShape(world, pos), 86 / 255f, 0 / 255f, 156 / 255f);
-                    RenderUtils.renderShapeSides(e.getPoseStack(), world.getBlockState(pos).getOcclusionShape(world, pos), 86 / 255f, 0 / 255f, 156 / 255f, 30 / 255f);
-                    RenderUtils.resetState();
+                    RenderUtils.renderShape(e.getPoseStack(), world.getBlockState(pos).getOcclusionShape(world, pos), 86 / 255f, 0 / 255f, 156 / 255f, false);
+                    RenderUtils.renderShapeSides(e.getPoseStack(), world.getBlockState(pos).getOcclusionShape(world, pos), 86 / 255f, 0 / 255f, 156 / 255f, 30 / 255f, false);
 
                     e.getPoseStack().popPose();
                 }
@@ -78,10 +69,8 @@ public class ClientProxy {
                     e.getPoseStack().translate(-camera.x, -camera.y, -camera.z);
                     e.getPoseStack().translate(pos.getX(), pos.getY(), pos.getZ());
 
-                    RenderUtils.disableDepthTest();
-                    RenderUtils.renderShape(e.getPoseStack(), world.getBlockState(pos).getOcclusionShape(world, pos), 235 / 255f, 210 / 255f, 52 / 255f);
-                    RenderUtils.renderShapeSides(e.getPoseStack(), world.getBlockState(pos).getOcclusionShape(world, pos), 235 / 255f, 210 / 255f, 52 / 255f, 30 / 255f);
-                    RenderUtils.resetState();
+                    RenderUtils.renderShape(e.getPoseStack(), world.getBlockState(pos).getOcclusionShape(world, pos), 235 / 255f, 210 / 255f, 52 / 255f, false);
+                    RenderUtils.renderShapeSides(e.getPoseStack(), world.getBlockState(pos).getOcclusionShape(world, pos), 235 / 255f, 210 / 255f, 52 / 255f, 30 / 255f, false);
 
                     e.getPoseStack().popPose();
                 }
@@ -103,10 +92,8 @@ public class ClientProxy {
                 e.getPoseStack().translate(-camera.x, -camera.y, -camera.z);
                 e.getPoseStack().translate(pos.getX(), pos.getY(), pos.getZ());
 
-                RenderUtils.disableDepthTest();
-                RenderUtils.renderShape(e.getPoseStack(), world.getBlockState(pos).getOcclusionShape(world, pos), 86 / 255f, 0 / 255f, 156 / 255f);
-                RenderUtils.renderShapeSides(e.getPoseStack(), world.getBlockState(pos).getOcclusionShape(world, pos), 86 / 255f, 0 / 255f, 156 / 255f, 30 / 255f);
-                RenderUtils.resetState();
+                RenderUtils.renderShape(e.getPoseStack(), world.getBlockState(pos).getOcclusionShape(world, pos), 86 / 255f, 0 / 255f, 156 / 255f, false);
+                RenderUtils.renderShapeSides(e.getPoseStack(), world.getBlockState(pos).getOcclusionShape(world, pos), 86 / 255f, 0 / 255f, 156 / 255f, 30 / 255f, false);
 
                 e.getPoseStack().popPose();
             }

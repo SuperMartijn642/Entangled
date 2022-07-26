@@ -18,8 +18,8 @@ import net.minecraft.world.level.block.state.BlockState;
 public class EntangledWailaPlugin implements IComponentProvider, IWailaPlugin {
 
     @Override
-    public void register(IRegistrar registrar){
-        registrar.registerComponentProvider(this, TooltipPosition.BODY, EntangledBlock.class);
+    public void registerClient(IWailaClientRegistration registration){
+        registration.registerComponentProvider(this, TooltipPosition.BODY, EntangledBlock.class);
     }
 
     @Override

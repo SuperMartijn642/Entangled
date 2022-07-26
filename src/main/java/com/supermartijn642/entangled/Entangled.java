@@ -1,52 +1,48 @@
 package com.supermartijn642.entangled;
 
 import com.google.common.collect.Sets;
+import com.supermartijn642.core.item.BaseBlockItem;
+import com.supermartijn642.core.item.ItemGroup;
+import com.supermartijn642.core.item.ItemProperties;
+import com.supermartijn642.core.registry.RegistrationHandler;
+import com.supermartijn642.core.registry.RegistryEntryAcceptor;
 import com.supermartijn642.entangled.integration.TheOneProbePlugin;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.CreativeModeTab;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
-import net.minecraftforge.event.RegistryEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import net.minecraftforge.registries.ObjectHolder;
 
 import java.util.Set;
 
 @Mod("entangled")
 public class Entangled {
 
-    @ObjectHolder("entangled:block")
+    @RegistryEntryAcceptor(namespace = "entangled", identifier = "block", registry = RegistryEntryAcceptor.Registry.BLOCKS)
     public static EntangledBlock block;
-    @ObjectHolder("entangled:tile")
+    @RegistryEntryAcceptor(namespace = "entangled", identifier = "tile", registry = RegistryEntryAcceptor.Registry.BLOCK_ENTITY_TYPES)
     public static BlockEntityType<EntangledBlockTile> tile;
-    @ObjectHolder("entangled:item")
+    @RegistryEntryAcceptor(namespace = "entangled", identifier = "item", registry = RegistryEntryAcceptor.Registry.ITEMS)
     public static EntangledBinder item;
 
     public Entangled(){
         FMLJavaModLoadingContext.get().getModEventBus().addListener(TheOneProbePlugin::interModEnqueue);
+
+        register();
+        DistExecutor.safeRunWhenOn(Dist.CLIENT, () -> EntangledClient::register);
     }
 
-    @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD)
-    public static class RegistryEvents {
+    private static void register(){
+        RegistrationHandler handler = RegistrationHandler.get("entangled");
 
-        @SubscribeEvent
-        public static void onBlockRegistry(final RegistryEvent.Register<Block> e){
-            e.getRegistry().register(new EntangledBlock());
-        }
-
-        @SubscribeEvent
-        public static void onTileRegistry(final RegistryEvent.Register<BlockEntityType<?>> e){
-            e.getRegistry().register(BlockEntityType.Builder.of(EntangledBlockTile::new, block).build(null).setRegistryName("tile"));
-        }
-
-        @SubscribeEvent
-        public static void onItemRegistry(final RegistryEvent.Register<Item> e){
-            e.getRegistry().register(new EntangledBlockItem(block, new Item.Properties().tab(CreativeModeTab.TAB_SEARCH)).setRegistryName("block"));
-            e.getRegistry().register(new EntangledBinder());
-        }
+        // Entangled block
+        handler.registerBlock("block", EntangledBlock::new);
+        handler.registerItem("block", () -> new BaseBlockItem(block, ItemProperties.create().group(ItemGroup.getDecoration())));
+        // Entangled block entity type
+        handler.registerBlockEntityType("tile", () -> BlockEntityType.Builder.of(EntangledBlockTile::new, block).build(null));
+        // Entangled binder
+        handler.registerItem("item", EntangledBinder::new);
     }
 
     public static final Set<String> RENDER_BLACKLISTED_MODS = Sets.newHashSet();

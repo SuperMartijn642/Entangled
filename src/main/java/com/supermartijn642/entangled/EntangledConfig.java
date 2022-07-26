@@ -1,6 +1,7 @@
 package com.supermartijn642.entangled;
 
-import com.supermartijn642.configlib.ModConfigBuilder;
+import com.supermartijn642.configlib.api.ConfigBuilders;
+import com.supermartijn642.configlib.api.IConfigBuilder;
 
 import java.util.function.Supplier;
 
@@ -16,7 +17,7 @@ public class EntangledConfig {
     public static final Supplier<Integer> maxDistance;
 
     static{
-        ModConfigBuilder builder = new ModConfigBuilder("entangled");
+        IConfigBuilder builder = ConfigBuilders.newTomlConfig("entangled", null, false);
         builder.push("Client");
         renderBlockHighlight = builder
             .dontSync()
