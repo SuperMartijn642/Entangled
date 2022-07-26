@@ -30,8 +30,8 @@ public class EntangledClient {
         ClientRegistrationHandler handler = ClientRegistrationHandler.get("entangled");
 
         // Entangled block renderer
-        handler.registerBlockEntityRenderer(() -> Entangled.tile, EntangledBlockTileRenderer::new);
-        handler.registerCustomItemRenderer(() -> Entangled.block.asItem(), EntangledBlockItemStackTileEntityRenderer::new);
+        handler.registerBlockEntityRenderer(() -> Entangled.tile, EntangledBlockEntityRenderer::new);
+        handler.registerCustomItemRenderer(() -> Entangled.block.asItem(), EntangledBlockItemRenderer::new);
         // Entangled block item model
         handler.registerModelOverwrite("entangled", "block", "inventory", CustomRendererBakedModelWrapper::new);
     }
@@ -84,8 +84,8 @@ public class EntangledClient {
 
             Level world = Minecraft.getInstance().level;
             BlockEntity tile = world.getBlockEntity(e.getTarget().getBlockPos());
-            if(tile instanceof EntangledBlockTile && ((EntangledBlockTile)tile).isBound() && ((EntangledBlockTile)tile).getBoundDimension() == world.dimension()){
-                BlockPos pos = ((EntangledBlockTile)tile).getBoundBlockPos();
+            if(tile instanceof EntangledBlockEntity && ((EntangledBlockEntity)tile).isBound() && ((EntangledBlockEntity)tile).getBoundDimension() == world.dimension()){
+                BlockPos pos = ((EntangledBlockEntity)tile).getBoundBlockPos();
 
                 e.getPoseStack().pushPose();
                 Vec3 camera = RenderUtils.getCameraPosition();

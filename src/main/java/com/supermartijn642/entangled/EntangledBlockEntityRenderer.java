@@ -16,12 +16,12 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 /**
  * Created 3/16/2020 by SuperMartijn642
  */
-public class EntangledBlockTileRenderer extends BaseBlockEntityRenderer<EntangledBlockTile> {
+public class EntangledBlockEntityRenderer extends BaseBlockEntityRenderer<EntangledBlockEntity> {
 
     private static int depth = 0;
 
     @Override
-    public void render(EntangledBlockTile entity, float partialTicks, PoseStack poseStack, MultiBufferSource bufferSource, int combinedLight, int combinedOverlay){
+    public void render(EntangledBlockEntity entity, float partialTicks, PoseStack poseStack, MultiBufferSource bufferSource, int combinedLight, int combinedOverlay){
         if(!entity.isBound())
             return;
 
@@ -54,7 +54,7 @@ public class EntangledBlockTileRenderer extends BaseBlockEntityRenderer<Entangle
         poseStack.translate(-bounds.getCenter().x, -bounds.getCenter().y, -bounds.getCenter().z);
 
         if(renderTile){
-            if(!(boundTile instanceof EntangledBlockTile) || depth < 10){
+            if(!(boundTile instanceof EntangledBlockEntity) || depth < 10){
                 depth++;
                 ClientUtils.getMinecraft().getBlockEntityRenderDispatcher().render(boundTile, partialTicks, poseStack, bufferSource);
                 depth--;

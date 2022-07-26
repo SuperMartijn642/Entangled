@@ -15,12 +15,12 @@ import net.minecraft.world.item.ItemStack;
 /**
  * Created 5/17/2021 by SuperMartijn642
  */
-public class EntangledBlockItemStackTileEntityRenderer extends BlockEntityCustomItemRenderer<EntangledBlockTile> {
+public class EntangledBlockItemRenderer extends BlockEntityCustomItemRenderer<EntangledBlockEntity> {
 
-    public EntangledBlockItemStackTileEntityRenderer(){
+    public EntangledBlockItemRenderer(){
         super(
             false,
-            () -> new EntangledBlockTile(BlockPos.ZERO, Entangled.block.defaultBlockState()),
+            () -> new EntangledBlockEntity(BlockPos.ZERO, Entangled.block.defaultBlockState()),
             (stack, entity) -> {
                 entity.setLevel(ClientUtils.getWorld());
                 if(stack.hasTag())

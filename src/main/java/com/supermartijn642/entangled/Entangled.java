@@ -22,9 +22,9 @@ public class Entangled {
     @RegistryEntryAcceptor(namespace = "entangled", identifier = "block", registry = RegistryEntryAcceptor.Registry.BLOCKS)
     public static EntangledBlock block;
     @RegistryEntryAcceptor(namespace = "entangled", identifier = "tile", registry = RegistryEntryAcceptor.Registry.BLOCK_ENTITY_TYPES)
-    public static BlockEntityType<EntangledBlockTile> tile;
+    public static BlockEntityType<EntangledBlockEntity> tile;
     @RegistryEntryAcceptor(namespace = "entangled", identifier = "item", registry = RegistryEntryAcceptor.Registry.ITEMS)
-    public static EntangledBinder item;
+    public static EntangledBinderItem item;
 
     public Entangled(){
         FMLJavaModLoadingContext.get().getModEventBus().addListener(TheOneProbePlugin::interModEnqueue);
@@ -40,9 +40,9 @@ public class Entangled {
         handler.registerBlock("block", EntangledBlock::new);
         handler.registerItem("block", () -> new BaseBlockItem(block, ItemProperties.create().group(ItemGroup.getDecoration())));
         // Entangled block entity type
-        handler.registerBlockEntityType("tile", () -> BlockEntityType.Builder.of(EntangledBlockTile::new, block).build(null));
+        handler.registerBlockEntityType("tile", () -> BlockEntityType.Builder.of(EntangledBlockEntity::new, block).build(null));
         // Entangled binder
-        handler.registerItem("item", EntangledBinder::new);
+        handler.registerItem("item", EntangledBinderItem::new);
     }
 
     public static final Set<String> RENDER_BLACKLISTED_MODS = Sets.newHashSet();

@@ -51,7 +51,7 @@ public class EntangledBlock extends BaseBlock implements EntityHoldingBlock {
             return InteractionFeedback.PASS;
         ItemStack stack = player.getItemInHand(hand);
         if(player.isCrouching() && stack.isEmpty() && state.getValue(ON)){
-            ((EntangledBlockTile)level.getBlockEntity(pos)).bind(null, null);
+            ((EntangledBlockEntity)level.getBlockEntity(pos)).bind(null, null);
             player.displayClientMessage(TextComponents.translation("entangled.entangled_block.unbind").color(ChatFormatting.YELLOW).get(), true);
             level.setBlockAndUpdate(pos, state.setValue(ON, false));
             return InteractionFeedback.SUCCESS;
@@ -66,7 +66,7 @@ public class EntangledBlock extends BaseBlock implements EntityHoldingBlock {
                 else{
                     if(!level.getBlockState(pos).getValue(ON))
                         level.setBlockAndUpdate(pos, state.setValue(ON, true));
-                    EntangledBlockTile tile = (EntangledBlockTile)level.getBlockEntity(pos);
+                    EntangledBlockEntity tile = (EntangledBlockEntity)level.getBlockEntity(pos);
                     if(compound.getString("dimension").equals(level.dimension().location().toString())){
                         if(EntangledConfig.maxDistance.get() == -1 || pos.closerThan(pos2, EntangledConfig.maxDistance.get() + 0.5)){
                             tile.bind(pos2, compound.getString("dimension"));
@@ -89,7 +89,7 @@ public class EntangledBlock extends BaseBlock implements EntityHoldingBlock {
 
     @Override
     public BlockEntity createNewBlockEntity(BlockPos pos, BlockState state){
-        return new EntangledBlockTile(pos, state);
+        return new EntangledBlockEntity(pos, state);
     }
 
     @Override
@@ -156,7 +156,7 @@ public class EntangledBlock extends BaseBlock implements EntityHoldingBlock {
     @Override
     public int getAnalogOutputSignal(BlockState state, Level world, BlockPos pos){
         BlockEntity entity = world.getBlockEntity(pos);
-        return entity instanceof EntangledBlockTile ? ((EntangledBlockTile)entity).getAnalogOutputSignal() : 0;
+        return entity instanceof EntangledBlockEntity ? ((EntangledBlockEntity)entity).getAnalogOutputSignal() : 0;
     }
 
     @Override
@@ -167,12 +167,12 @@ public class EntangledBlock extends BaseBlock implements EntityHoldingBlock {
     @Override
     public int getSignal(BlockState state, BlockGetter world, BlockPos pos, Direction direction){
         BlockEntity entity = world.getBlockEntity(pos);
-        return entity instanceof EntangledBlockTile ? ((EntangledBlockTile)entity).getRedstoneSignal(direction) : 0;
+        return entity instanceof EntangledBlockEntity ? ((EntangledBlockEntity)entity).getRedstoneSignal(direction) : 0;
     }
 
     @Override
     public int getDirectSignal(BlockState state, BlockGetter world, BlockPos pos, Direction direction){
         BlockEntity entity = world.getBlockEntity(pos);
-        return entity instanceof EntangledBlockTile ? ((EntangledBlockTile)entity).getDirectRedstoneSignal(direction) : 0;
+        return entity instanceof EntangledBlockEntity ? ((EntangledBlockEntity)entity).getDirectRedstoneSignal(direction) : 0;
     }
 }
