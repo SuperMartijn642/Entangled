@@ -3,68 +3,67 @@ package com.supermartijn642.entangled;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Quaternion;
 import com.supermartijn642.core.ClientUtils;
-import net.minecraft.client.Minecraft;
+import com.supermartijn642.core.registry.Registries;
+import com.supermartijn642.core.render.BaseBlockEntityRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.minecraftforge.registries.ForgeRegistries;
 
 /**
  * Created 3/16/2020 by SuperMartijn642
  */
-public class EntangledBlockTileRenderer implements BlockEntityRenderer<EntangledBlockTile> {
+public class EntangledBlockTileRenderer extends BaseBlockEntityRenderer<EntangledBlockTile> {
 
     private static int depth = 0;
 
     @Override
-    public void render(EntangledBlockTile tile, float partialTicks, PoseStack matrixStack, MultiBufferSource buffer, int combinedLight, int combinedOverlay){
-        if(!tile.isBound())
+    public void render(EntangledBlockTile entity, float partialTicks, PoseStack poseStack, MultiBufferSource bufferSource, int combinedLight, int combinedOverlay){
+        if(!entity.isBound())
             return;
 
-        BlockEntity boundTile = tile.getLevel().dimension() == tile.getBoundDimension() ? tile.getLevel().getBlockEntity(tile.getBoundBlockPos()) : null;
-        BlockState boundState = tile.getBoundBlockState();
+        BlockEntity boundTile = entity.getLevel().dimension() == entity.getBoundDimension() ? entity.getLevel().getBlockEntity(entity.getBoundBlockPos()) : null;
+        BlockState boundState = entity.getBoundBlockState();
 
-        boolean renderTile = boundTile != null && canRenderTileEntity(ForgeRegistries.BLOCK_ENTITY_TYPES.getKey(boundTile.getType()));
-        boolean renderBlock = boundState != null && boundState.getRenderShape() == RenderShape.MODEL && canRenderBlock(ForgeRegistries.BLOCKS.getKey(boundState.getBlock()));
+        boolean renderTile = boundTile != null && canRenderTileEntity(Registries.BLOCK_ENTITY_TYPES.getIdentifier(boundTile.getType()));
+        boolean renderBlock = boundState != null && boundState.getRenderShape() == RenderShape.MODEL && canRenderBlock(Registries.BLOCKS.getIdentifier(boundState.getBlock()));
 
         // get the bounding box
         AABB bounds = new AABB(0, 0, 0, 1, 1, 1);
-        if(renderBlock && tile.getLevel().dimension() == tile.getBoundDimension()){
-            VoxelShape shape = boundState.getOcclusionShape(tile.getLevel(), tile.getBoundBlockPos());
+        if(renderBlock && entity.getLevel().dimension() == entity.getBoundDimension()){
+            VoxelShape shape = boundState.getOcclusionShape(entity.getLevel(), entity.getBoundBlockPos());
             if(!shape.isEmpty())
                 bounds = shape.bounds();
         }
 
-        matrixStack.pushPose();
+        poseStack.pushPose();
 
         // rotate and scale
-        matrixStack.translate(0.5, 0.5, 0.5);
+        poseStack.translate(0.5, 0.5, 0.5);
         if(EntangledConfig.rotateRenderedBlock.get()){
             float angleX = System.currentTimeMillis() % 10000 / 10000f * 360f;
             float angleY = System.currentTimeMillis() % 11000 / 11000f * 360f;
             float angleZ = System.currentTimeMillis() % 12000 / 12000f * 360f;
-            matrixStack.mulPose(new Quaternion(angleX, angleY, angleZ, true));
+            poseStack.mulPose(new Quaternion(angleX, angleY, angleZ, true));
         }
         float scale = 0.4763f / (float)Math.sqrt((bounds.getXsize() * bounds.getXsize() + bounds.getYsize() * bounds.getYsize() + bounds.getZsize() * bounds.getZsize()) / 4);
-        matrixStack.scale(scale, scale, scale);
-        matrixStack.translate(-bounds.getCenter().x, -bounds.getCenter().y, -bounds.getCenter().z);
+        poseStack.scale(scale, scale, scale);
+        poseStack.translate(-bounds.getCenter().x, -bounds.getCenter().y, -bounds.getCenter().z);
 
         if(renderTile){
             if(!(boundTile instanceof EntangledBlockTile) || depth < 10){
                 depth++;
-                ClientUtils.getMinecraft().getBlockEntityRenderDispatcher().render(boundTile, partialTicks, matrixStack, buffer);
+                ClientUtils.getMinecraft().getBlockEntityRenderDispatcher().render(boundTile, partialTicks, poseStack, bufferSource);
                 depth--;
             }
         }
         if(renderBlock)
-            Minecraft.getInstance().getBlockRenderer().renderSingleBlock(boundState, matrixStack, buffer, combinedLight, combinedOverlay);
+            ClientUtils.getBlockRenderer().renderSingleBlock(boundState, poseStack, bufferSource, combinedLight, combinedOverlay);
 
-        matrixStack.popPose();
+        poseStack.popPose();
     }
 
     private static boolean canRenderBlock(ResourceLocation block){

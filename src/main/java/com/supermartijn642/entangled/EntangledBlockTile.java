@@ -1,6 +1,7 @@
 package com.supermartijn642.entangled;
 
-import com.supermartijn642.core.block.BaseTileEntity;
+import com.supermartijn642.core.block.BaseBlockEntity;
+import com.supermartijn642.core.block.TickableBlockEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Registry;
@@ -20,7 +21,7 @@ import javax.annotation.Nullable;
 /**
  * Created 2/6/2020 by SuperMartijn642
  */
-public class EntangledBlockTile extends BaseTileEntity {
+public class EntangledBlockTile extends BaseBlockEntity implements TickableBlockEntity {
 
     private boolean bound = false;
     private BlockPos pos;
@@ -36,7 +37,8 @@ public class EntangledBlockTile extends BaseTileEntity {
         super(Entangled.tile, pos, state);
     }
 
-    public void tick(){
+    @Override
+    public void update(){
         if(this.level == null || this.level.isClientSide)
             return;
         if(this.bound && this.pos != null){
