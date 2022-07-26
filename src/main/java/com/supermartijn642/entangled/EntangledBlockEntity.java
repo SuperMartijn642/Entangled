@@ -21,7 +21,7 @@ import javax.annotation.Nullable;
 /**
  * Created 2/6/2020 by SuperMartijn642
  */
-public class EntangledBlockTile extends BaseBlockEntity implements TickableBlockEntity {
+public class EntangledBlockEntity extends BaseBlockEntity implements TickableBlockEntity {
 
     private boolean bound = false;
     private BlockPos pos;
@@ -33,7 +33,7 @@ public class EntangledBlockTile extends BaseBlockEntity implements TickableBlock
     // Make sure we don't get in infinite loop when entangled blocks are linked to each other
     private int callDepth = 0;
 
-    public EntangledBlockTile(BlockPos pos, BlockState state){
+    public EntangledBlockEntity(BlockPos pos, BlockState state){
         super(Entangled.tile, pos, state);
     }
 

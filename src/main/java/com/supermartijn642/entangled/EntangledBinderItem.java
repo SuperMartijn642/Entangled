@@ -26,9 +26,9 @@ import java.util.function.Consumer;
 /**
  * Created 2/6/2020 by SuperMartijn642
  */
-public class EntangledBinder extends BaseItem {
+public class EntangledBinderItem extends BaseItem {
 
-    public EntangledBinder(){
+    public EntangledBinderItem(){
         super(ItemProperties.create().maxStackSize(1).group(CreativeModeTab.TAB_MISC));
     }
 
