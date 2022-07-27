@@ -4,7 +4,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Quaternion;
 import com.supermartijn642.core.ClientUtils;
 import com.supermartijn642.core.registry.Registries;
-import com.supermartijn642.core.render.BaseBlockEntityRenderer;
+import com.supermartijn642.core.render.CustomBlockEntityRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.RenderShape;
@@ -16,7 +16,7 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 /**
  * Created 3/16/2020 by SuperMartijn642
  */
-public class EntangledBlockEntityRenderer extends BaseBlockEntityRenderer<EntangledBlockEntity> {
+public class EntangledBlockEntityRenderer implements CustomBlockEntityRenderer<EntangledBlockEntity> {
 
     private static int depth = 0;
 

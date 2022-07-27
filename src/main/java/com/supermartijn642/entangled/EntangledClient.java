@@ -30,10 +30,10 @@ public class EntangledClient {
         ClientRegistrationHandler handler = ClientRegistrationHandler.get("entangled");
 
         // Entangled block renderer
-        handler.registerBlockEntityRenderer(() -> Entangled.tile, EntangledBlockEntityRenderer::new);
+        handler.registerCustomBlockEntityRenderer(() -> Entangled.tile, EntangledBlockEntityRenderer::new);
         handler.registerCustomItemRenderer(() -> Entangled.block.asItem(), EntangledBlockItemRenderer::new);
         // Entangled block item model
-        handler.registerModelOverwrite("entangled", "block", "inventory", CustomRendererBakedModelWrapper::new);
+        handler.registerModelOverwrite("entangled", "block", "inventory", CustomRendererBakedModelWrapper::wrap);
     }
 
     @Mod.EventBusSubscriber(value = Dist.CLIENT, bus = Mod.EventBusSubscriber.Bus.FORGE)
