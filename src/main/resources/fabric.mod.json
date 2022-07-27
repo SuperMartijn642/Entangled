@@ -20,6 +20,9 @@
     ],
     "client": [
       "${mod_package}.${mod_client_class}"
+    ],
+    "jade": [
+      "com.supermartijn642.entangled.integration.EntangledWailaPlugin"
     ]
   },
   "mixins": [

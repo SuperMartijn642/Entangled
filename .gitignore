@@ -25,15 +25,14 @@ bin/
 # macos
 *.DS_Store
 
-# other
-eclipse/
-run/
-libs/
-logs/
-
 # forge
 forge*changelog.txt
 
 # other
+eclipse/
+run/
+libs/
+lib/
+logs/
 images/
 desktop.ini

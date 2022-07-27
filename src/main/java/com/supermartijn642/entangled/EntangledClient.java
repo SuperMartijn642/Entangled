@@ -1,27 +1,22 @@
 package com.supermartijn642.entangled;
 
 import com.supermartijn642.core.ClientUtils;
+import com.supermartijn642.core.registry.ClientRegistrationHandler;
+import com.supermartijn642.core.render.CustomRendererBakedModelWrapper;
 import com.supermartijn642.core.render.RenderUtils;
 import com.supermartijn642.core.render.RenderWorldEvent;
 import net.fabricmc.api.ClientModInitializer;
-import net.fabricmc.fabric.api.client.rendering.v1.BlockEntityRendererRegistry;
-import net.fabricmc.fabric.api.client.rendering.v1.BuiltinItemRendererRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.resources.model.BakedModel;
-import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.phys.Vec3;
-
-import java.util.Map;
 
 /**
  * Created 3/16/2020 by SuperMartijn642
@@ -33,16 +28,17 @@ public class EntangledClient implements ClientModInitializer {
         RenderWorldEvent.EVENT.register(EntangledClient::onDrawPlayerEvent);
         WorldRenderEvents.BLOCK_OUTLINE.register(EntangledClient::onBlockHighlight);
 
-        BlockEntityRendererRegistry.register(Entangled.tile, context -> new EntangledBlockTileRenderer());
-        BuiltinItemRendererRegistry.INSTANCE.register(Entangled.block, new EntangledBlockItemStackTileEntityRenderer());
+        register();
     }
 
-    public static void onModelBake(Map<ResourceLocation,BakedModel> modelRegistry){
-        // replace the entangled block item model
-        ResourceLocation location = new ModelResourceLocation(new ResourceLocation("entangled", "block"), "inventory");
-        BakedModel model = modelRegistry.get(location);
-        if(model != null)
-            modelRegistry.put(location, new EntangledBlockBakedItemModel(model));
+    public static void register(){
+        ClientRegistrationHandler handler = ClientRegistrationHandler.get("entangled");
+
+        // Entangled block renderer
+        handler.registerCustomBlockEntityRenderer(() -> Entangled.tile, EntangledBlockEntityRenderer::new);
+        handler.registerCustomItemRenderer(() -> Entangled.block.asItem(), EntangledBlockItemRenderer::new);
+        // Entangled block item model
+        handler.registerModelOverwrite("entangled", "block", "inventory", CustomRendererBakedModelWrapper::wrap);
     }
 
     public static void onDrawPlayerEvent(RenderWorldEvent e){
@@ -59,10 +55,8 @@ public class EntangledClient implements ClientModInitializer {
                 e.getPoseStack().translate(-camera.x, -camera.y, -camera.z);
                 e.getPoseStack().translate(pos.getX(), pos.getY(), pos.getZ());
 
-                RenderUtils.disableDepthTest();
-                RenderUtils.renderShape(e.getPoseStack(), world.getBlockState(pos).getOcclusionShape(world, pos), 86 / 255f, 0 / 255f, 156 / 255f);
-                RenderUtils.renderShapeSides(e.getPoseStack(), world.getBlockState(pos).getOcclusionShape(world, pos), 86 / 255f, 0 / 255f, 156 / 255f, 30 / 255f);
-                RenderUtils.resetState();
+                RenderUtils.renderShape(e.getPoseStack(), world.getBlockState(pos).getOcclusionShape(world, pos), 86 / 255f, 0 / 255f, 156 / 255f, false);
+                RenderUtils.renderShapeSides(e.getPoseStack(), world.getBlockState(pos).getOcclusionShape(world, pos), 86 / 255f, 0 / 255f, 156 / 255f, 30 / 255f, false);
 
                 e.getPoseStack().popPose();
             }
@@ -76,10 +70,8 @@ public class EntangledClient implements ClientModInitializer {
                 e.getPoseStack().translate(-camera.x, -camera.y, -camera.z);
                 e.getPoseStack().translate(pos.getX(), pos.getY(), pos.getZ());
 
-                RenderUtils.disableDepthTest();
-                RenderUtils.renderShape(e.getPoseStack(), world.getBlockState(pos).getOcclusionShape(world, pos), 235 / 255f, 210 / 255f, 52 / 255f);
-                RenderUtils.renderShapeSides(e.getPoseStack(), world.getBlockState(pos).getOcclusionShape(world, pos), 235 / 255f, 210 / 255f, 52 / 255f, 30 / 255f);
-                RenderUtils.resetState();
+                RenderUtils.renderShape(e.getPoseStack(), world.getBlockState(pos).getOcclusionShape(world, pos), 235 / 255f, 210 / 255f, 52 / 255f, false);
+                RenderUtils.renderShapeSides(e.getPoseStack(), world.getBlockState(pos).getOcclusionShape(world, pos), 235 / 255f, 210 / 255f, 52 / 255f, 30 / 255f, false);
 
                 e.getPoseStack().popPose();
             }
@@ -92,18 +84,16 @@ public class EntangledClient implements ClientModInitializer {
 
         Level world = Minecraft.getInstance().level;
         BlockEntity tile = world.getBlockEntity(blockOutlineContext.blockPos());
-        if(tile instanceof EntangledBlockTile && ((EntangledBlockTile)tile).isBound() && ((EntangledBlockTile)tile).getBoundDimension() == world.dimension()){
-            BlockPos pos = ((EntangledBlockTile)tile).getBoundBlockPos();
+        if(tile instanceof EntangledBlockEntity && ((EntangledBlockEntity)tile).isBound() && ((EntangledBlockEntity)tile).getBoundDimension() == world.dimension()){
+            BlockPos pos = ((EntangledBlockEntity)tile).getBoundBlockPos();
 
             renderContext.matrixStack().pushPose();
             Vec3 camera = RenderUtils.getCameraPosition();
             renderContext.matrixStack().translate(-camera.x, -camera.y, -camera.z);
             renderContext.matrixStack().translate(pos.getX(), pos.getY(), pos.getZ());
 
-            RenderUtils.disableDepthTest();
-            RenderUtils.renderShape(renderContext.matrixStack(), world.getBlockState(pos).getOcclusionShape(world, pos), 86 / 255f, 0 / 255f, 156 / 255f);
-            RenderUtils.renderShapeSides(renderContext.matrixStack(), world.getBlockState(pos).getOcclusionShape(world, pos), 86 / 255f, 0 / 255f, 156 / 255f, 30 / 255f);
-            RenderUtils.resetState();
+            RenderUtils.renderShape(renderContext.matrixStack(), world.getBlockState(pos).getOcclusionShape(world, pos), 86 / 255f, 0 / 255f, 156 / 255f, false);
+            RenderUtils.renderShapeSides(renderContext.matrixStack(), world.getBlockState(pos).getOcclusionShape(world, pos), 86 / 255f, 0 / 255f, 156 / 255f, 30 / 255f, false);
 
             renderContext.matrixStack().popPose();
         }
