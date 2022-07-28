@@ -1,10 +1,10 @@
 package com.supermartijn642.entangled;
 
-import com.supermartijn642.core.block.BaseTileEntity;
+import com.supermartijn642.core.block.BaseBlockEntity;
+import com.supermartijn642.core.block.TickableBlockEntity;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.tileentity.ITickableTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
 import net.minecraft.util.RegistryKey;
@@ -21,7 +21,7 @@ import javax.annotation.Nullable;
 /**
  * Created 2/6/2020 by SuperMartijn642
  */
-public class EntangledBlockTile extends BaseTileEntity implements ITickableTileEntity {
+public class EntangledBlockEntity extends BaseBlockEntity implements TickableBlockEntity {
 
     private boolean bound = false;
     private BlockPos pos;
@@ -33,12 +33,12 @@ public class EntangledBlockTile extends BaseTileEntity implements ITickableTileE
     // Make sure we don't get in infinite loop when entangled blocks are linked to each other
     private int callDepth = 0;
 
-    public EntangledBlockTile(){
+    public EntangledBlockEntity(){
         super(Entangled.tile);
     }
 
     @Override
-    public void tick(){
+    public void update(){
         if(this.level == null || this.level.isClientSide)
             return;
         if(this.bound && this.pos != null){
