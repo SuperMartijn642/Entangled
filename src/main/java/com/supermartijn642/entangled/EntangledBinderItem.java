@@ -33,7 +33,7 @@ public class EntangledBinderItem extends BaseItem {
     }
 
     @Override
-    protected InteractionFeedback interactWithBlock(ItemStack stack, Player player, InteractionHand hand, Level level, BlockPos hitPos, Direction hitSide, Vec3 hitLocation){
+    public InteractionFeedback interactWithBlock(ItemStack stack, Player player, InteractionHand hand, Level level, BlockPos hitPos, Direction hitSide, Vec3 hitLocation){
         if(level.isClientSide || player == null)
             return InteractionFeedback.SUCCESS;
         CompoundTag compound = stack.getTag() == null ? new CompoundTag() : stack.getTag();
@@ -53,7 +53,7 @@ public class EntangledBinderItem extends BaseItem {
     }
 
     @Override
-    protected ItemUseResult interact(ItemStack stack, Player player, InteractionHand hand, Level level){
+    public ItemUseResult interact(ItemStack stack, Player player, InteractionHand hand, Level level){
         if(player.level.isClientSide)
             return super.interact(stack, player, hand, level);
         CompoundTag compound = player.getItemInHand(hand).getTag();
