@@ -1,55 +1,59 @@
 package com.supermartijn642.entangled;
 
 import com.supermartijn642.core.ClientUtils;
+import com.supermartijn642.core.render.BlockEntityCustomItemRenderer;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.ItemRenderer;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.model.IBakedModel;
-import net.minecraft.client.renderer.tileentity.ItemStackTileEntityRenderer;
-import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
+import net.minecraftforge.client.ForgeHooksClient;
+import net.minecraftforge.common.ForgeConfig;
 
 import java.util.Random;
 
 /**
  * Created 5/17/2021 by SuperMartijn642
  */
-public class EntangledBlockItemStackTileEntityRenderer extends ItemStackTileEntityRenderer {
+public class EntangledBlockItemRenderer extends BlockEntityCustomItemRenderer<EntangledBlockEntity> {
+
+    public EntangledBlockItemRenderer(){
+        super(
+            false,
+            EntangledBlockEntity::new,
+            (stack, entity) -> {
+                entity.setLevel(ClientUtils.getWorld());
+                entity.setPosition(BlockPos.ZERO);
+                if(stack.hasTag())
+                    entity.readData(stack.getTag().getCompound("tileData"));
+            }
+        );
+    }
 
     @Override
-    public void renderByItem(ItemStack stack){
-        if(!stack.hasTag() || !stack.getTag().contains("tileData") || !stack.getTag().getCompound("tileData").getBoolean("bound")){
-            IBakedModel model = ClientUtils.getMinecraft().getItemRenderer().getItemModelShaper().getItemModel(stack);
-            renderDefaultItem(stack, model);
+    public void render(ItemStack itemStack){
+        if(!itemStack.hasTag() || !itemStack.getTag().contains("tileData") || !itemStack.getTag().getCompound("tileData").getBoolean("bound")){
+            this.renderDefaultModel(itemStack);
             return;
         }
 
-        EntangledBlockTile tile = new EntangledBlockTile();
-        tile.setLevel(ClientUtils.getMinecraft().level);
-        tile.setPosition(BlockPos.ZERO);
-        tile.readData(stack.getTag().getCompound("tileData"));
-
         IBakedModel model = ClientUtils.getMinecraft().getBlockRenderer().getBlockModel(Entangled.block.defaultBlockState().setValue(EntangledBlock.ON, true));
-        renderDefaultItem(stack, model);
-
-        TileEntityRendererDispatcher.instance.renderItem(tile);
+        renderItemModel(itemStack, model);
+        super.render(itemStack);
     }
 
-    private static void renderDefaultItem(ItemStack itemStack, IBakedModel model){
+    private static void renderItemModel(ItemStack itemStack, IBakedModel model){
         renderModel(model, -1, itemStack);
-        if(itemStack.hasFoil()){
-            ItemRenderer.renderFoilLayer(ClientUtils.getTextureManager(), () -> {
-                renderModel(model, -8372020, ItemStack.EMPTY);
-            }, 8);
-        }
+        if(itemStack.hasFoil())
+            ItemRenderer.renderFoilLayer(ClientUtils.getTextureManager(), () -> renderModel(model, -8372020, ItemStack.EMPTY), 8);
     }
 
     private static void renderModel(IBakedModel model, int color, ItemStack stack){
-        if(net.minecraftforge.common.ForgeConfig.CLIENT.allowEmissiveItems.get()){
-            net.minecraftforge.client.ForgeHooksClient.renderLitItem(ClientUtils.getMinecraft().getItemRenderer(), model, color, stack);
+        if(ForgeConfig.CLIENT.allowEmissiveItems.get()){
+            ForgeHooksClient.renderLitItem(ClientUtils.getMinecraft().getItemRenderer(), model, color, stack);
             return;
         }
         Tessellator tessellator = Tessellator.getInstance();
