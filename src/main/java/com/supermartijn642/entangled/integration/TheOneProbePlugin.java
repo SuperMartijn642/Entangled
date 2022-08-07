@@ -1,7 +1,7 @@
 package com.supermartijn642.entangled.integration;
 
 import com.supermartijn642.core.TextComponents;
-import com.supermartijn642.entangled.EntangledBlockTile;
+import com.supermartijn642.entangled.EntangledBlockEntity;
 import mcjty.theoneprobe.api.*;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
@@ -38,18 +38,18 @@ public class TheOneProbePlugin {
         @Override
         public void addProbeInfo(ProbeMode probeMode, IProbeInfo probeInfo, EntityPlayer player, World world, IBlockState state, IProbeHitData probeHitData){
             TileEntity tile = world.getTileEntity(probeHitData.getPos());
-            if(tile instanceof EntangledBlockTile){
-                if(((EntangledBlockTile)tile).isBound()){
-                    IBlockState boundBlockState = ((EntangledBlockTile)tile).getBoundBlockState();
+            if(tile instanceof EntangledBlockEntity){
+                if(((EntangledBlockEntity)tile).isBound()){
+                    IBlockState boundBlockState = ((EntangledBlockEntity)tile).getBoundBlockState();
                     String boundBlock = TextStyleClass.WARNING + (boundBlockState == null ? "Block" : TextComponents.blockState(boundBlockState).format()) + TextStyleClass.INFO;
-                    BlockPos boundPos = ((EntangledBlockTile)tile).getBoundBlockPos();
+                    BlockPos boundPos = ((EntangledBlockEntity)tile).getBoundBlockPos();
                     String x = TextStyleClass.WARNING.toString() + boundPos.getX() + TextStyleClass.INFO;
                     String y = TextStyleClass.WARNING.toString() + boundPos.getY() + TextStyleClass.INFO;
                     String z = TextStyleClass.WARNING.toString() + boundPos.getZ() + TextStyleClass.INFO;
-                    if(((EntangledBlockTile)tile).getBoundDimension() == world.provider.getDimensionType().getId())
+                    if(((EntangledBlockEntity)tile).getBoundDimension() == world.provider.getDimensionType().getId())
                         probeInfo.vertical().text(TextComponents.translation("entangled.waila.bound_same_dimension", boundBlock, x, y, z).format());
                     else{
-                        String dimension = TextStyleClass.WARNING + TextComponents.dimension(DimensionType.getById(((EntangledBlockTile)tile).getBoundDimension())).format() + TextStyleClass.INFO;
+                        String dimension = TextStyleClass.WARNING + TextComponents.dimension(DimensionType.getById(((EntangledBlockEntity)tile).getBoundDimension())).format() + TextStyleClass.INFO;
                         probeInfo.text(TextComponents.translation("entangled.waila.bound_other_dimension", boundBlock, x, y, z, dimension).format());
                     }
                 }else

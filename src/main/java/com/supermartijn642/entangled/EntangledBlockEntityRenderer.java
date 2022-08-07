@@ -1,16 +1,16 @@
 package com.supermartijn642.entangled;
 
 import com.supermartijn642.core.ClientUtils;
-import com.supermartijn642.core.gui.ScreenUtils;
+import com.supermartijn642.core.render.CustomBlockEntityRenderer;
+import com.supermartijn642.core.render.RenderConfiguration;
+import com.supermartijn642.core.render.RenderStateConfiguration;
+import com.supermartijn642.core.render.TextureAtlases;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.BlockRendererDispatcher;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.block.model.IBakedModel;
-import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
-import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockRenderLayer;
@@ -20,37 +20,50 @@ import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.client.ForgeHooksClient;
 import net.minecraftforge.client.MinecraftForgeClient;
-import org.lwjgl.opengl.GL11;
 
 /**
  * Created 3/16/2020 by SuperMartijn642
  */
-public class EntangledBlockTileRenderer extends TileEntitySpecialRenderer<EntangledBlockTile> {
+public class EntangledBlockEntityRenderer implements CustomBlockEntityRenderer<EntangledBlockEntity> {
+
+    private static final RenderConfiguration BLOCK_RENDER_CONFIGURATION = RenderConfiguration.create(
+        "entangled",
+        "block_solid",
+        DefaultVertexFormats.BLOCK,
+        RenderConfiguration.PrimitiveType.QUADS,
+        RenderStateConfiguration
+            .builder()
+            .disableLightmap()
+            .useTexture(TextureAtlases.getBlocks(), false, false)
+            .enableCulling()
+            .useLessThanOrEqualDepthTest()
+            .useTranslucentTransparency()
+            .disableLighting()
+            .build()
+    );
 
     private static int depth = 0;
 
     @Override
-    public void render(EntangledBlockTile tile, double x, double y, double z, float partialTicks, int destroyStage, float alpha){
-        if(!tile.isBound())
+    public void render(EntangledBlockEntity entity, float partialTicks, int destroyStage, float alpha){
+        if(!entity.isBound())
             return;
 
-        TileEntity boundTile = tile.getWorld().provider.getDimensionType().getId() == tile.getBoundDimension() ? tile.getWorld().getTileEntity(tile.getBoundBlockPos()) : null;
-        IBlockState boundState = tile.getBoundBlockState();
+        TileEntity boundTile = entity.getWorld().provider.getDimensionType().getId() == entity.getBoundDimension() ? entity.getWorld().getTileEntity(entity.getBoundBlockPos()) : null;
+        IBlockState boundState = entity.getBoundBlockState();
 
         boolean renderTile = boundTile != null && canRenderTileEntity(boundTile.getBlockType().getRegistryName());
         boolean renderBlock = boundState != null && boundState.getRenderType() == EnumBlockRenderType.MODEL && canRenderBlock(boundState.getBlock().getRegistryName());
 
         // get the bounding box
         AxisAlignedBB bounds = new AxisAlignedBB(0, 0, 0, 1, 1, 1);
-        if(renderBlock && tile.getWorld().provider.getDimensionType().getId() == tile.getBoundDimension()){
-            AxisAlignedBB shape = boundState.getBoundingBox(tile.getWorld(), tile.getBoundBlockPos());
+        if(renderBlock && entity.getWorld().provider.getDimensionType().getId() == entity.getBoundDimension()){
+            AxisAlignedBB shape = boundState.getBoundingBox(entity.getWorld(), entity.getBoundBlockPos());
             if(shape.minX != shape.maxX || shape.minY != shape.maxY || shape.minZ != shape.maxZ)
                 bounds = shape;
         }
 
         GlStateManager.pushMatrix();
-
-        GlStateManager.translate(x, y, z);
 
         // rotate and scale
         GlStateManager.translate(0.5, 0.5, 0.5);
@@ -68,49 +81,27 @@ public class EntangledBlockTileRenderer extends TileEntitySpecialRenderer<Entang
         GlStateManager.translate(-bounds.getCenter().x, -bounds.getCenter().y, -bounds.getCenter().z);
 
         if(renderTile){
-            if(!(boundTile instanceof EntangledBlockTile) || depth < 10){
+            if(!(boundTile instanceof EntangledBlockEntity) || depth < 10){
                 depth++;
                 TileEntityRendererDispatcher.instance.render(boundTile, 0, 0, 0, partialTicks);
                 depth--;
             }
         }
-
         if(renderBlock){
-            GlStateManager.disableLighting();
-
-            ScreenUtils.bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
-
             BlockRenderLayer initialLayer = MinecraftForgeClient.getRenderLayer();
 
             for(BlockRenderLayer layer : BlockRenderLayer.values()){
                 if(boundState.getBlock().canRenderInLayer(boundState, layer)){
-                    Tessellator tessellator = Tessellator.getInstance();
-                    BufferBuilder buffer = tessellator.getBuffer();
-                    buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.BLOCK);
-                    buffer.setTranslation(tile.getPos().getX(), tile.getPos().getY() - 300, tile.getPos().getZ());
-
-                    if(layer == BlockRenderLayer.TRANSLUCENT){
-                        GlStateManager.tryBlendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
-                        GlStateManager.enableBlend();
-                    }
+                    BufferBuilder buffer = BLOCK_RENDER_CONFIGURATION.begin();
+                    buffer.setTranslation(0, -1000, 0);
 
                     ForgeHooksClient.setRenderLayer(layer);
-                    try{
-                        BlockRendererDispatcher brd = ClientUtils.getMinecraft().getBlockRendererDispatcher();
-                        IBakedModel model = brd.getModelForState(boundState);
-                        brd.getBlockModelRenderer().renderModel(tile.getWorld(), model, boundState, new BlockPos(0, 300, 0), buffer, false);
-                    }catch(Exception e){
-                        e.printStackTrace();
-                    }
-
-                    GlStateManager.translate(-tile.getPos().getX(), -tile.getPos().getY(), -tile.getPos().getZ());
+                    BlockRendererDispatcher blockRenderer = ClientUtils.getBlockRenderer();
+                    IBakedModel model = blockRenderer.getModelForState(boundState);
+                    blockRenderer.getBlockModelRenderer().renderModel(entity.getWorld(), model, boundState, new BlockPos(0, 1000, 0), buffer, false);
 
                     buffer.setTranslation(0, 0, 0);
-                    tessellator.draw();
-
-                    if(layer == BlockRenderLayer.TRANSLUCENT){
-                        GlStateManager.disableBlend();
-                    }
+                    BLOCK_RENDER_CONFIGURATION.end();
                 }
             }
 

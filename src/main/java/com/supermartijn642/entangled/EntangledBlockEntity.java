@@ -1,13 +1,13 @@
 package com.supermartijn642.entangled;
 
-import com.supermartijn642.core.block.BaseTileEntity;
+import com.supermartijn642.core.block.BaseBlockEntity;
+import com.supermartijn642.core.block.TickableBlockEntity;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.ITickable;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.common.DimensionManager;
@@ -15,7 +15,7 @@ import net.minecraftforge.common.capabilities.Capability;
 
 import javax.annotation.Nullable;
 
-public class EntangledBlockTile extends BaseTileEntity implements ITickable {
+public class EntangledBlockEntity extends BaseBlockEntity implements TickableBlockEntity {
 
     private boolean bound = false;
     private BlockPos pos;
@@ -26,6 +26,10 @@ public class EntangledBlockTile extends BaseTileEntity implements ITickable {
     private int analogOutputSignal = -1;
     // Make sure we don't get in infinite loop when entangled blocks are linked to each other
     private int callDepth = 0;
+
+    public EntangledBlockEntity(){
+        super(Entangled.tile);
+    }
 
     @Override
     public void update(){
