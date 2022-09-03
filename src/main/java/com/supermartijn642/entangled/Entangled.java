@@ -4,8 +4,10 @@ import com.google.common.collect.Sets;
 import com.supermartijn642.core.item.BaseBlockItem;
 import com.supermartijn642.core.item.CreativeItemGroup;
 import com.supermartijn642.core.item.ItemProperties;
+import com.supermartijn642.core.registry.GeneratorRegistrationHandler;
 import com.supermartijn642.core.registry.RegistrationHandler;
 import com.supermartijn642.core.registry.RegistryEntryAcceptor;
+import com.supermartijn642.entangled.generators.*;
 import com.supermartijn642.entangled.integration.TheOneProbePlugin;
 import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.ResourceLocation;
@@ -31,6 +33,7 @@ public class Entangled {
 
         register();
         DistExecutor.safeRunWhenOn(Dist.CLIENT, () -> EntangledClient::register);
+        registerGenerators();
     }
 
     private static void register(){
@@ -43,6 +46,18 @@ public class Entangled {
         handler.registerBlockEntityType("tile", () -> TileEntityType.Builder.of(EntangledBlockEntity::new, block).build(null));
         // Entangled binder
         handler.registerItem("item", EntangledBinderItem::new);
+    }
+
+    private static void registerGenerators(){
+        GeneratorRegistrationHandler handler = GeneratorRegistrationHandler.get("entangled");
+
+        // Add all the generators
+        handler.addGenerator(EntangledModelGenerator::new);
+        handler.addGenerator(EntangledBlockStateGenerator::new);
+        handler.addGenerator(EntangledLanguageGenerator::new);
+        handler.addGenerator(EntangledLootTableGenerator::new);
+        handler.addGenerator(EntangledRecipeGenerator::new);
+        handler.addGenerator(EntangledTagGenerator::new);
     }
 
     public static final Set<String> RENDER_BLACKLISTED_MODS = Sets.newHashSet();
