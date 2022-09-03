@@ -2,10 +2,12 @@ package com.supermartijn642.entangled;
 
 import com.google.common.collect.Sets;
 import com.supermartijn642.core.item.BaseBlockItem;
-import com.supermartijn642.core.item.ItemGroup;
+import com.supermartijn642.core.item.CreativeItemGroup;
 import com.supermartijn642.core.item.ItemProperties;
+import com.supermartijn642.core.registry.GeneratorRegistrationHandler;
 import com.supermartijn642.core.registry.RegistrationHandler;
 import com.supermartijn642.core.registry.RegistryEntryAcceptor;
+import com.supermartijn642.entangled.generators.*;
 import com.supermartijn642.entangled.integration.TheOneProbePlugin;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -31,6 +33,7 @@ public class Entangled {
 
         register();
         DistExecutor.safeRunWhenOn(Dist.CLIENT, () -> EntangledClient::register);
+        registerGenerators();
     }
 
     private static void register(){
@@ -38,11 +41,23 @@ public class Entangled {
 
         // Entangled block
         handler.registerBlock("block", EntangledBlock::new);
-        handler.registerItem("block", () -> new BaseBlockItem(block, ItemProperties.create().group(ItemGroup.getDecoration())));
+        handler.registerItem("block", () -> new BaseBlockItem(block, ItemProperties.create().group(CreativeItemGroup.getDecoration())));
         // Entangled block entity type
         handler.registerBlockEntityType("tile", () -> BlockEntityType.Builder.of(EntangledBlockEntity::new, block).build(null));
         // Entangled binder
         handler.registerItem("item", EntangledBinderItem::new);
+    }
+
+    private static void registerGenerators(){
+        GeneratorRegistrationHandler handler = GeneratorRegistrationHandler.get("entangled");
+
+        // Add all the generators
+        handler.addGenerator(EntangledModelGenerator::new);
+        handler.addGenerator(EntangledBlockStateGenerator::new);
+        handler.addGenerator(EntangledLanguageGenerator::new);
+        handler.addGenerator(EntangledLootTableGenerator::new);
+        handler.addGenerator(EntangledRecipeGenerator::new);
+        handler.addGenerator(EntangledTagGenerator::new);
     }
 
     public static final Set<String> RENDER_BLACKLISTED_MODS = Sets.newHashSet();
