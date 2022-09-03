@@ -1,6 +1,0 @@
-{
-    "variants": {
-        "on=false": { "model": "entangled:block/off" },
-        "on=true": { "model": "entangled:block/on" }
-    }
-}

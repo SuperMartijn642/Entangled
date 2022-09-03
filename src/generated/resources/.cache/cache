@@ -1,0 +1,12 @@
+80ac8056007b27bd71d83bf0f11f079570f9b85b assets/entangled/blockstates/block.json
+b45a47e538f2a97dd3a7bfe660a7ac1df106ea9a assets/entangled/lang/en_us.json
+a85f38028f47c0647bf248a0112e152ab89ba891 assets/entangled/models/block/off.json
+d01b82fb5196a6de3e7fde7fcebf3ecf40955a6e assets/entangled/models/item/block.json
+8fd74a9cd4333651d0ac090bfe74bc8b5644e89d assets/entangled/models/item/item.json
+9d23a69bbe0e49b09d6d401ad14c3a3891b2d86d data/entangled/advancements/recipes/decorations/block.json
+8582ecca6f502038e1f95bc73d6f511ef916b614 data/entangled/advancements/recipes/misc/item.json
+f6255284e6b8e791baf3819f34941dbc4daf4b92 data/entangled/loot_tables/blocks/block.json
+fae0e38ce56275b251a24a5797c60984551281e3 data/entangled/recipes/block.json
+22d28d9dfb70bc146aadee27535f5fab820e3ebb data/entangled/recipes/entangled_clear_nbt.json
+bed4609088a63adf30dbcc5850155e47aa680b6e data/entangled/recipes/item.json
+4d3314d9af89e32440c0624fcd66fff5d392f900 data/minecraft/tags/blocks/mineable/pickaxe.json
