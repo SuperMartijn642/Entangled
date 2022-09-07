@@ -1,19 +1,19 @@
 {
   "type": "minecraft:crafting_shaped",
   "pattern": [
-    " AC",
-    " BA",
-    "B  "
+    " AB",
+    " CA",
+    "C  "
   ],
   "key": {
     "A": {
       "item": "minecraft:ender_pearl"
     },
     "B": {
-      "item": "minecraft:obsidian"
+      "tag": "c:diamonds"
     },
     "C": {
-      "item": "minecraft:diamond"
+      "item": "minecraft:obsidian"
     }
   },
   "result": {

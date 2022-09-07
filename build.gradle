@@ -13,7 +13,7 @@ println("Java: " + System.getProperty("java.version") + " JVM: " + System.getPro
 
 repositories {
     flatDir {
-        dir "libs/"
+        dirs "libs"
     }
     maven {
         url "https://www.cursemaven.com"
@@ -56,6 +56,8 @@ processResources {
         expand project.properties
     }
 
+    exclude "**/*.pdn"
+
     rename "^icon.png\$", "${project.mod_id}.png"
     rename "^modid.accesswidener\$", "${project.mod_id}.accesswidener"
     rename "^modid.mixins.json\$", "${project.mod_id}.mixins.json"
@@ -63,6 +65,23 @@ processResources {
 
 loom {
     accessWidenerPath = file("src/main/resources/modid.accesswidener")
+
+    loom {
+        runs {
+            // This adds a new gradle task that runs the datagen API: "gradlew runDatagenClient"
+            datagenClient {
+                inherit client
+                name "Minecraft Datagen"
+                vmArg "-Dfabric-api.datagen"
+                vmArg "-Dfabric-api.datagen.modid=${project.mod_id}"
+                vmArg "-Dfabric-api.datagen.output-dir=${file("src/generated/resources")}"
+                vmArg "-Dfabric-api.datagen.manual-dir=${file("src/main/resources")}"
+
+                ideConfigGenerated = true
+                runDir "build/datagen"
+            }
+        }
+    }
 }
 
 tasks.withType(JavaCompile).configureEach {

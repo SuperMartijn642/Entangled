@@ -1,15 +1,16 @@
 package com.supermartijn642.entangled;
 
 import com.google.common.collect.Sets;
+import com.supermartijn642.core.block.BaseBlockEntityType;
 import com.supermartijn642.core.item.BaseBlockItem;
-import com.supermartijn642.core.item.ItemGroup;
+import com.supermartijn642.core.item.CreativeItemGroup;
 import com.supermartijn642.core.item.ItemProperties;
+import com.supermartijn642.core.registry.GeneratorRegistrationHandler;
 import com.supermartijn642.core.registry.RegistrationHandler;
 import com.supermartijn642.core.registry.RegistryEntryAcceptor;
+import com.supermartijn642.entangled.generators.*;
 import net.fabricmc.api.ModInitializer;
-import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.level.block.entity.BlockEntityType;
 
 import java.util.Set;
 
@@ -21,13 +22,14 @@ public class Entangled implements ModInitializer {
     @RegistryEntryAcceptor(namespace = "entangled", identifier = "block", registry = RegistryEntryAcceptor.Registry.BLOCKS)
     public static EntangledBlock block;
     @RegistryEntryAcceptor(namespace = "entangled", identifier = "tile", registry = RegistryEntryAcceptor.Registry.BLOCK_ENTITY_TYPES)
-    public static BlockEntityType<EntangledBlockEntity> tile;
+    public static BaseBlockEntityType<EntangledBlockEntity> tile;
     @RegistryEntryAcceptor(namespace = "entangled", identifier = "item", registry = RegistryEntryAcceptor.Registry.ITEMS)
     public static EntangledBinderItem item;
 
     @Override
     public void onInitialize(){
         register();
+        registerGenerators();
     }
 
     private static void register(){
@@ -35,13 +37,25 @@ public class Entangled implements ModInitializer {
 
         // Entangled block
         handler.registerBlock("block", EntangledBlock::new);
-        handler.registerItem("block", () -> new BaseBlockItem(block, ItemProperties.create().group(ItemGroup.getDecoration())));
+        handler.registerItem("block", () -> new BaseBlockItem(block, ItemProperties.create().group(CreativeItemGroup.getDecoration())));
         // Entangled block entity type
-        handler.registerBlockEntityType("tile", () -> FabricBlockEntityTypeBuilder.create(EntangledBlockEntity::new, block).build(null));
+        handler.registerBlockEntityType("tile", () -> BaseBlockEntityType.create(EntangledBlockEntity::new, block));
         // Entangled block api providers
         handler.registerBlockEntityTypeCallback(helper -> EntangledBlockApiProviders.register());
         // Entangled binder
         handler.registerItem("item", EntangledBinderItem::new);
+    }
+
+    private static void registerGenerators(){
+        GeneratorRegistrationHandler handler = GeneratorRegistrationHandler.get("entangled");
+
+        // Add all the generators
+        handler.addGenerator(EntangledModelGenerator::new);
+        handler.addGenerator(EntangledBlockStateGenerator::new);
+        handler.addGenerator(EntangledLanguageGenerator::new);
+        handler.addGenerator(EntangledLootTableGenerator::new);
+        handler.addGenerator(EntangledRecipeGenerator::new);
+        handler.addGenerator(EntangledTagGenerator::new);
     }
 
     public static final Set<String> RENDER_BLACKLISTED_MODS = Sets.newHashSet();

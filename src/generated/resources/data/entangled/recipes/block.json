@@ -1,19 +1,19 @@
 {
   "type": "minecraft:crafting_shaped",
   "pattern": [
-    "#O#",
-    "OCO",
-    "#O#"
+    "ABA",
+    "BCB",
+    "ABA"
   ],
   "key": {
-    "#": {
+    "A": {
       "item": "minecraft:ender_pearl"
     },
-    "O": {
+    "B": {
       "item": "minecraft:obsidian"
     },
     "C": {
-      "tag": "forge:chests/wooden"
+      "item": "minecraft:chest"
     }
   },
   "result": {

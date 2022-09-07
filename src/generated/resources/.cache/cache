@@ -1,0 +1,12 @@
+22d28d9dfb70bc146aadee27535f5fab820e3ebb data\entangled\recipes\entangled_clear_nbt.json
+6e182e3f3ff2e50d9165ccd0d4ffd5d59eb902a3 data\entangled\advancements\recipes\decorations\block.json
+a85f38028f47c0647bf248a0112e152ab89ba891 assets\entangled\models\block\off.json
+b45a47e538f2a97dd3a7bfe660a7ac1df106ea9a assets\entangled\lang\en_us.json
+80ac8056007b27bd71d83bf0f11f079570f9b85b assets\entangled\blockstates\block.json
+4d3314d9af89e32440c0624fcd66fff5d392f900 data\minecraft\tags\blocks\mineable\pickaxe.json
+f0feaa7b1334cfc8b35306aa5ed3911de14dd132 data\entangled\advancements\recipes\misc\item.json
+8fd74a9cd4333651d0ac090bfe74bc8b5644e89d assets\entangled\models\item\item.json
+f6255284e6b8e791baf3819f34941dbc4daf4b92 data\entangled\loot_tables\blocks\block.json
+44109d54ae635f86fd1aa98de23cb927ae7d041c data\entangled\recipes\item.json
+d01b82fb5196a6de3e7fde7fcebf3ecf40955a6e assets\entangled\models\item\block.json
+13dca7aaab4760806aaef98a2139800d4d8b52fb data\entangled\recipes\block.json
