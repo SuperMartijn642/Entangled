@@ -1,0 +1,48 @@
+{
+  "parent": "minecraft:recipes/root",
+  "display": {
+    "icon": {
+      "item": "entangled:block"
+    },
+    "title": {
+      "translate": "entangled.advancement.recipes/decorations/block.title"
+    },
+    "description": {
+      "translate": "entangled.advancement.recipes/decorations/block.description"
+    },
+    "frame": "task",
+    "show_toast": false,
+    "announce_to_chat": false,
+    "hidden": false
+  },
+  "criteria": {
+    "can_unlock_recipe": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "item": "minecraft:ender_pearl",
+            "data": 0
+          }
+        ]
+      }
+    },
+    "has_the_recipe": {
+      "trigger": "minecraft:recipe_unlocked",
+      "conditions": {
+        "recipe": "entangled:block"
+      }
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "can_unlock_recipe"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "entangled:block"
+    ]
+  }
+}

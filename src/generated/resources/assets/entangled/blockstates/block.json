@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "on\u003dfalse": {
+      "model": "entangled:off"
+    },
+    "on\u003dtrue": {
+      "model": "entangled:on"
+    }
+  }
+}

@@ -6,8 +6,10 @@ import com.supermartijn642.core.block.BaseBlockEntityType;
 import com.supermartijn642.core.item.BaseBlockItem;
 import com.supermartijn642.core.item.CreativeItemGroup;
 import com.supermartijn642.core.item.ItemProperties;
+import com.supermartijn642.core.registry.GeneratorRegistrationHandler;
 import com.supermartijn642.core.registry.RegistrationHandler;
 import com.supermartijn642.core.registry.RegistryEntryAcceptor;
+import com.supermartijn642.entangled.generators.*;
 import com.supermartijn642.entangled.integration.TheOneProbePlugin;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.common.Loader;
@@ -30,6 +32,7 @@ public class Entangled {
         register();
         if(CommonUtils.getEnvironmentSide().isClient())
             EntangledClient.register();
+        registerGenerators();
     }
 
     private static void register(){
@@ -42,6 +45,18 @@ public class Entangled {
         handler.registerBlockEntityType("teentangledblock", () -> BaseBlockEntityType.create(EntangledBlockEntity::new, block));
         // Entangled binder
         handler.registerItem("item", EntangledBinderItem::new);
+    }
+
+    private static void registerGenerators(){
+        GeneratorRegistrationHandler handler = GeneratorRegistrationHandler.get("entangled");
+
+        // Add all the generators
+        handler.addGenerator(EntangledModelGenerator::new);
+        handler.addGenerator(EntangledBlockStateGenerator::new);
+        handler.addGenerator(EntangledLanguageGenerator::new);
+        handler.addGenerator(EntangledLootTableGenerator::new);
+        handler.addGenerator(EntangledRecipeGenerator::new);
+        handler.addGenerator(EntangledTagGenerator::new);
     }
 
     @Mod.EventHandler

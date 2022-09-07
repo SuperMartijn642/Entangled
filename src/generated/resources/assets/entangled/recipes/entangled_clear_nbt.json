@@ -1,0 +1,14 @@
+{
+  "type": "forge:ore_shapeless",
+  "ingredients": [
+    [
+      {
+        "type": "minecraft:item",
+        "item": "entangled:block"
+      }
+    ]
+  ],
+  "result": {
+    "item": "entangled:block"
+  }
+}
