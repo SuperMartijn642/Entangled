@@ -95,7 +95,7 @@ public class EntangledBlockTile extends BaseTileEntity {
             if((this.level.isClientSide && this.level.dimension() != this.dimension) || this.callDepth >= 10)
                 return LazyOptional.empty();
             Level world = this.getDimension();
-            if(world != null){
+            if(world != null && world.isLoaded(this.pos)){
                 BlockEntity tile = world.getBlockEntity(this.pos);
                 if(tile != null){
                     this.callDepth++;
@@ -117,7 +117,7 @@ public class EntangledBlockTile extends BaseTileEntity {
             if((this.level.isClientSide && this.level.dimension() != this.dimension) || this.callDepth >= 10)
                 return LazyOptional.empty();
             Level world = this.getDimension();
-            if(world != null){
+            if(world != null && world.isLoaded(this.pos)){
                 BlockEntity tile = world.getBlockEntity(this.pos);
                 if(tile != null){
                     this.callDepth++;
