@@ -31,16 +31,22 @@ public class EntangledBlockTile extends BaseTileEntity {
     private int analogOutputSignal = -1;
     // Make sure we don't get in infinite loop when entangled blocks are linked to each other
     private int callDepth = 0;
+    private BlockEntity phantomEntity;
 
     public EntangledBlockTile(BlockPos pos, BlockState state){
         super(Entangled.tile, pos, state);
     }
 
     public void tick(){
+        this.phantomEntity = null;
         if(this.level == null || this.level.isClientSide)
             return;
         if(this.bound && this.pos != null){
             Level world = this.getDimension();
+
+            if(world != null && world.isLoaded(this.pos)) {
+                this.phantomEntity = world.getBlockEntity(this.pos);
+            }
             if(world != null && (world.isAreaLoaded(this.pos, 1) || this.blockState == null || this.analogOutputSignal == -1)){
                 BlockState state = world.getBlockState(this.pos);
                 int analogOutputSignal = state.hasAnalogOutputSignal() ?
@@ -88,44 +94,12 @@ public class EntangledBlockTile extends BaseTileEntity {
 
     @Nonnull
     @Override
-    public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> capability){
-        if(this.level == null)
-            return LazyOptional.empty();
-        if(this.bound){
-            if((this.level.isClientSide && this.level.dimension() != this.dimension) || this.callDepth >= 10)
-                return LazyOptional.empty();
-            Level world = this.getDimension();
-            if(world != null){
-                BlockEntity tile = world.getBlockEntity(this.pos);
-                if(tile != null){
-                    this.callDepth++;
-                    LazyOptional<T> value = tile.getCapability(capability);
-                    this.callDepth--;
-                    return value;
-                }
-            }
-        }
-        return LazyOptional.empty();
-    }
-
-    @Nonnull
-    @Override
     public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> capability, @Nullable Direction facing){
-        if(this.level == null)
-            return LazyOptional.empty();
-        if(this.bound){
-            if((this.level.isClientSide && this.level.dimension() != this.dimension) || this.callDepth >= 10)
-                return LazyOptional.empty();
-            Level world = this.getDimension();
-            if(world != null){
-                BlockEntity tile = world.getBlockEntity(this.pos);
-                if(tile != null){
-                    this.callDepth++;
-                    LazyOptional<T> value = tile.getCapability(capability, facing);
-                    this.callDepth--;
-                    return value;
-                }
-            }
+        if(this.phantomEntity != null && this.phantomEntity != this && this.callDepth <= 10 && !this.phantomEntity.isRemoved()) {
+            this.callDepth++;
+            LazyOptional<T> value = this.phantomEntity.getCapability(capability, facing);
+            this.callDepth--;
+            return value;
         }
         return LazyOptional.empty();
     }
