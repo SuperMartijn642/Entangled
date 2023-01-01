@@ -1,0 +1,22 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " AB",
+    " CA",
+    "C  "
+  ],
+  "key": {
+    "A": {
+      "tag": "forge:ender_pearls"
+    },
+    "B": {
+      "tag": "forge:gems/diamond"
+    },
+    "C": {
+      "tag": "forge:obsidian"
+    }
+  },
+  "result": {
+    "item": "entangled:item"
+  }
+}
