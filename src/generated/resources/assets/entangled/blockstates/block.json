@@ -1,10 +1,10 @@
 {
   "variants": {
-    "on\u003dfalse": {
-      "model": "entangled:block/off"
-    },
-    "on\u003dtrue": {
+    "on=true": {
       "model": "entangled:block/on"
+    },
+    "on=false": {
+      "model": "entangled:block/off"
     }
   }
 }
