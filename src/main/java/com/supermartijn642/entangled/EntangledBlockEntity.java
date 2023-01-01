@@ -30,6 +30,7 @@ public class EntangledBlockEntity extends BaseBlockEntity implements TickableBlo
     private final int[] redstoneSignal = new int[]{0, 0, 0, 0, 0, 0};
     private final int[] directRedstoneSignal = new int[]{0, 0, 0, 0, 0, 0};
     private int analogOutputSignal = -1;
+    private boolean shouldUpdateOnceLoaded = false;
     // Make sure we don't get in infinite loop when entangled blocks are linked to each other
     private int callDepth = 0;
 
@@ -42,16 +43,16 @@ public class EntangledBlockEntity extends BaseBlockEntity implements TickableBlo
         if(this.level == null || this.level.isClientSide)
             return;
         if(this.bound && this.pos != null){
-            Level world = this.getDimension();
-            if(world != null && (world.isAreaLoaded(this.pos, 1) || this.blockState == null || this.analogOutputSignal == -1)){
-                BlockState state = world.getBlockState(this.pos);
+            Level level = this.getDimension();
+            if(level != null && (level.hasChunkAt(this.pos) || this.blockState == null || this.analogOutputSignal == -1)){
+                BlockState state = level.getBlockState(this.pos);
                 int analogOutputSignal = state.hasAnalogOutputSignal() ?
-                    state.getAnalogOutputSignal(world, this.pos) : 0;
+                    state.getAnalogOutputSignal(level, this.pos) : 0;
 
                 boolean signalChanged = false;
                 for(Direction direction : Direction.values()){
-                    int redstoneSignal = state.getSignal(world, this.pos, direction);
-                    int directRedstoneSignal = state.getDirectSignal(world, this.pos, direction);
+                    int redstoneSignal = state.getSignal(level, this.pos, direction);
+                    int directRedstoneSignal = state.getDirectSignal(level, this.pos, direction);
                     if(redstoneSignal != this.redstoneSignal[direction.get3DDataValue()]
                         || directRedstoneSignal != this.directRedstoneSignal[direction.get3DDataValue()]){
                         signalChanged = true;
@@ -60,12 +61,13 @@ public class EntangledBlockEntity extends BaseBlockEntity implements TickableBlo
                     }
                 }
 
-                if(state != this.blockState || analogOutputSignal != this.analogOutputSignal || signalChanged){
+                if(state != this.blockState || analogOutputSignal != this.analogOutputSignal || signalChanged || this.shouldUpdateOnceLoaded){
                     this.blockState = state;
                     this.analogOutputSignal = analogOutputSignal;
                     this.dataChanged();
                     this.level.updateNeighbourForOutputSignal(this.worldPosition, this.getBlockState().getBlock());
                     this.level.updateNeighborsAt(this.worldPosition, this.getBlockState().getBlock());
+                    this.shouldUpdateOnceLoaded = false;
                 }
             }
         }
@@ -96,16 +98,17 @@ public class EntangledBlockEntity extends BaseBlockEntity implements TickableBlo
         if(this.bound){
             if((this.level.isClientSide && this.level.dimension() != this.dimension) || this.callDepth >= 10)
                 return LazyOptional.empty();
-            Level world = this.getDimension();
-            if(world != null){
-                BlockEntity tile = world.getBlockEntity(this.pos);
-                if(tile != null){
+            Level level = this.getDimension();
+            if(level != null && level.hasChunkAt(this.pos)){
+                BlockEntity entity = level.getBlockEntity(this.pos);
+                if(entity != null){
                     this.callDepth++;
-                    LazyOptional<T> value = tile.getCapability(capability);
+                    LazyOptional<T> value = entity.getCapability(capability);
                     this.callDepth--;
                     return value;
                 }
-            }
+            }else
+                this.shouldUpdateOnceLoaded = true;
         }
         return LazyOptional.empty();
     }
@@ -118,16 +121,17 @@ public class EntangledBlockEntity extends BaseBlockEntity implements TickableBlo
         if(this.bound){
             if((this.level.isClientSide && this.level.dimension() != this.dimension) || this.callDepth >= 10)
                 return LazyOptional.empty();
-            Level world = this.getDimension();
-            if(world != null){
-                BlockEntity tile = world.getBlockEntity(this.pos);
-                if(tile != null){
+            Level level = this.getDimension();
+            if(level != null && level.hasChunkAt(this.pos)){
+                BlockEntity entity = level.getBlockEntity(this.pos);
+                if(entity != null){
                     this.callDepth++;
-                    LazyOptional<T> value = tile.getCapability(capability, facing);
+                    LazyOptional<T> value = entity.getCapability(capability, facing);
                     this.callDepth--;
                     return value;
                 }
-            }
+            }else
+                this.shouldUpdateOnceLoaded = true;
         }
         return LazyOptional.empty();
     }

@@ -1,6 +1,6 @@
 {
   "entangled.entangled_block.info.bound": "Bound to %1$s in the %5$s at (%2$d, %3$d, %4$d)",
-  "entangled.entangled_block.self": "Can\u0027t bind a block to itself!",
+  "entangled.entangled_block.self": "Can't bind a block to itself!",
   "config.jade.plugin_entangled.entangled_block_component": "Entangled Block",
   "entangled.entangled_block.info.ranged_same_dimension": "Can be bound to blocks in the same dimension up to %d blocks away",
   "entangled.entangled_block.too_far": "The targeted block is too far away!",
