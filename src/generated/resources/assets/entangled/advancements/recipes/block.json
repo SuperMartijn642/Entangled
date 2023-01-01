@@ -5,10 +5,10 @@
       "item": "entangled:block"
     },
     "title": {
-      "translate": "entangled.advancement.recipes/decorations/block.title"
+      "translate": "entangled.advancement.recipes/block.title"
     },
     "description": {
-      "translate": "entangled.advancement.recipes/decorations/block.description"
+      "translate": "entangled.advancement.recipes/block.description"
     },
     "frame": "task",
     "show_toast": false,
@@ -16,7 +16,13 @@
     "hidden": false
   },
   "criteria": {
-    "can_unlock_recipe": {
+    "has_the_recipe": {
+      "trigger": "minecraft:recipe_unlocked",
+      "conditions": {
+        "recipe": "entangled:block"
+      }
+    },
+    "recipe_condition": {
       "trigger": "minecraft:inventory_changed",
       "conditions": {
         "items": [
@@ -26,18 +32,12 @@
           }
         ]
       }
-    },
-    "has_the_recipe": {
-      "trigger": "minecraft:recipe_unlocked",
-      "conditions": {
-        "recipe": "entangled:block"
-      }
     }
   },
   "requirements": [
     [
       "has_the_recipe",
-      "can_unlock_recipe"
+      "recipe_condition"
     ]
   ],
   "rewards": {

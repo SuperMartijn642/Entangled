@@ -24,6 +24,7 @@ public class EntangledBlockEntity extends BaseBlockEntity implements TickableBlo
     private final int[] redstoneSignal = new int[]{0, 0, 0, 0, 0, 0};
     private final int[] directRedstoneSignal = new int[]{0, 0, 0, 0, 0, 0};
     private int analogOutputSignal = -1;
+    private boolean shouldUpdateOnceLoaded = false;
     // Make sure we don't get in infinite loop when entangled blocks are linked to each other
     private int callDepth = 0;
 
@@ -36,16 +37,16 @@ public class EntangledBlockEntity extends BaseBlockEntity implements TickableBlo
         if(this.world == null || this.world.isRemote)
             return;
         if(this.bound && this.pos != null){
-            World world = this.getDimension();
-            if(world != null && (world.isAreaLoaded(this.pos, 1) || this.blockState == null || this.analogOutputSignal == -1)){
-                IBlockState state = world.getBlockState(this.pos);
+            World level = this.getDimension();
+            if(level != null && (level.isBlockLoaded(this.pos) || this.blockState == null || this.analogOutputSignal == -1)){
+                IBlockState state = level.getBlockState(this.pos);
                 int analogOutputSignal = state.hasComparatorInputOverride() ?
-                    state.getComparatorInputOverride(world, this.pos) : 0;
+                    state.getComparatorInputOverride(level, this.pos) : 0;
 
                 boolean signalChanged = false;
                 for(EnumFacing direction : EnumFacing.values()){
-                    int redstoneSignal = state.getWeakPower(world, this.pos, direction);
-                    int directRedstoneSignal = state.getStrongPower(world, this.pos, direction);
+                    int redstoneSignal = state.getWeakPower(level, this.pos, direction);
+                    int directRedstoneSignal = state.getStrongPower(level, this.pos, direction);
                     if(redstoneSignal != this.redstoneSignal[direction.getIndex()]
                         || directRedstoneSignal != this.directRedstoneSignal[direction.getIndex()]){
                         signalChanged = true;
@@ -54,12 +55,13 @@ public class EntangledBlockEntity extends BaseBlockEntity implements TickableBlo
                     }
                 }
 
-                if(state != this.blockState || analogOutputSignal != this.analogOutputSignal || signalChanged){
+                if(state != this.blockState || analogOutputSignal != this.analogOutputSignal || signalChanged || this.shouldUpdateOnceLoaded){
                     this.blockState = state;
                     this.analogOutputSignal = analogOutputSignal;
                     this.dataChanged();
                     this.world.updateComparatorOutputLevel(this.getPos(), this.getBlockState().getBlock());
                     this.world.notifyNeighborsOfStateChange(this.getPos(), this.getBlockState().getBlock(), false);
+                    this.shouldUpdateOnceLoaded = false;
                 }
             }
         }
@@ -89,16 +91,17 @@ public class EntangledBlockEntity extends BaseBlockEntity implements TickableBlo
         if(this.bound){
             if((this.world.isRemote && this.world.provider.getDimensionType().getId() != this.dimension) || this.callDepth >= 10)
                 return false;
-            World world = this.getDimension();
-            if(world != null){
-                TileEntity tile = world.getTileEntity(this.pos);
-                if(tile != null){
+            World level = this.getDimension();
+            if(level != null && level.isBlockLoaded(this.pos)){
+                TileEntity entity = level.getTileEntity(this.pos);
+                if(entity != null){
                     this.callDepth++;
-                    boolean value = tile.hasCapability(capability, facing);
+                    boolean value = entity.hasCapability(capability, facing);
                     this.callDepth--;
                     return value;
                 }
-            }
+            }else
+                this.shouldUpdateOnceLoaded = false;
         }
         return false;
     }
@@ -111,16 +114,17 @@ public class EntangledBlockEntity extends BaseBlockEntity implements TickableBlo
         if(this.bound){
             if((this.world.isRemote && this.world.provider.getDimensionType().getId() != this.dimension) || this.callDepth >= 10)
                 return null;
-            World world = this.getDimension();
-            if(world != null){
-                TileEntity tile = world.getTileEntity(this.pos);
-                if(tile != null){
+            World level = this.getDimension();
+            if(level != null && level.isBlockLoaded(this.pos)){
+                TileEntity entity = level.getTileEntity(this.pos);
+                if(entity != null){
                     this.callDepth++;
-                    T value = tile.getCapability(capability, facing);
+                    T value = entity.getCapability(capability, facing);
                     this.callDepth--;
                     return value;
                 }
-            }
+            }else
+                this.shouldUpdateOnceLoaded = false;
         }
         return null;
     }
