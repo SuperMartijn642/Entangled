@@ -4,7 +4,7 @@ import com.supermartijn642.core.block.BaseBlockEntity;
 import com.supermartijn642.core.block.TickableBlockEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.Registry;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -140,7 +140,7 @@ public class EntangledBlockEntity extends BaseBlockEntity implements TickableBlo
         if(!this.canBindTo(pos, dimension))
             return false;
         this.pos = pos == null ? null : new BlockPos(pos);
-        this.dimension = dimension == null ? null : ResourceKey.create(Registry.DIMENSION_REGISTRY, new ResourceLocation(dimension));
+        this.dimension = dimension == null ? null : ResourceKey.create(Registries.DIMENSION, new ResourceLocation(dimension));
         this.bound = pos != null;
         this.level.updateNeighborsAt(this.getBlockPos(), this.getBlockState().getBlock());
         this.dataChanged();
@@ -248,7 +248,7 @@ public class EntangledBlockEntity extends BaseBlockEntity implements TickableBlo
         this.bound = compound.getBoolean("bound");
         if(this.bound){
             this.pos = new BlockPos(compound.getInt("boundx"), compound.getInt("boundy"), compound.getInt("boundz"));
-            this.dimension = ResourceKey.create(Registry.DIMENSION_REGISTRY, new ResourceLocation(compound.getString("dimension")));
+            this.dimension = ResourceKey.create(Registries.DIMENSION, new ResourceLocation(compound.getString("dimension")));
             this.blockState = Block.stateById(compound.getInt("blockstate"));
             for(Direction direction : Direction.values()){
                 int index = direction.get3DDataValue();

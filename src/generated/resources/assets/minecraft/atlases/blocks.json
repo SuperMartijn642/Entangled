@@ -1,0 +1,12 @@
+{
+  "sources": [
+    {
+      "type": "minecraft:single",
+      "resource": "entangled:items/item"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "entangled:blocks/off"
+    }
+  ]
+}

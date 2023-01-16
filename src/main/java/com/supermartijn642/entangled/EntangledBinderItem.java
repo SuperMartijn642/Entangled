@@ -2,18 +2,18 @@ package com.supermartijn642.entangled;
 
 import com.supermartijn642.core.TextComponents;
 import com.supermartijn642.core.item.BaseItem;
+import com.supermartijn642.core.item.CreativeItemGroup;
 import com.supermartijn642.core.item.ItemProperties;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.Registry;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
@@ -29,7 +29,7 @@ import java.util.function.Consumer;
 public class EntangledBinderItem extends BaseItem {
 
     public EntangledBinderItem(){
-        super(ItemProperties.create().maxStackSize(1).group(CreativeModeTab.TAB_MISC));
+        super(ItemProperties.create().maxStackSize(1).group(CreativeItemGroup.getToolsAndUtilities()));
     }
 
     @Override
@@ -73,7 +73,7 @@ public class EntangledBinderItem extends BaseItem {
         CompoundTag tag = stack.getOrCreateTag();
         if(tag.contains("bound") && tag.getBoolean("bound")){
             int x = tag.getInt("boundx"), y = tag.getInt("boundy"), z = tag.getInt("boundz");
-            Component dimension = TextComponents.dimension(ResourceKey.create(Registry.DIMENSION_REGISTRY, new ResourceLocation(tag.getString("dimension")))).color(ChatFormatting.GOLD).get();
+            Component dimension = TextComponents.dimension(ResourceKey.create(Registries.DIMENSION, new ResourceLocation(tag.getString("dimension")))).color(ChatFormatting.GOLD).get();
             Component xText = TextComponents.string(Integer.toString(x)).color(ChatFormatting.GOLD).get();
             Component yText = TextComponents.string(Integer.toString(y)).color(ChatFormatting.GOLD).get();
             Component zText = TextComponents.string(Integer.toString(z)).color(ChatFormatting.GOLD).get();
