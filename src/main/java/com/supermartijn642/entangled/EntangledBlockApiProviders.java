@@ -35,20 +35,23 @@ public class EntangledBlockApiProviders {
                     return null;
 
                 // Check if the bound block's level is available
-                Level boundLevel = entity.getLevel().isClientSide ?
-                    entity.getLevel().dimension() == entity.getBoundDimension() ? entity.getLevel() : null :
-                    entity.getLevel().getServer().getLevel(entity.getBoundDimension());
-                if(boundLevel == null)
+                if(entity.getLevel().isClientSide && entity.getLevel().dimension() != entity.getBoundDimension())
                     return null;
 
-                BlockPos boundPos = entity.getBoundBlockPos();
-                BlockState boundState = boundLevel.getBlockState(boundPos);
-                BlockEntity boundEntity = boundLevel.getBlockEntity(boundPos);
-                entity.callDepth++;
-                A apiObject = apiLookup.find(boundLevel, boundPos, boundState, boundEntity, context);
-                entity.callDepth--;
-
-                return apiObject;
+                Level level = entity.getLevel().isClientSide ?
+                    entity.getLevel().dimension() == entity.getBoundDimension() ? entity.getLevel() : null :
+                    entity.getLevel().getServer().getLevel(entity.getBoundDimension());
+                if(level != null && level.hasChunkAt(entity.getBoundBlockPos())){
+                    BlockPos boundPos = entity.getBoundBlockPos();
+                    BlockState boundState = level.getBlockState(boundPos);
+                    BlockEntity boundEntity = level.getBlockEntity(boundPos);
+                    entity.callDepth++;
+                    A apiObject = apiLookup.find(level, boundPos, boundState, boundEntity, context);
+                    entity.callDepth--;
+                    return apiObject;
+                }else
+                    entity.shouldUpdateOnceLoaded = true;
+                return null;
             },
             Entangled.tile
         );
