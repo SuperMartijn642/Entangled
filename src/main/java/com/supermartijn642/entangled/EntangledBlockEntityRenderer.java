@@ -1,7 +1,6 @@
 package com.supermartijn642.entangled;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.math.Quaternion;
 import com.supermartijn642.core.ClientUtils;
 import com.supermartijn642.core.registry.Registries;
 import com.supermartijn642.core.render.CustomBlockEntityRenderer;
@@ -12,6 +11,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import org.joml.Quaternionf;
 
 /**
  * Created 3/16/2020 by SuperMartijn642
@@ -44,10 +44,12 @@ public class EntangledBlockEntityRenderer implements CustomBlockEntityRenderer<E
         // rotate and scale
         poseStack.translate(0.5, 0.5, 0.5);
         if(EntangledConfig.rotateRenderedBlock.get()){
-            float angleX = System.currentTimeMillis() % 10000 / 10000f * 360f;
-            float angleY = System.currentTimeMillis() % 11000 / 11000f * 360f;
-            float angleZ = System.currentTimeMillis() % 12000 / 12000f * 360f;
-            poseStack.mulPose(new Quaternion(angleX, angleY, angleZ, true));
+            float angleX = System.currentTimeMillis() % 10000 / 10000f * 2 * (float)Math.PI;
+            float angleY = System.currentTimeMillis() % 11000 / 11000f * 2 * (float)Math.PI;
+            float angleZ = System.currentTimeMillis() % 12000 / 12000f * 2 * (float)Math.PI;
+            poseStack.mulPose(new Quaternionf().setAngleAxis(angleX, 1, 0, 0));
+            poseStack.mulPose(new Quaternionf().setAngleAxis(angleY, 0, 1, 0));
+            poseStack.mulPose(new Quaternionf().setAngleAxis(angleZ, 0, 0, 1));
         }
         float scale = 0.4763f / (float)Math.sqrt((bounds.getXsize() * bounds.getXsize() + bounds.getYsize() * bounds.getYsize() + bounds.getZsize() * bounds.getZsize()) / 4);
         poseStack.scale(scale, scale, scale);

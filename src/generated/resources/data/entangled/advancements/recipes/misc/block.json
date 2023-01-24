@@ -5,10 +5,10 @@
       "item": "entangled:block"
     },
     "title": {
-      "translate": "entangled.advancement.recipes/decorations/block.title"
+      "translate": "entangled.advancement.recipes/misc/block.title"
     },
     "description": {
-      "translate": "entangled.advancement.recipes/decorations/block.description"
+      "translate": "entangled.advancement.recipes/misc/block.description"
     },
     "frame": "task",
     "show_toast": false,
