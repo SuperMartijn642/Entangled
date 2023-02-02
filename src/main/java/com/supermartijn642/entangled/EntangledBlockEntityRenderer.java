@@ -25,7 +25,7 @@ public class EntangledBlockEntityRenderer implements CustomBlockEntityRenderer<E
         if(!entity.isBound())
             return;
 
-        BlockEntity boundTile = entity.getLevel().dimension() == entity.getBoundDimension() ? entity.getLevel().getBlockEntity(entity.getBoundBlockPos()) : null;
+        BlockEntity boundTile = entity.getLevel().dimension() == entity.getBoundDimensionIdentifier() ? entity.getLevel().getBlockEntity(entity.getBoundBlockPos()) : null;
         BlockState boundState = entity.getBoundBlockState();
 
         boolean renderTile = boundTile != null && canRenderTileEntity(Registries.BLOCK_ENTITY_TYPES.getIdentifier(boundTile.getType()));
@@ -33,7 +33,7 @@ public class EntangledBlockEntityRenderer implements CustomBlockEntityRenderer<E
 
         // get the bounding box
         AABB bounds = new AABB(0, 0, 0, 1, 1, 1);
-        if(renderBlock && entity.getLevel().dimension() == entity.getBoundDimension()){
+        if(renderBlock && entity.getLevel().dimension() == entity.getBoundDimensionIdentifier()){
             VoxelShape shape = boundState.getOcclusionShape(entity.getLevel(), entity.getBoundBlockPos());
             if(!shape.isEmpty())
                 bounds = shape.bounds();
