@@ -35,12 +35,12 @@ public class EntangledBlockApiProviders {
                     return null;
 
                 // Check if the bound block's level is available
-                if(entity.getLevel().isClientSide && entity.getLevel().dimension() != entity.getBoundDimension())
+                if(entity.getLevel().isClientSide && entity.getLevel().dimension() != entity.getBoundDimensionIdentifier())
                     return null;
 
                 Level level = entity.getLevel().isClientSide ?
-                    entity.getLevel().dimension() == entity.getBoundDimension() ? entity.getLevel() : null :
-                    entity.getLevel().getServer().getLevel(entity.getBoundDimension());
+                    entity.getLevel().dimension() == entity.getBoundDimensionIdentifier() ? entity.getLevel() : null :
+                    entity.getLevel().getServer().getLevel(entity.getBoundDimensionIdentifier());
                 if(level != null && level.hasChunkAt(entity.getBoundBlockPos())){
                     BlockPos boundPos = entity.getBoundBlockPos();
                     BlockState boundState = level.getBlockState(boundPos);

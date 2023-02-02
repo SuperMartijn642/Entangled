@@ -10,6 +10,7 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 
 import javax.annotation.Nullable;
@@ -20,9 +21,10 @@ import javax.annotation.Nullable;
 public class EntangledBlockEntity extends BaseBlockEntity implements TickableBlockEntity {
 
     private boolean bound = false;
-    private BlockPos pos;
-    private ResourceKey<Level> dimension;
-    private BlockState blockState;
+    private BlockPos boundPos;
+    private ResourceKey<Level> boundDimension;
+    private BlockState boundBlockState;
+    private BlockEntity boundBlockEntity;
     private final int[] redstoneSignal = new int[]{0, 0, 0, 0, 0, 0};
     private final int[] directRedstoneSignal = new int[]{0, 0, 0, 0, 0, 0};
     private int analogOutputSignal = -1;
@@ -38,17 +40,17 @@ public class EntangledBlockEntity extends BaseBlockEntity implements TickableBlo
     public void update(){
         if(this.level == null || this.level.isClientSide)
             return;
-        if(this.bound && this.pos != null){
-            Level level = this.getDimension();
-            if(level != null && (level.hasChunkAt(this.pos) || this.blockState == null || this.analogOutputSignal == -1)){
-                BlockState state = level.getBlockState(this.pos);
+        if(this.bound && this.boundPos != null){
+            Level level = this.getBoundDimension();
+            if(level != null && (level.hasChunkAt(this.boundPos) || this.boundBlockState == null || this.analogOutputSignal == -1)){
+                BlockState state = level.getBlockState(this.boundPos);
                 int analogOutputSignal = state.hasAnalogOutputSignal() ?
-                    state.getAnalogOutputSignal(level, this.pos) : 0;
+                    state.getAnalogOutputSignal(level, this.boundPos) : 0;
 
                 boolean signalChanged = false;
                 for(Direction direction : Direction.values()){
-                    int redstoneSignal = state.getSignal(level, this.pos, direction);
-                    int directRedstoneSignal = state.getDirectSignal(level, this.pos, direction);
+                    int redstoneSignal = state.getSignal(level, this.boundPos, direction);
+                    int directRedstoneSignal = state.getDirectSignal(level, this.boundPos, direction);
                     if(redstoneSignal != this.redstoneSignal[direction.get3DDataValue()]
                         || directRedstoneSignal != this.directRedstoneSignal[direction.get3DDataValue()]){
                         signalChanged = true;
@@ -57,8 +59,15 @@ public class EntangledBlockEntity extends BaseBlockEntity implements TickableBlo
                     }
                 }
 
-                if(state != this.blockState || analogOutputSignal != this.analogOutputSignal || signalChanged || this.shouldUpdateOnceLoaded){
-                    this.blockState = state;
+                boolean entityChanged = false;
+                BlockEntity entity = level.getBlockEntity(this.boundPos);
+                if(entity != this.boundBlockEntity){
+                    entityChanged = true;
+                    this.boundBlockEntity = entity;
+                }
+
+                if(state != this.boundBlockState || analogOutputSignal != this.analogOutputSignal || signalChanged || entityChanged || this.shouldUpdateOnceLoaded){
+                    this.boundBlockState = state;
                     this.analogOutputSignal = analogOutputSignal;
                     this.dataChanged();
                     this.level.updateNeighbourForOutputSignal(this.worldPosition, this.getBlockState().getBlock());
@@ -75,23 +84,24 @@ public class EntangledBlockEntity extends BaseBlockEntity implements TickableBlo
 
     @Nullable
     public BlockPos getBoundBlockPos(){
-        return this.pos;
+        return this.boundPos;
     }
 
-    public ResourceKey<Level> getBoundDimension(){
-        return this.dimension;
+    public ResourceKey<Level> getBoundDimensionIdentifier(){
+        return this.boundDimension;
     }
 
     public BlockState getBoundBlockState(){
-        return this.blockState;
+        return this.boundBlockState;
     }
 
     public boolean bind(BlockPos pos, String dimension){
         if(!this.canBindTo(pos, dimension))
             return false;
-        this.pos = pos == null ? null : new BlockPos(pos);
-        this.dimension = dimension == null ? null : ResourceKey.create(Registries.DIMENSION, new ResourceLocation(dimension));
+        this.boundPos = pos == null ? null : new BlockPos(pos);
+        this.boundDimension = dimension == null ? null : ResourceKey.create(Registries.DIMENSION, new ResourceLocation(dimension));
         this.bound = pos != null;
+        this.boundBlockState = null;
         this.level.updateNeighborsAt(this.getBlockPos(), this.getBlockState().getBlock());
         this.dataChanged();
         return true;
@@ -104,20 +114,20 @@ public class EntangledBlockEntity extends BaseBlockEntity implements TickableBlo
             EntangledConfig.allowDimensional.get();
     }
 
-    private Level getDimension(){
-        if(this.dimension == null)
+    private Level getBoundDimension(){
+        if(this.boundDimension == null)
             return null;
         return this.level.isClientSide ?
-            this.level.dimension() == this.dimension ? this.level : null :
-            this.level.getServer().getLevel(this.dimension);
+            this.level.dimension() == this.boundDimension ? this.level : null :
+            this.level.getServer().getLevel(this.boundDimension);
     }
 
     private boolean isTargetLoaded(){
         if(this.level.isClientSide || !this.bound)
             return false;
-        Level world = this.level.dimension() == this.dimension ?
-            this.level : this.level.getServer().getLevel(this.dimension);
-        return world != null && world.isLoaded(this.pos);
+        Level level = this.level.dimension() == this.boundDimension ?
+            this.level : this.level.getServer().getLevel(this.boundDimension);
+        return level != null && level.isLoaded(this.boundPos);
     }
 
     public int getRedstoneSignal(Direction side){
@@ -125,8 +135,8 @@ public class EntangledBlockEntity extends BaseBlockEntity implements TickableBlo
             return 0;
         if(this.isTargetLoaded() && this.callDepth < 10){
             this.callDepth++;
-            Level world = this.getDimension();
-            this.redstoneSignal[side.get3DDataValue()] = world.getBlockState(this.pos).getSignal(world, this.pos, side);
+            Level level = this.getBoundDimension();
+            this.redstoneSignal[side.get3DDataValue()] = level.getBlockState(this.boundPos).getSignal(level, this.boundPos, side);
             this.callDepth--;
             return Math.max(this.redstoneSignal[side.get3DDataValue()], 0);
         }
@@ -138,8 +148,8 @@ public class EntangledBlockEntity extends BaseBlockEntity implements TickableBlo
             return 0;
         if(this.isTargetLoaded() && this.callDepth < 10){
             this.callDepth++;
-            Level world = this.getDimension();
-            this.directRedstoneSignal[side.get3DDataValue()] = world.getBlockState(this.pos).getDirectSignal(world, this.pos, side);
+            Level level = this.getBoundDimension();
+            this.directRedstoneSignal[side.get3DDataValue()] = level.getBlockState(this.boundPos).getDirectSignal(level, this.boundPos, side);
             this.callDepth--;
             return Math.max(this.directRedstoneSignal[side.get3DDataValue()], 0);
         }
@@ -151,8 +161,8 @@ public class EntangledBlockEntity extends BaseBlockEntity implements TickableBlo
             return 0;
         if(this.isTargetLoaded() && this.callDepth < 10){
             this.callDepth++;
-            Level world = this.getDimension();
-            this.analogOutputSignal = world.getBlockState(this.pos).getAnalogOutputSignal(world, this.pos);
+            Level level = this.getBoundDimension();
+            this.analogOutputSignal = level.getBlockState(this.boundPos).getAnalogOutputSignal(level, this.boundPos);
             this.callDepth--;
             return Math.max(this.analogOutputSignal, 0);
         }
@@ -178,11 +188,11 @@ public class EntangledBlockEntity extends BaseBlockEntity implements TickableBlo
         CompoundTag compound = new CompoundTag();
         if(this.bound){
             compound.putBoolean("bound", true);
-            compound.putInt("boundx", this.pos.getX());
-            compound.putInt("boundy", this.pos.getY());
-            compound.putInt("boundz", this.pos.getZ());
-            compound.putString("dimension", this.dimension.location().toString());
-            compound.putInt("blockstate", Block.getId(this.blockState));
+            compound.putInt("boundx", this.boundPos.getX());
+            compound.putInt("boundy", this.boundPos.getY());
+            compound.putInt("boundz", this.boundPos.getZ());
+            compound.putString("dimension", this.boundDimension.location().toString());
+            compound.putInt("blockstate", Block.getId(this.boundBlockState));
             for(Direction direction : Direction.values()){
                 int index = direction.get3DDataValue();
                 compound.putInt("redstoneSignal" + index, this.redstoneSignal[index]);
@@ -197,9 +207,9 @@ public class EntangledBlockEntity extends BaseBlockEntity implements TickableBlo
     protected void readData(CompoundTag compound){
         this.bound = compound.getBoolean("bound");
         if(this.bound){
-            this.pos = new BlockPos(compound.getInt("boundx"), compound.getInt("boundy"), compound.getInt("boundz"));
-            this.dimension = ResourceKey.create(Registries.DIMENSION, new ResourceLocation(compound.getString("dimension")));
-            this.blockState = Block.stateById(compound.getInt("blockstate"));
+            this.boundPos = new BlockPos(compound.getInt("boundx"), compound.getInt("boundy"), compound.getInt("boundz"));
+            this.boundDimension = ResourceKey.create(Registries.DIMENSION, new ResourceLocation(compound.getString("dimension")));
+            this.boundBlockState = Block.stateById(compound.getInt("blockstate"));
             for(Direction direction : Direction.values()){
                 int index = direction.get3DDataValue();
                 this.redstoneSignal[index] = compound.getInt("redstoneSignal" + index);
