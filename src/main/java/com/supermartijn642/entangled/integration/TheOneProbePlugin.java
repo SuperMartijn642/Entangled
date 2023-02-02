@@ -48,10 +48,10 @@ public class TheOneProbePlugin {
                     String x = TextStyleClass.WARNING.toString() + boundPos.getX() + TextStyleClass.INFO;
                     String y = TextStyleClass.WARNING.toString() + boundPos.getY() + TextStyleClass.INFO;
                     String z = TextStyleClass.WARNING.toString() + boundPos.getZ() + TextStyleClass.INFO;
-                    if(((EntangledBlockEntity)tile).getBoundDimension() == world.getDimension().getType().getId())
+                    if(((EntangledBlockEntity)tile).getBoundDimensionIdentifier() == world.getDimension().getType().getId())
                         probeInfo.vertical().text(TextComponents.translation("entangled.waila.bound_same_dimension", boundBlock, x, y, z).format());
                     else{
-                        String dimension = TextStyleClass.WARNING + TextComponents.dimension(DimensionType.getById(((EntangledBlockEntity)tile).getBoundDimension())).format() + TextStyleClass.INFO;
+                        String dimension = TextStyleClass.WARNING + TextComponents.dimension(DimensionType.getById(((EntangledBlockEntity)tile).getBoundDimensionIdentifier())).format() + TextStyleClass.INFO;
                         probeInfo.vertical().text(TextComponents.translation("entangled.waila.bound_other_dimension", boundBlock, x, y, z, dimension).format());
                     }
                 }else

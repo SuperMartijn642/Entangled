@@ -85,7 +85,7 @@ public class EntangledClient {
 
             World world = Minecraft.getInstance().level;
             TileEntity tile = world.getBlockEntity(e.getTarget().getBlockPos());
-            if(tile instanceof EntangledBlockEntity && ((EntangledBlockEntity)tile).isBound() && ((EntangledBlockEntity)tile).getBoundDimension() == world.getDimension().getType().getId()){
+            if(tile instanceof EntangledBlockEntity && ((EntangledBlockEntity)tile).isBound() && ((EntangledBlockEntity)tile).getBoundDimensionIdentifier() == world.getDimension().getType().getId()){
                 BlockPos pos = ((EntangledBlockEntity)tile).getBoundBlockPos();
 
                 GlStateManager.pushMatrix();
