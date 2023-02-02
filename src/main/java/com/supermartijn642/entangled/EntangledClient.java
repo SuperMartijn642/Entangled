@@ -84,7 +84,7 @@ public class EntangledClient implements ClientModInitializer {
 
         Level world = Minecraft.getInstance().level;
         BlockEntity tile = world.getBlockEntity(blockOutlineContext.blockPos());
-        if(tile instanceof EntangledBlockEntity && ((EntangledBlockEntity)tile).isBound() && ((EntangledBlockEntity)tile).getBoundDimension() == world.dimension()){
+        if(tile instanceof EntangledBlockEntity && ((EntangledBlockEntity)tile).isBound() && ((EntangledBlockEntity)tile).getBoundDimensionIdentifier() == world.dimension()){
             BlockPos pos = ((EntangledBlockEntity)tile).getBoundBlockPos();
 
             renderContext.matrixStack().pushPose();
