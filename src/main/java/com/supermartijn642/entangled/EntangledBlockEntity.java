@@ -4,7 +4,6 @@ import com.supermartijn642.core.block.BaseBlockEntity;
 import com.supermartijn642.core.block.TickableBlockEntity;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.init.Blocks;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
@@ -18,9 +17,10 @@ import javax.annotation.Nullable;
 public class EntangledBlockEntity extends BaseBlockEntity implements TickableBlockEntity {
 
     private boolean bound = false;
-    private BlockPos pos;
-    private int dimension;
-    private IBlockState blockState = Blocks.AIR.getDefaultState();
+    private BlockPos boundPos;
+    private int boundDimension;
+    private IBlockState boundBlockState;
+    private TileEntity boundBlockEntity;
     private final int[] redstoneSignal = new int[]{0, 0, 0, 0, 0, 0};
     private final int[] directRedstoneSignal = new int[]{0, 0, 0, 0, 0, 0};
     private int analogOutputSignal = -1;
@@ -36,17 +36,17 @@ public class EntangledBlockEntity extends BaseBlockEntity implements TickableBlo
     public void update(){
         if(this.world == null || this.world.isRemote)
             return;
-        if(this.bound && this.pos != null){
-            World level = this.getDimension();
-            if(level != null && (level.isBlockLoaded(this.pos) || this.blockState == null || this.analogOutputSignal == -1)){
-                IBlockState state = level.getBlockState(this.pos);
+        if(this.bound && this.boundPos != null){
+            World level = this.getBoundDimension();
+            if(level != null && (level.isBlockLoaded(this.boundPos) || this.boundBlockState == null || this.analogOutputSignal == -1)){
+                IBlockState state = level.getBlockState(this.boundPos);
                 int analogOutputSignal = state.hasComparatorInputOverride() ?
-                    state.getComparatorInputOverride(level, this.pos) : 0;
+                    state.getComparatorInputOverride(level, this.boundPos) : 0;
 
                 boolean signalChanged = false;
                 for(EnumFacing direction : EnumFacing.values()){
-                    int redstoneSignal = state.getWeakPower(level, this.pos, direction);
-                    int directRedstoneSignal = state.getStrongPower(level, this.pos, direction);
+                    int redstoneSignal = state.getWeakPower(level, this.boundPos, direction);
+                    int directRedstoneSignal = state.getStrongPower(level, this.boundPos, direction);
                     if(redstoneSignal != this.redstoneSignal[direction.getIndex()]
                         || directRedstoneSignal != this.directRedstoneSignal[direction.getIndex()]){
                         signalChanged = true;
@@ -55,8 +55,15 @@ public class EntangledBlockEntity extends BaseBlockEntity implements TickableBlo
                     }
                 }
 
-                if(state != this.blockState || analogOutputSignal != this.analogOutputSignal || signalChanged || this.shouldUpdateOnceLoaded){
-                    this.blockState = state;
+                boolean entityChanged = false;
+                TileEntity entity = level.getTileEntity(this.boundPos);
+                if(entity != this.boundBlockEntity){
+                    entityChanged = true;
+                    this.boundBlockEntity = entity;
+                }
+
+                if(state != this.boundBlockState || analogOutputSignal != this.analogOutputSignal || signalChanged || entityChanged || this.shouldUpdateOnceLoaded){
+                    this.boundBlockState = state;
                     this.analogOutputSignal = analogOutputSignal;
                     this.dataChanged();
                     this.world.updateComparatorOutputLevel(this.getPos(), this.getBlockState().getBlock());
@@ -73,35 +80,29 @@ public class EntangledBlockEntity extends BaseBlockEntity implements TickableBlo
 
     @Nullable
     public BlockPos getBoundBlockPos(){
-        return this.pos;
+        return this.boundPos;
     }
 
-    public int getBoundDimension(){
-        return this.dimension;
+    public int getBoundDimensionIdentifier(){
+        return this.boundDimension;
     }
 
     public IBlockState getBoundBlockState(){
-        return this.blockState;
+        return this.boundBlockState;
     }
 
     @Override
     public boolean hasCapability(Capability<?> capability, @Nullable EnumFacing facing){
-        if(this.world == null)
-            return false;
-        if(this.bound){
-            if((this.world.isRemote && this.world.provider.getDimensionType().getId() != this.dimension) || this.callDepth >= 10)
-                return false;
-            World level = this.getDimension();
-            if(level != null && level.isBlockLoaded(this.pos)){
-                TileEntity entity = level.getTileEntity(this.pos);
-                if(entity != null){
-                    this.callDepth++;
-                    boolean value = entity.hasCapability(capability, facing);
-                    this.callDepth--;
-                    return value;
-                }
-            }else
-                this.shouldUpdateOnceLoaded = false;
+        if(this.bound && this.boundBlockEntity != null && this.callDepth < 10){
+            if(!this.boundBlockEntity.isInvalid()){
+                this.callDepth++;
+                boolean value = this.boundBlockEntity.hasCapability(capability, facing);
+                this.callDepth--;
+                return value;
+            }else{
+                this.boundBlockEntity = null;
+                this.shouldUpdateOnceLoaded = true;
+            }
         }
         return false;
     }
@@ -109,22 +110,16 @@ public class EntangledBlockEntity extends BaseBlockEntity implements TickableBlo
     @Nullable
     @Override
     public <T> T getCapability(Capability<T> capability, @Nullable EnumFacing facing){
-        if(this.world == null)
-            return null;
-        if(this.bound){
-            if((this.world.isRemote && this.world.provider.getDimensionType().getId() != this.dimension) || this.callDepth >= 10)
-                return null;
-            World level = this.getDimension();
-            if(level != null && level.isBlockLoaded(this.pos)){
-                TileEntity entity = level.getTileEntity(this.pos);
-                if(entity != null){
-                    this.callDepth++;
-                    T value = entity.getCapability(capability, facing);
-                    this.callDepth--;
-                    return value;
-                }
-            }else
-                this.shouldUpdateOnceLoaded = false;
+        if(this.bound && this.boundBlockEntity != null && this.callDepth < 10){
+            if(!this.boundBlockEntity.isInvalid()){
+                this.callDepth++;
+                T value = this.boundBlockEntity.getCapability(capability, facing);
+                this.callDepth--;
+                return value;
+            }else{
+                this.boundBlockEntity = null;
+                this.shouldUpdateOnceLoaded = true;
+            }
         }
         return null;
     }
@@ -132,9 +127,10 @@ public class EntangledBlockEntity extends BaseBlockEntity implements TickableBlo
     public boolean bind(BlockPos pos, int dimension){
         if(!this.canBindTo(pos, dimension))
             return false;
-        this.pos = pos == null ? null : new BlockPos(pos);
-        this.dimension = dimension;
+        this.boundPos = pos == null ? null : new BlockPos(pos);
+        this.boundDimension = dimension;
         this.bound = pos != null;
+        this.boundBlockState = null;
         this.world.notifyNeighborsOfStateChange(this.getPos(), this.getBlockState().getBlock(), false);
         this.dataChanged();
         return true;
@@ -147,18 +143,18 @@ public class EntangledBlockEntity extends BaseBlockEntity implements TickableBlo
             EntangledConfig.allowDimensional.get();
     }
 
-    private World getDimension(){
+    private World getBoundDimension(){
         return this.world.isRemote ?
-            this.world.provider.getDimensionType().getId() == this.dimension ? this.world : null :
-            DimensionManager.getWorld(this.dimension);
+            this.world.provider.getDimensionType().getId() == this.boundDimension ? this.world : null :
+            DimensionManager.getWorld(this.boundDimension);
     }
 
     private boolean isTargetLoaded(){
         if(this.world.isRemote || !this.bound)
             return false;
-        World world = this.world.provider.getDimensionType().getId() == this.dimension ?
-            this.world : DimensionManager.getWorld(this.dimension);
-        return world != null && world.isBlockLoaded(this.pos);
+        World level = this.world.provider.getDimensionType().getId() == this.boundDimension ?
+            this.world : DimensionManager.getWorld(this.boundDimension);
+        return level != null && level.isBlockLoaded(this.boundPos);
     }
 
     public int getRedstoneSignal(EnumFacing side){
@@ -166,8 +162,8 @@ public class EntangledBlockEntity extends BaseBlockEntity implements TickableBlo
             return 0;
         if(this.isTargetLoaded() && this.callDepth < 10){
             this.callDepth++;
-            World world = this.getDimension();
-            this.redstoneSignal[side.getIndex()] = world.getBlockState(this.pos).getWeakPower(world, this.pos, side);
+            World level = this.getBoundDimension();
+            this.redstoneSignal[side.getIndex()] = level.getBlockState(this.boundPos).getWeakPower(level, this.boundPos, side);
             this.callDepth--;
             return Math.max(this.redstoneSignal[side.getIndex()], 0);
         }
@@ -179,8 +175,8 @@ public class EntangledBlockEntity extends BaseBlockEntity implements TickableBlo
             return 0;
         if(this.isTargetLoaded() && this.callDepth < 10){
             this.callDepth++;
-            World world = this.getDimension();
-            this.directRedstoneSignal[side.getIndex()] = world.getBlockState(this.pos).getStrongPower(world, this.pos, side);
+            World level = this.getBoundDimension();
+            this.directRedstoneSignal[side.getIndex()] = level.getBlockState(this.boundPos).getStrongPower(level, this.boundPos, side);
             this.callDepth--;
             return Math.max(this.directRedstoneSignal[side.getIndex()], 0);
         }
@@ -192,8 +188,8 @@ public class EntangledBlockEntity extends BaseBlockEntity implements TickableBlo
             return 0;
         if(this.isTargetLoaded() && this.callDepth < 10){
             this.callDepth++;
-            World world = this.getDimension();
-            this.analogOutputSignal = world.getBlockState(this.pos).getComparatorInputOverride(world, this.pos);
+            World level = this.getBoundDimension();
+            this.analogOutputSignal = level.getBlockState(this.boundPos).getComparatorInputOverride(level, this.boundPos);
             this.callDepth--;
             return Math.max(this.analogOutputSignal, 0);
         }
@@ -219,11 +215,11 @@ public class EntangledBlockEntity extends BaseBlockEntity implements TickableBlo
         NBTTagCompound compound = new NBTTagCompound();
         if(this.bound){
             compound.setBoolean("bound", true);
-            compound.setInteger("boundx", this.pos.getX());
-            compound.setInteger("boundy", this.pos.getY());
-            compound.setInteger("boundz", this.pos.getZ());
-            compound.setInteger("dimension", this.dimension);
-            compound.setInteger("blockstate", Block.getStateId(this.blockState));
+            compound.setInteger("boundx", this.boundPos.getX());
+            compound.setInteger("boundy", this.boundPos.getY());
+            compound.setInteger("boundz", this.boundPos.getZ());
+            compound.setInteger("dimension", this.boundDimension);
+            compound.setInteger("blockstate", Block.getStateId(this.boundBlockState));
             for(EnumFacing direction : EnumFacing.values()){
                 int index = direction.getIndex();
                 compound.setInteger("redstoneSignal" + index, this.redstoneSignal[index]);
@@ -238,9 +234,9 @@ public class EntangledBlockEntity extends BaseBlockEntity implements TickableBlo
     protected void readData(NBTTagCompound compound){
         this.bound = compound.getBoolean("bound");
         if(this.bound){
-            this.pos = new BlockPos(compound.getInteger("boundx"), compound.getInteger("boundy"), compound.getInteger("boundz"));
-            this.dimension = compound.getInteger("dimension");
-            this.blockState = Block.getStateById(compound.getInteger("blockstate"));
+            this.boundPos = new BlockPos(compound.getInteger("boundx"), compound.getInteger("boundy"), compound.getInteger("boundz"));
+            this.boundDimension = compound.getInteger("dimension");
+            this.boundBlockState = Block.getStateById(compound.getInteger("blockstate"));
             for(EnumFacing direction : EnumFacing.values()){
                 int index = direction.getIndex();
                 this.redstoneSignal[index] = compound.getInteger("redstoneSignal" + index);

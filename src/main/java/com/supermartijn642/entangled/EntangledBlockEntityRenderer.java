@@ -49,7 +49,7 @@ public class EntangledBlockEntityRenderer implements CustomBlockEntityRenderer<E
         if(!entity.isBound())
             return;
 
-        TileEntity boundTile = entity.getWorld().provider.getDimensionType().getId() == entity.getBoundDimension() ? entity.getWorld().getTileEntity(entity.getBoundBlockPos()) : null;
+        TileEntity boundTile = entity.getWorld().provider.getDimensionType().getId() == entity.getBoundDimensionIdentifier() ? entity.getWorld().getTileEntity(entity.getBoundBlockPos()) : null;
         IBlockState boundState = entity.getBoundBlockState();
 
         boolean renderTile = boundTile != null && canRenderTileEntity(boundTile.getBlockType().getRegistryName());
@@ -57,7 +57,7 @@ public class EntangledBlockEntityRenderer implements CustomBlockEntityRenderer<E
 
         // get the bounding box
         AxisAlignedBB bounds = new AxisAlignedBB(0, 0, 0, 1, 1, 1);
-        if(renderBlock && entity.getWorld().provider.getDimensionType().getId() == entity.getBoundDimension()){
+        if(renderBlock && entity.getWorld().provider.getDimensionType().getId() == entity.getBoundDimensionIdentifier()){
             AxisAlignedBB shape = boundState.getBoundingBox(entity.getWorld(), entity.getBoundBlockPos());
             if(shape.minX != shape.maxX || shape.minY != shape.maxY || shape.minZ != shape.maxZ)
                 bounds = shape;

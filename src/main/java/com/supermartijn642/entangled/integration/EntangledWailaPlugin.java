@@ -36,10 +36,10 @@ public class EntangledWailaPlugin implements IWailaDataProvider, IWailaPlugin {
                 ITextComponent x = TextComponents.string(Integer.toString(boundPos.getX())).color(TextFormatting.GOLD).get();
                 ITextComponent y = TextComponents.string(Integer.toString(boundPos.getY())).color(TextFormatting.GOLD).get();
                 ITextComponent z = TextComponents.string(Integer.toString(boundPos.getZ())).color(TextFormatting.GOLD).get();
-                if(((EntangledBlockEntity)tile).getBoundDimension() == accessor.getWorld().provider.getDimensionType().getId())
+                if(((EntangledBlockEntity)tile).getBoundDimensionIdentifier() == accessor.getWorld().provider.getDimensionType().getId())
                     tooltip.add(TextComponents.translation("entangled.waila.bound_same_dimension", boundBlock, x, y, z).color(TextFormatting.YELLOW).format());
                 else{
-                    ITextComponent dimension = TextComponents.dimension(DimensionType.getById(((EntangledBlockEntity)tile).getBoundDimension())).color(TextFormatting.GOLD).get();
+                    ITextComponent dimension = TextComponents.dimension(DimensionType.getById(((EntangledBlockEntity)tile).getBoundDimensionIdentifier())).color(TextFormatting.GOLD).get();
                     tooltip.add(TextComponents.translation("entangled.waila.bound_other_dimension", boundBlock, x, y, z, dimension).color(TextFormatting.YELLOW).format());
                 }
             }else
