@@ -1,3 +1,6 @@
+### Entangled 1.3.14
+- Fixed pipes sometimes disconnecting
+
 ### Entangled 1.3.13a
 - Fixed crash when saving entangled block data
 
