@@ -1,3 +1,6 @@
+### Entangled 1.3.13a
+- Fixed crash when saving entangled block data
+
 ### Entangled 1.3.13
 - Updated Brazilian Portuguese translations (thanks to FITFC!)
 
