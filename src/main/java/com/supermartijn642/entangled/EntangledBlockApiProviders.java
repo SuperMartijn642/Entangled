@@ -4,10 +4,6 @@ import net.fabricmc.fabric.api.lookup.v1.block.BlockApiLookup;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.core.BlockPos;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.state.BlockState;
 import team.reborn.energy.api.EnergyStorage;
 
 import java.util.function.Supplier;
@@ -30,29 +26,7 @@ public class EntangledBlockApiProviders {
 
     private static <A, C> void registerApiProvider(BlockApiLookup<A,C> apiLookup){
         apiLookup.registerForBlockEntity(
-            (entity, context) -> {
-                if(entity.getLevel() == null || !entity.isBound() || entity.callDepth >= 10)
-                    return null;
-
-                // Check if the bound block's level is available
-                if(entity.getLevel().isClientSide && entity.getLevel().dimension() != entity.getBoundDimensionIdentifier())
-                    return null;
-
-                Level level = entity.getLevel().isClientSide ?
-                    entity.getLevel().dimension() == entity.getBoundDimensionIdentifier() ? entity.getLevel() : null :
-                    entity.getLevel().getServer().getLevel(entity.getBoundDimensionIdentifier());
-                if(level != null && level.hasChunkAt(entity.getBoundBlockPos())){
-                    BlockPos boundPos = entity.getBoundBlockPos();
-                    BlockState boundState = level.getBlockState(boundPos);
-                    BlockEntity boundEntity = level.getBlockEntity(boundPos);
-                    entity.callDepth++;
-                    A apiObject = apiLookup.find(level, boundPos, boundState, boundEntity, context);
-                    entity.callDepth--;
-                    return apiObject;
-                }else
-                    entity.shouldUpdateOnceLoaded = true;
-                return null;
-            },
+            (entity, context) -> entity.getCapability(apiLookup, context),
             Entangled.tile
         );
     }
