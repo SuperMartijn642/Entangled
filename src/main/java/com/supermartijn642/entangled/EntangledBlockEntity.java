@@ -219,7 +219,8 @@ public class EntangledBlockEntity extends BaseBlockEntity implements TickableBlo
             compound.setInteger("boundy", this.boundPos.getY());
             compound.setInteger("boundz", this.boundPos.getZ());
             compound.setInteger("dimension", this.boundDimension);
-            compound.setInteger("blockstate", Block.getStateId(this.boundBlockState));
+            if(this.boundBlockState != null)
+                compound.setInteger("blockstate", Block.getStateId(this.boundBlockState));
             for(EnumFacing direction : EnumFacing.values()){
                 int index = direction.getIndex();
                 compound.setInteger("redstoneSignal" + index, this.redstoneSignal[index]);
@@ -236,7 +237,7 @@ public class EntangledBlockEntity extends BaseBlockEntity implements TickableBlo
         if(this.bound){
             this.boundPos = new BlockPos(compound.getInteger("boundx"), compound.getInteger("boundy"), compound.getInteger("boundz"));
             this.boundDimension = compound.getInteger("dimension");
-            this.boundBlockState = Block.getStateById(compound.getInteger("blockstate"));
+            this.boundBlockState = compound.hasKey("blockstate") ? Block.getStateById(compound.getInteger("blockstate")) : null;
             for(EnumFacing direction : EnumFacing.values()){
                 int index = direction.getIndex();
                 this.redstoneSignal[index] = compound.getInteger("redstoneSignal" + index);
