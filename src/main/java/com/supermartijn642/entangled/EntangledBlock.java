@@ -24,8 +24,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
-import net.minecraft.world.level.material.Material;
-import net.minecraft.world.level.material.MaterialColor;
+import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
@@ -41,7 +40,7 @@ public class EntangledBlock extends BaseBlock implements EntityHoldingBlock {
     public static final BooleanProperty ON = BooleanProperty.create("on");
 
     public EntangledBlock(){
-        super(true, BlockProperties.create(new Material.Builder(MaterialColor.COLOR_BROWN).noCollider().build()).sound(SoundType.STONE).destroyTime(1).explosionResistance(2));
+        super(true, BlockProperties.create().mapColor(MapColor.COLOR_BROWN).sound(SoundType.STONE).destroyTime(1).explosionResistance(2));
         this.registerDefaultState(this.defaultBlockState().setValue(ON, false));
     }
 

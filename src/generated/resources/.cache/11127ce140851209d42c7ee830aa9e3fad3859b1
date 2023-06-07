@@ -1,0 +1,14 @@
+// this.cache.versionId	2023-06-07T13:36:12.3397903	Core Lib Generators
+f6255284e6b8e791baf3819f34941dbc4daf4b92 data\entangled\loot_tables\blocks\block.json
+44109d54ae635f86fd1aa98de23cb927ae7d041c data\entangled\recipes\item.json
+d01b82fb5196a6de3e7fde7fcebf3ecf40955a6e assets\entangled\models\item\block.json
+e2378afa8614be26c1f8d64791e08b3101ce7134 data\entangled\advancements\recipes\misc\block.json
+a85f38028f47c0647bf248a0112e152ab89ba891 assets\entangled\models\block\off.json
+309d0b44cd3e3f1330b6d13fdad69b87bc5d44c6 assets\entangled\lang\en_us.json
+4d3314d9af89e32440c0624fcd66fff5d392f900 data\minecraft\tags\blocks\mineable\pickaxe.json
+22d28d9dfb70bc146aadee27535f5fab820e3ebb data\entangled\recipes\entangled_clear_nbt.json
+13dca7aaab4760806aaef98a2139800d4d8b52fb data\entangled\recipes\block.json
+55977e6591df3e95b45a089ed8ea8850b703faed assets\entangled\models\item\item.json
+ff991a0cfc3be91f9b4461100c51e66a8e940056 assets\entangled\blockstates\block.json
+0b20a2e7573d4c4bfe9ab97634bc51a2884b379c assets\minecraft\atlases\blocks.json
+fe2b502274146167a0cd2a38d7a7d7cca925fdf1 data\entangled\advancements\recipes\misc\item.json
