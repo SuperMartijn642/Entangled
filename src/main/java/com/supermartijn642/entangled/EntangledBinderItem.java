@@ -54,7 +54,7 @@ public class EntangledBinderItem extends BaseItem {
 
     @Override
     public ItemUseResult interact(ItemStack stack, Player player, InteractionHand hand, Level level){
-        if(player.level.isClientSide)
+        if(player.level().isClientSide)
             return super.interact(stack, player, hand, level);
         CompoundTag compound = player.getItemInHand(hand).getTag();
         if(player.isCrouching() && compound != null && compound.getBoolean("bound")){
