@@ -1,7 +1,7 @@
 {
   "entangled.block.block": "纠缠方块",
   "entangled.item.item": "纠缠绑定器",
-  "entangled.entangled_block.info.ranged_same_dimension": "可以绑定到相同维度的方块上，最远 %d 个块",
+  "entangled.entangled_block.info.ranged_same_dimension": "可以绑定到相同维度的方块上，最远 %d 个方块",
   "entangled.entangled_block.info.infinite_same_dimension": "可以绑定到同维度的方块",
   "entangled.entangled_block.info.ranged_other_dimension": "可以绑定到最远 %d 个方块以外的方块或其他维度的方块",
   "entangled.entangled_block.info.infinite_other_dimension": "可以绑定到其他方块",
