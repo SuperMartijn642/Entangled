@@ -15,6 +15,7 @@ import net.minecraft.client.renderer.model.IBakedModel;
 import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.AxisAlignedBB;
@@ -25,12 +26,18 @@ import net.minecraftforge.client.MinecraftForgeClient;
 import net.minecraftforge.client.model.data.EmptyModelData;
 import net.minecraftforge.client.model.data.IModelData;
 
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Random;
+import java.util.Set;
 
 /**
  * Created 3/16/2020 by SuperMartijn642
  */
 public class EntangledBlockEntityRenderer implements CustomBlockEntityRenderer<EntangledBlockEntity> {
+
+    private static final Set<TileEntityType<?>> ERRORED_BLOCK_ENTITIES = Collections.synchronizedSet(new HashSet<>());
+    private static final Set<BlockState> ERRORED_BLOCK_STATES = Collections.synchronizedSet(new HashSet<>());
 
     private static final RenderConfiguration BLOCK_RENDER_CONFIGURATION = RenderConfiguration.create(
         "entangled",
@@ -58,8 +65,8 @@ public class EntangledBlockEntityRenderer implements CustomBlockEntityRenderer<E
         TileEntity boundTile = entity.getLevel().getDimension().getType().getId() == entity.getBoundDimensionIdentifier() ? entity.getLevel().getBlockEntity(entity.getBoundBlockPos()) : null;
         BlockState boundState = entity.getBoundBlockState();
 
-        boolean renderTile = boundTile != null && canRenderTileEntity(Registries.BLOCK_ENTITY_TYPES.getIdentifier(boundTile.getType()));
-        boolean renderBlock = boundState != null && boundState.getRenderShape() == BlockRenderType.MODEL && canRenderBlock(Registries.BLOCKS.getIdentifier(boundState.getBlock()));
+        boolean renderTile = boundTile != null && canRenderTileEntity(Registries.BLOCK_ENTITY_TYPES.getIdentifier(boundTile.getType())) && !ERRORED_BLOCK_ENTITIES.contains(boundTile.getType());
+        boolean renderBlock = boundState != null && boundState.getRenderShape() == BlockRenderType.MODEL && canRenderBlock(Registries.BLOCKS.getIdentifier(boundState.getBlock())) && !ERRORED_BLOCK_STATES.contains(boundState);
 
         // get the bounding box
         AxisAlignedBB bounds = new AxisAlignedBB(0, 0, 0, 1, 1, 1);
@@ -88,29 +95,37 @@ public class EntangledBlockEntityRenderer implements CustomBlockEntityRenderer<E
         if(renderTile){
             if(!(boundTile instanceof EntangledBlockEntity) || depth < 10){
                 depth++;
-                TileEntityRendererDispatcher.instance.render(boundTile, 0, 0, 0, partialTicks);
+                try{
+                    TileEntityRendererDispatcher.instance.render(boundTile, 0, 0, 0, partialTicks);
+                }catch(Exception e){
+                    ERRORED_BLOCK_ENTITIES.add(boundTile.getType());
+                    Entangled.LOGGER.error("Encountered an exception whilst rendering block entity '" + Registries.BLOCK_ENTITY_TYPES.getIdentifier(boundTile.getType()) + "'! Please report to Entangled!", e);
+                }
                 depth--;
             }
         }
         if(renderBlock){
             BlockRenderLayer initialLayer = MinecraftForgeClient.getRenderLayer();
+            try{
+                for(BlockRenderLayer layer : BlockRenderLayer.values()){
+                    if(boundState.getBlock().canRenderInLayer(boundState, layer)){
+                        BufferBuilder buffer = BLOCK_RENDER_CONFIGURATION.begin();
+                        buffer.offset(0, -1000, 0);
 
-            for(BlockRenderLayer layer : BlockRenderLayer.values()){
-                if(boundState.getBlock().canRenderInLayer(boundState, layer)){
-                    BufferBuilder buffer = BLOCK_RENDER_CONFIGURATION.begin();
-                    buffer.offset(0, -1000, 0);
+                        ForgeHooksClient.setRenderLayer(layer);
+                        BlockRendererDispatcher blockRenderer = ClientUtils.getBlockRenderer();
+                        IModelData data = blockRenderer.getBlockModel(boundState).getModelData(entity.getLevel(), entity.getBlockPos(), boundState, EmptyModelData.INSTANCE);
+                        IBakedModel model = blockRenderer.getBlockModel(boundState);
+                        blockRenderer.getModelRenderer().renderModel(entity.getLevel(), model, boundState, new BlockPos(0, 1000, 0), buffer, false, new Random(), 0, data);
 
-                    ForgeHooksClient.setRenderLayer(layer);
-                    BlockRendererDispatcher blockRenderer = ClientUtils.getBlockRenderer();
-                    IModelData data = blockRenderer.getBlockModel(boundState).getModelData(entity.getLevel(), entity.getBlockPos(), boundState, EmptyModelData.INSTANCE);
-                    IBakedModel model = blockRenderer.getBlockModel(boundState);
-                    blockRenderer.getModelRenderer().renderModel(entity.getLevel(), model, boundState, new BlockPos(0, 1000, 0), buffer, false, new Random(), 0, data);
-
-                    buffer.offset(0, 0, 0);
-                    BLOCK_RENDER_CONFIGURATION.end();
+                        buffer.offset(0, 0, 0);
+                        BLOCK_RENDER_CONFIGURATION.end();
+                    }
                 }
+            }catch(Exception e){
+                ERRORED_BLOCK_STATES.add(boundState);
+                Entangled.LOGGER.error("Encountered an exception whilst rendering block '" + boundState + "'! Please report to Entangled!", e);
             }
-
             ForgeHooksClient.setRenderLayer(initialLayer);
         }
 
