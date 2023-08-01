@@ -38,11 +38,9 @@ dependencies {
     minecraft "net.minecraftforge:forge:${project.minecraft_version}-${project.forge_version}"
 
     // Core library
-//    implementation fg.deobf("curse.maven:supermartijn642s-core-lib-454372:${project.core_library_file}")
-    implementation fg.deobf("com.supermartijn642:supermartijn642corelib:1.1.9-forge-mc1.20")
+    implementation fg.deobf("curse.maven:supermartijn642s-core-lib-454372:${project.core_library_file}")
     // Config library
-//    implementation fg.deobf("curse.maven:supermartijn642s-config-lib-438332:${project.config_library_file}")
-    implementation fg.deobf("com.supermartijn642:supermartijn642configlib:1.1.6-forge-mc1.20")
+    implementation fg.deobf("curse.maven:supermartijn642s-config-lib-438332:${project.config_library_file}")
 
     // Jade
     compileOnly fg.deobf("curse.maven:jade-324717:${project.jade_file}")
