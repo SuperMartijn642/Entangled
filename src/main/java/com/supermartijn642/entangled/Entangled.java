@@ -1,6 +1,7 @@
 package com.supermartijn642.entangled;
 
 import com.google.common.collect.Sets;
+import com.supermartijn642.core.CommonUtils;
 import com.supermartijn642.core.block.BaseBlockEntityType;
 import com.supermartijn642.core.item.BaseBlockItem;
 import com.supermartijn642.core.item.CreativeItemGroup;
@@ -11,6 +12,7 @@ import com.supermartijn642.core.registry.RegistryEntryAcceptor;
 import com.supermartijn642.entangled.generators.*;
 import net.fabricmc.api.ModInitializer;
 import net.minecraft.resources.ResourceLocation;
+import org.slf4j.Logger;
 
 import java.util.Set;
 
@@ -18,6 +20,8 @@ import java.util.Set;
  * Created 18/03/2022 by SuperMartijn642
  */
 public class Entangled implements ModInitializer {
+
+    public static final Logger LOGGER = CommonUtils.getLogger("entangled");
 
     @RegistryEntryAcceptor(namespace = "entangled", identifier = "block", registry = RegistryEntryAcceptor.Registry.BLOCKS)
     public static EntangledBlock block;
