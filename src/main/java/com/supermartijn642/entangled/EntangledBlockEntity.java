@@ -5,6 +5,7 @@ import com.supermartijn642.core.block.TickableBlockEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Registry;
+import net.minecraft.core.SectionPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -14,6 +15,8 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.ChunkSource;
+import net.minecraft.world.level.chunk.ChunkStatus;
+import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
 
@@ -40,22 +43,25 @@ public class EntangledBlockEntity extends BaseBlockEntity implements TickableBlo
         super(Entangled.tile, pos, state);
     }
 
-    private void updateBoundBlockData(boolean forceLoad){
+    private void updateBoundBlockData(boolean forceLoad) {
         if(this.level == null || this.level.isClientSide || !this.bound || this.boundPos == null)
             return;
 
         Level level = this.getBoundDimension();
         if(level == null)
             return;
+
         ChunkSource chunkSource = level.getChunkSource();
-        if(chunkSource instanceof ServerChunkCache && ((ServerChunkCache)chunkSource).mainThread != Thread.currentThread())
+        if(chunkSource instanceof ServerChunkCache serverChunkCache && serverChunkCache.mainThread != Thread.currentThread())
             return;
 
+        LevelChunk ourChunk = chunkSource.getChunkNow(SectionPos.blockToSectionCoord(this.boundPos.getX()), SectionPos.blockToSectionCoord(this.boundPos.getZ()));
+
         boolean sendUpdate = false;
-        if(level.hasChunkAt(this.boundPos) || forceLoad){
+        if(ourChunk != null) {
             // Get the block and entity
-            BlockState state = level.getBlockState(this.boundPos);
-            BlockEntity entity = level.getBlockEntity(this.boundPos);
+            BlockState state = ourChunk.getBlockState(this.boundPos);
+            BlockEntity entity = ourChunk.getBlockEntity(this.boundPos);
             // Check redstone stuff
             int analogOutputSignal = state.hasAnalogOutputSignal() ?
                 state.getAnalogOutputSignal(level, this.boundPos) : 0;
