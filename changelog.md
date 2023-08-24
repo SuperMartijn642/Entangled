@@ -1,3 +1,6 @@
+### Entangled 1.3.16
+- Fixed some blocks not visually connecting to the entangled block
+
 ### Entangled 1.3.15
 - Errors from rendering blocks inside entangled blocks will now be reported instead of crashing the game
 
