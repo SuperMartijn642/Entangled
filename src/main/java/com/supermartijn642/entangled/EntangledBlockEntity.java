@@ -5,6 +5,7 @@ import com.supermartijn642.core.block.TickableBlockEntity;
 import net.fabricmc.fabric.api.lookup.v1.block.BlockApiLookup;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.SectionPos;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceKey;
@@ -49,7 +50,7 @@ public class EntangledBlockEntity extends BaseBlockEntity implements TickableBlo
             return;
 
         boolean sendUpdate = false;
-        if(level.hasChunkAt(this.boundPos) || forceLoad){
+        if(forceLoad || chunkSource.getChunkNow(SectionPos.blockToSectionCoord(this.boundPos.getX()), SectionPos.blockToSectionCoord(this.boundPos.getZ())) != null){
             // Get the block and entity
             BlockState state = level.getBlockState(this.boundPos);
             BlockEntity entity = level.getBlockEntity(this.boundPos);
