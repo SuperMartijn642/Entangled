@@ -33,7 +33,7 @@ public class EntangledBlockEntity extends BaseBlockEntity implements TickableBlo
     }
 
     private void updateBoundBlockData(boolean forceLoad){
-        if(this.world == null || this.world.isRemote || !this.bound || this.boundPos == null)
+        if(this.world == null || !this.bound || this.boundPos == null)
             return;
 
         World level = this.getBoundDimension();
