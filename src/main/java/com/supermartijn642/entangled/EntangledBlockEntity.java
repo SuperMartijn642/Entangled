@@ -50,7 +50,7 @@ public class EntangledBlockEntity extends BaseBlockEntity implements TickableBlo
             return;
 
         ChunkSource chunkSource = level.getChunkSource();
-        if(chunkSource instanceof chunkSource && ((ServerChunkCache)chunkSource).mainThread != Thread.currentThread())
+        if(chunkSource instanceof ServerChunkCache && ((ServerChunkCache)chunkSource).mainThread != Thread.currentThread())
             return;
 
         boolean sendUpdate = false;
