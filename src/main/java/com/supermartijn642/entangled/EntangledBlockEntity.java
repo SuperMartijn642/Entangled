@@ -41,14 +41,13 @@ public class EntangledBlockEntity extends BaseBlockEntity implements TickableBlo
         super(Entangled.tile, pos, state);
     }
 
-    private void updateBoundBlockData(boolean forceLoad) {
+    private void updateBoundBlockData(boolean forceLoad){
         if(this.level == null || this.level.isClientSide || !this.bound || this.boundPos == null)
             return;
 
         Level level = this.getBoundDimension();
         if(level == null)
             return;
-
         ChunkSource chunkSource = level.getChunkSource();
         if(chunkSource instanceof ServerChunkCache && ((ServerChunkCache)chunkSource).mainThread != Thread.currentThread())
             return;
