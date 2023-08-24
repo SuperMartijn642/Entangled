@@ -10,6 +10,7 @@ import net.minecraft.util.Direction;
 import net.minecraft.util.RegistryKey;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.SectionPos;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.AbstractChunkProvider;
@@ -52,7 +53,7 @@ public class EntangledBlockEntity extends BaseBlockEntity implements TickableBlo
             return;
 
         boolean sendUpdate = false;
-        if(level.hasChunkAt(this.boundPos) || forceLoad){
+        if(forceLoad || chunkSource.getChunkNow(SectionPos.blockToSectionCoord(this.boundPos.getX()), SectionPos.blockToSectionCoord(this.boundPos.getZ())) != null){
             // Get the block and entity
             BlockState state = level.getBlockState(this.boundPos);
             TileEntity entity = level.getBlockEntity(this.boundPos);
