@@ -15,8 +15,6 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.ChunkSource;
-import net.minecraft.world.level.chunk.ChunkStatus;
-import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
 
@@ -52,16 +50,14 @@ public class EntangledBlockEntity extends BaseBlockEntity implements TickableBlo
             return;
 
         ChunkSource chunkSource = level.getChunkSource();
-        if(chunkSource instanceof ServerChunkCache serverChunkCache && serverChunkCache.mainThread != Thread.currentThread())
+        if(chunkSource instanceof serverChunkCache && ((ServerChunkCache)serverChunkCache).mainThread != Thread.currentThread())
             return;
 
-        LevelChunk ourChunk = chunkSource.getChunkNow(SectionPos.blockToSectionCoord(this.boundPos.getX()), SectionPos.blockToSectionCoord(this.boundPos.getZ()));
-
         boolean sendUpdate = false;
-        if(ourChunk != null) {
+        if(forceLoad || chunkSource.getChunkNow(SectionPos.blockToSectionCoord(this.boundPos.getX()), SectionPos.blockToSectionCoord(this.boundPos.getZ())) != null){
             // Get the block and entity
-            BlockState state = ourChunk.getBlockState(this.boundPos);
-            BlockEntity entity = ourChunk.getBlockEntity(this.boundPos);
+            BlockState state = level.getBlockState(this.boundPos);
+            BlockEntity entity = level.getBlockEntity(this.boundPos);
             // Check redstone stuff
             int analogOutputSignal = state.hasAnalogOutputSignal() ?
                 state.getAnalogOutputSignal(level, this.boundPos) : 0;
