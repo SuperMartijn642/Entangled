@@ -4,7 +4,8 @@ import com.supermartijn642.core.ClientUtils;
 import com.supermartijn642.core.registry.ClientRegistrationHandler;
 import com.supermartijn642.core.render.CustomRendererBakedModelWrapper;
 import com.supermartijn642.core.render.RenderUtils;
-import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.BufferBuilder;
+import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
@@ -47,28 +48,28 @@ public class EntangledClient {
                 if(compound.getBoolean("bound") && compound.getInteger("dimension") == world.provider.getDimensionType().getId()){
                     BlockPos pos = new BlockPos(compound.getInteger("boundx"), compound.getInteger("boundy"), compound.getInteger("boundz"));
 
-                    GlStateManager.pushMatrix();
+                    BufferBuilder buffer = Tessellator.getInstance().getBuffer();
                     Vec3d camera = RenderUtils.getCameraPosition();
-                    GlStateManager.translate(-camera.x, -camera.y, -camera.z);
+                    buffer.setTranslation(-camera.x, -camera.y, -camera.z);
 
                     RenderUtils.renderBox(world.getBlockState(pos).getSelectedBoundingBox(world, pos), 86 / 255f, 0 / 255f, 156 / 255f, false);
                     RenderUtils.renderBoxSides(world.getBlockState(pos).getSelectedBoundingBox(world, pos), 86 / 255f, 0 / 255f, 156 / 255f, 30 / 255f, false);
 
-                    GlStateManager.popMatrix();
+                    buffer.setTranslation(0, 0, 0);
                 }
             }else if(stack.getItem() == Entangled.item && stack.hasTagCompound()){
                 NBTTagCompound compound = stack.getTagCompound();
                 if(compound.getBoolean("bound") && compound.getInteger("dimension") == world.provider.getDimensionType().getId()){
                     BlockPos pos = new BlockPos(compound.getInteger("boundx"), compound.getInteger("boundy"), compound.getInteger("boundz"));
 
-                    GlStateManager.pushMatrix();
+                    BufferBuilder buffer = Tessellator.getInstance().getBuffer();
                     Vec3d camera = RenderUtils.getCameraPosition();
-                    GlStateManager.translate(-camera.x, -camera.y, -camera.z);
+                    buffer.setTranslation(-camera.x, -camera.y, -camera.z);
 
                     RenderUtils.renderBox(world.getBlockState(pos).getSelectedBoundingBox(world, pos), 235 / 255f, 210 / 255f, 52 / 255f, false);
                     RenderUtils.renderBoxSides(world.getBlockState(pos).getSelectedBoundingBox(world, pos), 235 / 255f, 210 / 255f, 52 / 255f, 30 / 255f, false);
 
-                    GlStateManager.popMatrix();
+                    buffer.setTranslation(0, 0, 0);
                 }
             }
         }
@@ -83,14 +84,14 @@ public class EntangledClient {
             if(tile instanceof EntangledBlockEntity && ((EntangledBlockEntity)tile).isBound() && ((EntangledBlockEntity)tile).getBoundDimensionIdentifier() == world.provider.getDimensionType().getId()){
                 BlockPos pos = ((EntangledBlockEntity)tile).getBoundBlockPos();
 
-                GlStateManager.pushMatrix();
+                BufferBuilder buffer = Tessellator.getInstance().getBuffer();
                 Vec3d camera = RenderUtils.getCameraPosition();
-                GlStateManager.translate(-camera.x, -camera.y, -camera.z);
+                buffer.setTranslation(-camera.x, -camera.y, -camera.z);
 
                 RenderUtils.renderBox(world.getBlockState(pos).getSelectedBoundingBox(world, pos), 86 / 255f, 0 / 255f, 156 / 255f, false);
                 RenderUtils.renderBoxSides(world.getBlockState(pos).getSelectedBoundingBox(world, pos), 86 / 255f, 0 / 255f, 156 / 255f, 30 / 255f, false);
 
-                GlStateManager.popMatrix();
+                buffer.setTranslation(0, 0, 0);
             }
         }
     }
