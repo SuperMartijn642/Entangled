@@ -1,3 +1,7 @@
+### Entangled 1.3.16a
+- Fixed bound block names in Waila and The One Probe tips
+- Fixed selected block highlight offset when far away from spawn
+
 ### Entangled 1.3.16
 - Fixed some blocks not visually connecting to the entangled block
 
