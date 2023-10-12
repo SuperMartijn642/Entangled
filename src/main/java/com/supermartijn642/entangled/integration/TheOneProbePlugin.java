@@ -41,7 +41,7 @@ public class TheOneProbePlugin {
             if(tile instanceof EntangledBlockEntity){
                 if(((EntangledBlockEntity)tile).isBound()){
                     IBlockState boundBlockState = ((EntangledBlockEntity)tile).getBoundBlockState();
-                    String boundBlock = TextStyleClass.WARNING + (boundBlockState == null ? "Block" : TextComponents.blockState(boundBlockState).format()) + TextStyleClass.INFO;
+                    String boundBlock = TextStyleClass.WARNING + (boundBlockState == null ? "Block" : boundBlockState.getBlock().getLocalizedName()) + TextStyleClass.INFO;
                     BlockPos boundPos = ((EntangledBlockEntity)tile).getBoundBlockPos();
                     String x = TextStyleClass.WARNING.toString() + boundPos.getX() + TextStyleClass.INFO;
                     String y = TextStyleClass.WARNING.toString() + boundPos.getY() + TextStyleClass.INFO;

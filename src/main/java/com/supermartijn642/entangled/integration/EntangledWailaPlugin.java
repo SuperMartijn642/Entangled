@@ -31,7 +31,7 @@ public class EntangledWailaPlugin implements IWailaDataProvider, IWailaPlugin {
         if(tile instanceof EntangledBlockEntity){
             if(((EntangledBlockEntity)tile).isBound()){
                 IBlockState boundBlockState = ((EntangledBlockEntity)tile).getBoundBlockState();
-                ITextComponent boundBlock = (boundBlockState == null ? TextComponents.string("Block") : TextComponents.blockState(boundBlockState)).color(TextFormatting.GOLD).get();
+                ITextComponent boundBlock = (boundBlockState == null ? TextComponents.string("Block") : TextComponents.string(boundBlockState.getBlock().getLocalizedName())).color(TextFormatting.GOLD).get();
                 BlockPos boundPos = ((EntangledBlockEntity)tile).getBoundBlockPos();
                 ITextComponent x = TextComponents.string(Integer.toString(boundPos.getX())).color(TextFormatting.GOLD).get();
                 ITextComponent y = TextComponents.string(Integer.toString(boundPos.getY())).color(TextFormatting.GOLD).get();
