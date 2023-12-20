@@ -3,7 +3,7 @@ package com.supermartijn642.entangled.generators;
 import com.supermartijn642.core.generator.RecipeGenerator;
 import com.supermartijn642.core.generator.ResourceCache;
 import com.supermartijn642.entangled.Entangled;
-import net.minecraftforge.common.Tags;
+import net.neoforged.neoforge.common.Tags;
 
 /**
  * Created 01/09/2022 by SuperMartijn642

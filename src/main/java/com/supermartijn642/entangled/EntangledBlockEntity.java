@@ -10,15 +10,15 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerChunkCache;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.ChunkSource;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.util.LazyOptional;
+import net.neoforged.neoforge.capabilities.BlockCapability;
+import net.neoforged.neoforge.capabilities.ICapabilityInvalidationListener;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 /**
@@ -34,6 +34,7 @@ public class EntangledBlockEntity extends BaseBlockEntity implements TickableBlo
     private final int[] redstoneSignal = new int[]{0, 0, 0, 0, 0, 0};
     private final int[] directRedstoneSignal = new int[]{0, 0, 0, 0, 0, 0};
     private int analogOutputSignal = -1;
+    private ICapabilityInvalidationListener capabilityListener;
     // Make sure we don't get in infinite loop when entangled blocks are linked to each other
     private int callDepth = 0;
 
@@ -41,7 +42,7 @@ public class EntangledBlockEntity extends BaseBlockEntity implements TickableBlo
         super(Entangled.tile, pos, state);
     }
 
-    private void updateBoundBlockData(boolean forceLoad){
+    void updateBoundBlockData(boolean forceLoad){
         if(this.level == null || !this.bound || this.boundPos == null)
             return;
 
@@ -51,6 +52,19 @@ public class EntangledBlockEntity extends BaseBlockEntity implements TickableBlo
         ChunkSource chunkSource = level.getChunkSource();
         if(chunkSource instanceof ServerChunkCache && ((ServerChunkCache)chunkSource).mainThread != Thread.currentThread())
             return;
+
+        if(this.capabilityListener == null && level instanceof ServerLevel){
+            this.capabilityListener = new ICapabilityInvalidationListener() {
+                @Override
+                public boolean onInvalidate(){
+                    if(this != EntangledBlockEntity.this.capabilityListener)
+                        return false;
+                    EntangledBlockEntity.this.invalidateCapabilities();
+                    return true;
+                }
+            };
+            ((ServerLevel)level).registerCapabilityListener(this.boundPos, this.capabilityListener);
+        }
 
         boolean sendUpdate = false;
         if(forceLoad || chunkSource.getChunkNow(SectionPos.blockToSectionCoord(this.boundPos.getX()), SectionPos.blockToSectionCoord(this.boundPos.getZ())) != null){
@@ -120,36 +134,18 @@ public class EntangledBlockEntity extends BaseBlockEntity implements TickableBlo
         return this.boundBlockState;
     }
 
-    @Nonnull
-    @Override
-    public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> capability){
+    public <A, C> A getCapability(BlockCapability<A,C> capability, C context){
         if(this.bound && this.callDepth < 10){
             if(this.boundBlockEntity == null ? this.boundBlockState == null || this.boundBlockState.hasBlockEntity() : this.boundBlockEntity.isRemoved())
                 this.updateBoundBlockData(false);
             if(this.boundBlockEntity != null && !this.boundBlockEntity.isRemoved()){
                 this.callDepth++;
-                LazyOptional<T> value = this.boundBlockEntity.getCapability(capability);
+                A value = this.level.getCapability(capability, this.boundPos, this.boundBlockState, this.boundBlockEntity, context);
                 this.callDepth--;
                 return value;
             }
         }
-        return LazyOptional.empty();
-    }
-
-    @Nonnull
-    @Override
-    public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> capability, @Nullable Direction facing){
-        if(this.bound && this.callDepth < 10){
-            if(this.boundBlockEntity == null ? this.boundBlockState == null || this.boundBlockState.hasBlockEntity() : this.boundBlockEntity.isRemoved())
-                this.updateBoundBlockData(false);
-            if(this.boundBlockEntity != null && !this.boundBlockEntity.isRemoved()){
-                this.callDepth++;
-                LazyOptional<T> value = this.boundBlockEntity.getCapability(capability, facing);
-                this.callDepth--;
-                return value;
-            }
-        }
-        return LazyOptional.empty();
+        return null;
     }
 
     public boolean bind(BlockPos pos, String dimension){
@@ -160,7 +156,9 @@ public class EntangledBlockEntity extends BaseBlockEntity implements TickableBlo
         this.bound = pos != null;
         this.boundBlockState = null;
         this.boundBlockEntity = null;
+        this.capabilityListener = null;
         this.level.updateNeighborsAt(this.getBlockPos(), this.getBlockState().getBlock());
+        this.invalidateCapabilities();
         this.dataChanged();
         return true;
     }
@@ -172,7 +170,7 @@ public class EntangledBlockEntity extends BaseBlockEntity implements TickableBlo
             EntangledConfig.allowDimensional.get();
     }
 
-    private Level getBoundDimension(){
+    Level getBoundDimension(){
         if(this.boundDimension == null)
             return null;
         return this.level.isClientSide ?
