@@ -78,8 +78,7 @@ tasks.withType(ProcessResources).configureEach {
     rename "^icon.png\$", "${project.mod_id}.png"
 }
 
-if (file("src/main/resources/META-INF/accesstransformer.cfg").exists())
-    minecraft.accessTransformers.file rootProject.file("src/main/resources/META-INF/accesstransformer.cfg")
+minecraft.accessTransformers.file rootProject.file("src/main/resources/META-INF/accesstransformer.cfg")
 
 runs {
     configureEach {
