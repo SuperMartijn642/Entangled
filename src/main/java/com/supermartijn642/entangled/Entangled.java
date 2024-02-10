@@ -1,6 +1,5 @@
 package com.supermartijn642.entangled;
 
-import com.google.common.collect.Sets;
 import com.supermartijn642.core.CommonUtils;
 import com.supermartijn642.core.block.BaseBlockEntityType;
 import com.supermartijn642.core.item.BaseBlockItem;
@@ -11,12 +10,9 @@ import com.supermartijn642.core.registry.RegistrationHandler;
 import com.supermartijn642.core.registry.RegistryEntryAcceptor;
 import com.supermartijn642.entangled.generators.*;
 import com.supermartijn642.entangled.integration.TheOneProbePlugin;
-import net.minecraft.resources.ResourceLocation;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;
 import org.slf4j.Logger;
-
-import java.util.Set;
 
 @Mod("entangled")
 public class Entangled {
@@ -57,16 +53,12 @@ public class Entangled {
         GeneratorRegistrationHandler handler = GeneratorRegistrationHandler.get("entangled");
 
         // Add all the generators
-        handler.addGenerator(EntangledModelGenerator::new);
+        handler.addGenerator(EntangledAtlasSourceGenerator::new);
         handler.addGenerator(EntangledBlockStateGenerator::new);
+        handler.addGenerator(EntangledModelGenerator::new);
         handler.addGenerator(EntangledLanguageGenerator::new);
         handler.addGenerator(EntangledLootTableGenerator::new);
         handler.addGenerator(EntangledRecipeGenerator::new);
         handler.addGenerator(EntangledTagGenerator::new);
     }
-
-    public static final Set<String> RENDER_BLACKLISTED_MODS = Sets.newHashSet();
-    public static final Set<ResourceLocation> RENDER_BLACKLISTED_BLOCKS = Sets.newHashSet();
-    public static final Set<ResourceLocation> RENDER_BLACKLISTED_TILE_ENTITIES = Sets.newHashSet(new ResourceLocation("tconstruct", "smeltery"), new ResourceLocation("tconstruct", "foundry"));
-
 }

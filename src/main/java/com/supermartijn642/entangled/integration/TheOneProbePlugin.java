@@ -3,6 +3,7 @@ package com.supermartijn642.entangled.integration;
 import com.supermartijn642.core.TextComponents;
 import com.supermartijn642.entangled.EntangledBlockEntity;
 import mcjty.theoneprobe.api.*;
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -55,6 +56,8 @@ public class TheOneProbePlugin {
                         String dimension = TextStyleClass.HIGHLIGHTED + TextComponents.dimension(((EntangledBlockEntity)tile).getBoundDimensionIdentifier()).format() + TextStyleClass.INFO;
                         probeInfo.vertical().text(TextComponents.translation("entangled.waila.bound_other_dimension", boundBlock, x, y, z, dimension).get());
                     }
+                    if(!((EntangledBlockEntity)tile).isBoundAndValid())
+                        probeInfo.text(TextStyleClass.WARNING + TextComponents.translation("entangled.waila.invalid_block", boundBlock).color(ChatFormatting.RED).format());
                 }else
                     probeInfo.text(TextComponents.translation("entangled.waila.unbound").get());
             }
