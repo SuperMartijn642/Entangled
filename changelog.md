@@ -1,3 +1,11 @@
+### Entangled 1.3.17
+- Added a tag for invalid target blocks
+- Added a tag blocks and block entities which should not be rendered
+- Blocks from Applied Energistics and Refined Storage are now blacklisted by default to avoid buggy behaviour
+- Improved Waila/Jade message coloring
+- Fixed some ways to bypass the `maxDistance` and `allowDimensional` config options
+- Fixed some cases where the incorrect dimension id was checked
+
 ### Entangled 1.3.16a
 - Fixed bound block names in Waila and The One Probe tips
 - Fixed selected block highlight offset when far away from spawn
