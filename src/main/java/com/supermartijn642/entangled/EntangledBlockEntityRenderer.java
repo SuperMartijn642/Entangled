@@ -6,13 +6,17 @@ import com.supermartijn642.core.ClientUtils;
 import com.supermartijn642.core.registry.Registries;
 import com.supermartijn642.core.render.CustomBlockEntityRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.TagKey;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -23,6 +27,8 @@ import java.util.Set;
  */
 public class EntangledBlockEntityRenderer implements CustomBlockEntityRenderer<EntangledBlockEntity> {
 
+    public static final TagKey<Block> BLACKLISTED_BLOCKS = TagKey.create(Registry.BLOCK_REGISTRY, new ResourceLocation("entangled", "render_blacklist"));
+    public static final TagKey<BlockEntityType<?>> BLACKLISTED_ENTITIES = TagKey.create(Registry.BLOCK_ENTITY_TYPE_REGISTRY, new ResourceLocation("entangled", "render_blacklist"));
     private static final Set<BlockEntityType<?>> ERRORED_BLOCK_ENTITIES = Collections.synchronizedSet(new HashSet<>());
     private static final Set<BlockState> ERRORED_BLOCK_STATES = Collections.synchronizedSet(new HashSet<>());
 
@@ -36,8 +42,12 @@ public class EntangledBlockEntityRenderer implements CustomBlockEntityRenderer<E
         BlockEntity boundTile = entity.getLevel().dimension() == entity.getBoundDimensionIdentifier() ? entity.getLevel().getBlockEntity(entity.getBoundBlockPos()) : null;
         BlockState boundState = entity.getBoundBlockState();
 
-        boolean renderTile = boundTile != null && canRenderTileEntity(Registries.BLOCK_ENTITY_TYPES.getIdentifier(boundTile.getType())) && !ERRORED_BLOCK_ENTITIES.contains(boundTile.getType());
-        boolean renderBlock = boundState != null && boundState.getRenderShape() == RenderShape.MODEL && canRenderBlock(Registries.BLOCKS.getIdentifier(boundState.getBlock())) && !ERRORED_BLOCK_STATES.contains(boundState);
+        boolean renderTile = boundTile != null
+            && !ForgeRegistries.BLOCK_ENTITIES.tags().getTag(BLACKLISTED_ENTITIES).contains(boundTile.getType())
+            && !ERRORED_BLOCK_ENTITIES.contains(boundTile.getType());
+        boolean renderBlock = boundState != null && boundState.getRenderShape() == RenderShape.MODEL
+            && !boundState.is(BLACKLISTED_BLOCKS)
+            && !ERRORED_BLOCK_STATES.contains(boundState);
 
         // get the bounding box
         AABB bounds = new AABB(0, 0, 0, 1, 1, 1);
@@ -83,13 +93,5 @@ public class EntangledBlockEntityRenderer implements CustomBlockEntityRenderer<E
         }
 
         poseStack.popPose();
-    }
-
-    private static boolean canRenderBlock(ResourceLocation block){
-        return !Entangled.RENDER_BLACKLISTED_MODS.contains(block.getNamespace()) && !Entangled.RENDER_BLACKLISTED_BLOCKS.contains(block);
-    }
-
-    private static boolean canRenderTileEntity(ResourceLocation tile){
-        return !Entangled.RENDER_BLACKLISTED_MODS.contains(tile.getNamespace()) && !Entangled.RENDER_BLACKLISTED_TILE_ENTITIES.contains(tile);
     }
 }

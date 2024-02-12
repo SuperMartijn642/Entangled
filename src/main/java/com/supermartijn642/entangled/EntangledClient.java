@@ -34,6 +34,8 @@ public class EntangledClient {
         handler.registerCustomItemRenderer(() -> Entangled.block.asItem(), EntangledBlockItemRenderer::new);
         // Entangled block item model
         handler.registerModelOverwrite("entangled", "block", "inventory", CustomRendererBakedModelWrapper::wrap);
+        // Entangled block render type
+        handler.registerBlockModelCutoutRenderType(() -> Entangled.block);
     }
 
     @Mod.EventBusSubscriber(value = Dist.CLIENT, bus = Mod.EventBusSubscriber.Bus.FORGE)
