@@ -1,0 +1,13 @@
+{
+  "replace": false,
+  "values": [
+    {
+      "id": "tconstruct:foundry",
+      "required": false
+    },
+    {
+      "id": "tconstruct:smeltery",
+      "required": false
+    }
+  ]
+}
