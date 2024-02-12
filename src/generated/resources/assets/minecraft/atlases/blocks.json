@@ -2,11 +2,15 @@
   "sources": [
     {
       "type": "minecraft:single",
-      "resource": "entangled:items/item"
+      "resource": "entangled:blocks/warning"
     },
     {
       "type": "minecraft:single",
-      "resource": "entangled:blocks/off"
+      "resource": "entangled:blocks/side"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "entangled:items/binder"
     }
   ]
 }
