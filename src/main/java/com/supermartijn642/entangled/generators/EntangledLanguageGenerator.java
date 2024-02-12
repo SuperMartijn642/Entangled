@@ -36,11 +36,13 @@ public class EntangledLanguageGenerator extends LanguageGenerator {
         this.translation("entangled.entangled_binder.info.target.known", "Linked to %1$s in the %5$s at (%2$d, %3$d, %4$d)");
         this.translation("entangled.entangled_binder.select", "Block selected!");
         this.translation("entangled.entangled_binder.clear", "Connection cleared!");
+        this.translation("entangled.entangled_binder.unknown_dimension", "Binder is bound to unknown dimension '%s'!");
 
         // Jade & The One Probe
         this.translation("entangled.waila.bound_same_dimension", "Bound to %1$s at (%2$d, %3$d, %4$d)");
         this.translation("entangled.waila.bound_other_dimension", "Bound to %1$s in the %5$s at (%2$d, %3$d, %4$d)");
         this.translation("entangled.waila.unbound", "Unbound");
+        this.translation("entangled.waila.invalid_block", "Invalid block '%s'!");
         this.translation("config.jade.plugin_entangled.entangled_block_component", "Entangled Block");
     }
 }
