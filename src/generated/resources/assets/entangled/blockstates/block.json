@@ -1,10 +1,13 @@
 {
   "variants": {
-    "on=true": {
-      "model": "entangled:block/on"
+    "state=unbound": {
+      "model": "entangled:block/unbound"
     },
-    "on=false": {
-      "model": "entangled:block/off"
+    "state=bound_valid": {
+      "model": "entangled:block/bound"
+    },
+    "state=bound_invalid": {
+      "model": "entangled:block/bound_invalid"
     }
   }
 }
