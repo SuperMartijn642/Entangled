@@ -40,7 +40,7 @@ public class EntangledBlockItemRenderer extends BlockEntityCustomItemRenderer<En
             return;
         }
 
-        IBakedModel model = ClientUtils.getMinecraft().getBlockRenderer().getBlockModel(Entangled.block.defaultBlockState().setValue(EntangledBlock.ON, true));
+        IBakedModel model = ClientUtils.getMinecraft().getBlockRenderer().getBlockModel(Entangled.block.defaultBlockState().setValue(EntangledBlock.STATE_PROPERTY, EntangledBlock.State.BOUND_VALID));
         renderItemModel(itemStack, poseStack, bufferSource, combinedLight, combinedOverlay, model);
         super.render(itemStack, transformType, poseStack, bufferSource, combinedLight, combinedOverlay);
     }

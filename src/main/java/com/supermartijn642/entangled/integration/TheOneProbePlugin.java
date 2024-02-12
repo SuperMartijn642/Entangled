@@ -8,8 +8,8 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
-import net.minecraft.world.dimension.DimensionType;
 import net.minecraftforge.fml.InterModComms;
 import net.minecraftforge.fml.event.lifecycle.InterModEnqueueEvent;
 
@@ -48,12 +48,14 @@ public class TheOneProbePlugin {
                     String x = TextStyleClass.HIGHLIGHTED.toString() + boundPos.getX() + TextStyleClass.INFO;
                     String y = TextStyleClass.HIGHLIGHTED.toString() + boundPos.getY() + TextStyleClass.INFO;
                     String z = TextStyleClass.HIGHLIGHTED.toString() + boundPos.getZ() + TextStyleClass.INFO;
-                    if(((EntangledBlockEntity)tile).getBoundDimensionIdentifier() == world.getDimension().getType().getId())
+                    if(((EntangledBlockEntity)tile).getBoundDimensionType() == world.getDimension().getType())
                         probeInfo.vertical().text(TextComponents.translation("entangled.waila.bound_same_dimension", boundBlock, x, y, z).get());
                     else{
-                        String dimension = TextStyleClass.HIGHLIGHTED + TextComponents.dimension(DimensionType.getById(((EntangledBlockEntity)tile).getBoundDimensionIdentifier())).format() + TextStyleClass.INFO;
+                        String dimension = TextStyleClass.HIGHLIGHTED + TextComponents.dimension(((EntangledBlockEntity)tile).getBoundDimensionType()).format() + TextStyleClass.INFO;
                         probeInfo.vertical().text(TextComponents.translation("entangled.waila.bound_other_dimension", boundBlock, x, y, z, dimension).get());
                     }
+                    if(!((EntangledBlockEntity)tile).isBoundAndValid())
+                        probeInfo.text(TextStyleClass.WARNING + TextComponents.translation("entangled.waila.invalid_block", boundBlock).color(TextFormatting.RED).format());
                 }else
                     probeInfo.text(TextComponents.translation("entangled.waila.unbound").get());
             }

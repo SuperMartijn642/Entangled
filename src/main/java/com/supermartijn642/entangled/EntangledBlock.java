@@ -1,5 +1,6 @@
 package com.supermartijn642.entangled;
 
+import com.supermartijn642.core.CommonUtils;
 import com.supermartijn642.core.TextComponents;
 import com.supermartijn642.core.block.BaseBlock;
 import com.supermartijn642.core.block.BlockProperties;
@@ -13,11 +14,13 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.state.BooleanProperty;
+import net.minecraft.state.EnumProperty;
 import net.minecraft.state.StateContainer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
+import net.minecraft.util.IStringSerializable;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.shapes.VoxelShape;
@@ -29,6 +32,7 @@ import net.minecraft.world.World;
 import net.minecraft.world.dimension.DimensionType;
 
 import javax.annotation.Nullable;
+import java.util.Locale;
 import java.util.function.Consumer;
 
 /**
@@ -36,49 +40,59 @@ import java.util.function.Consumer;
  */
 public class EntangledBlock extends BaseBlock implements EntityHoldingBlock {
 
-    public static final BooleanProperty ON = BooleanProperty.create("on");
+    public static boolean canBindTo(ResourceLocation blockDimension, BlockPos blockPosition, ResourceLocation targetDimension, BlockPos targetPosition){
+        // Validate dimension exists
+        DimensionType targetDimensionType = DimensionType.getByName(targetDimension);
+        if(targetDimensionType == null || CommonUtils.getLevel(targetDimensionType) == null)
+            return false;
+        // Check dimension
+        if(!blockDimension.equals(targetDimension))
+            return EntangledConfig.allowDimensional.get();
+        // Check not itself
+        if(blockPosition.equals(targetPosition))
+            return false;
+        // Check distance
+        int maxDistance = EntangledConfig.maxDistance.get();
+        return maxDistance == -1 || blockPosition.closerThan(targetPosition, maxDistance + 0.5);
+    }
+
+    public static final EnumProperty<State> STATE_PROPERTY = EnumProperty.create("state", State.class);
 
     public EntangledBlock(){
         super(true, BlockProperties.create(new Material.Builder(MaterialColor.COLOR_BROWN).noCollider().build()).sound(SoundType.STONE).destroyTime(1).explosionResistance(2));
-        this.registerDefaultState(this.defaultBlockState().setValue(ON, false));
+        this.registerDefaultState(this.defaultBlockState().setValue(STATE_PROPERTY, State.UNBOUND));
     }
 
     @Override
     protected InteractionFeedback interact(BlockState state, World level, BlockPos pos, PlayerEntity player, Hand hand, Direction hitSide, Vec3d hitLocation){
-        if(level.isClientSide)
+        TileEntity entity = level.getBlockEntity(pos);
+        if(!(entity instanceof EntangledBlockEntity))
             return InteractionFeedback.PASS;
         ItemStack stack = player.getItemInHand(hand);
-        if(player.isCrouching() && stack.isEmpty() && state.getValue(ON)){
-            ((EntangledBlockEntity)level.getBlockEntity(pos)).bind(null, 0);
-            player.displayClientMessage(TextComponents.translation("entangled.entangled_block.unbind").color(TextFormatting.YELLOW).get(), true);
-            level.setBlockAndUpdate(pos, state.setValue(ON, false));
+        if(player.isCrouching() && stack.isEmpty() && ((EntangledBlockEntity)entity).isBound()){
+            if(!level.isClientSide){
+                ((EntangledBlockEntity)entity).unbind();
+                player.displayClientMessage(TextComponents.translation("entangled.entangled_block.unbind").color(TextFormatting.YELLOW).get(), true);
+            }
             return InteractionFeedback.SUCCESS;
         }else if(stack.getItem() == Entangled.item){
-            CompoundNBT compound = stack.getTag();
-            if(compound == null || !compound.getBoolean("bound"))
-                player.displayClientMessage(TextComponents.translation("entangled.entangled_block.no_selection").color(TextFormatting.RED).get(), true);
-            else{
-                BlockPos pos2 = new BlockPos(compound.getInt("boundx"), compound.getInt("boundy"), compound.getInt("boundz"));
-                if(pos2.equals(pos))
-                    player.displayClientMessage(TextComponents.translation("entangled.entangled_block.self").color(TextFormatting.RED).get(), true);
-                else{
-                    if(!level.getBlockState(pos).getValue(ON))
-                        level.setBlockAndUpdate(pos, state.setValue(ON, true));
-                    EntangledBlockEntity tile = (EntangledBlockEntity)level.getBlockEntity(pos);
-                    if(compound.getInt("dimension") == level.getDimension().getType().getId()){
-                        if(EntangledConfig.maxDistance.get() == -1 || pos.closerThan(pos2, EntangledConfig.maxDistance.get() + 0.5)){
-                            tile.bind(pos2, compound.getInt("dimension"));
-                            player.displayClientMessage(TextComponents.translation("entangled.entangled_block.bind").color(TextFormatting.YELLOW).get(), true);
-                        }else
-                            player.displayClientMessage(TextComponents.translation("entangled.entangled_block.too_far").color(TextFormatting.RED).get(), true);
-                    }else{
-                        if(EntangledConfig.allowDimensional.get()){
-                            tile.bind(pos2, compound.getInt("dimension"));
-                            player.displayClientMessage(TextComponents.translation("entangled.entangled_block.bind").color(TextFormatting.YELLOW).get(), true);
-                        }else
-                            player.displayClientMessage(TextComponents.translation("entangled.entangled_block.wrong_dimension").color(TextFormatting.RED).get(), true);
-                    }
-                }
+            if(!level.isClientSide){
+                if(EntangledBinderItem.isBound(stack)){
+                    ResourceLocation targetDimension = EntangledBinderItem.getBoundDimension(stack);
+                    BlockPos targetPos = EntangledBinderItem.getBoundPosition(stack);
+                    if(canBindTo(DimensionType.getName(level.getDimension().getType()), pos, targetDimension, targetPos)){
+                        ((EntangledBlockEntity)entity).bind(targetPos, targetDimension);
+                        player.displayClientMessage(TextComponents.translation("entangled.entangled_block.bind").color(TextFormatting.YELLOW).get(), true);
+                    }else if(DimensionType.getByName(targetDimension) == null || CommonUtils.getLevel(DimensionType.getByName(targetDimension)) == null)
+                        player.displayClientMessage(TextComponents.translation("entangled.entangled_binder.unknown_dimension", targetDimension).color(TextFormatting.RED).get(), true);
+                    else if(!DimensionType.getName(level.getDimension().getType()).equals(targetDimension) && !EntangledConfig.allowDimensional.get())
+                        player.displayClientMessage(TextComponents.translation("entangled.entangled_block.wrong_dimension").color(TextFormatting.RED).get(), true);
+                    else if(pos.equals(targetPos))
+                        player.displayClientMessage(TextComponents.translation("entangled.entangled_block.self").color(TextFormatting.RED).get(), true);
+                    else
+                        player.displayClientMessage(TextComponents.translation("entangled.entangled_block.too_far").color(TextFormatting.RED).get(), true);
+                }else
+                    player.displayClientMessage(TextComponents.translation("entangled.entangled_block.no_selection").color(TextFormatting.RED).get(), true);
             }
             return InteractionFeedback.SUCCESS;
         }
@@ -92,12 +106,12 @@ public class EntangledBlock extends BaseBlock implements EntityHoldingBlock {
 
     @Override
     protected void createBlockStateDefinition(StateContainer.Builder<Block,BlockState> builder){
-        builder.add(ON);
+        builder.add(STATE_PROPERTY);
     }
 
     @Override
     public VoxelShape getOcclusionShape(BlockState state, IBlockReader worldIn, BlockPos pos){
-        return state.getValue(ON) ? VoxelShapes.empty() : VoxelShapes.block();
+        return state.getValue(STATE_PROPERTY).isBound() ? VoxelShapes.empty() : VoxelShapes.block();
     }
 
     @Override
@@ -125,23 +139,25 @@ public class EntangledBlock extends BaseBlock implements EntityHoldingBlock {
         ItemStack stack = context.getItemInHand();
         CompoundNBT compound = stack.getOrCreateTag().getCompound("tileData");
         if(compound.getBoolean("bound")){
-            PlayerEntity player = context.getPlayer();
-            BlockPos pos = context.getClickedPos();
-            BlockPos pos2 = new BlockPos(compound.getInt("boundx"), compound.getInt("boundy"), compound.getInt("boundz"));
-            if(compound.getInt("dimension") == context.getLevel().getDimension().getType().getId()){
-                if(EntangledConfig.maxDistance.get() >= 0 && !pos.closerThan(pos2, EntangledConfig.maxDistance.get() + 0.5)){
-                    if(player != null && !context.getLevel().isClientSide)
-                        player.displayClientMessage(TextComponents.translation("entangled.entangled_block.too_far").color(TextFormatting.RED).get(), true);
-                    return null;
-                }
-            }else{
-                if(!EntangledConfig.allowDimensional.get()){
-                    if(player != null && !context.getLevel().isClientSide)
+            ResourceLocation placeDimension = DimensionType.getName(context.getLevel().getDimension().getType());
+            BlockPos placePos = context.getClickedPos();
+            ResourceLocation targetDimension = EntangledBinderItem.getBoundDimension(stack);
+            BlockPos targetPos = EntangledBinderItem.getBoundPosition(stack);
+            if(!canBindTo(placeDimension, placePos, targetDimension, targetPos)){
+                PlayerEntity player = context.getPlayer();
+                if(player != null){
+                    if(DimensionType.getByName(targetDimension) == null || CommonUtils.getLevel(DimensionType.getByName(targetDimension)) == null)
+                        player.displayClientMessage(TextComponents.translation("entangled.entangled_binder.unknown_dimension", targetDimension).color(TextFormatting.RED).get(), true);
+                    else if(!placeDimension.equals(targetDimension) && !EntangledConfig.allowDimensional.get())
                         player.displayClientMessage(TextComponents.translation("entangled.entangled_block.wrong_dimension").color(TextFormatting.RED).get(), true);
-                    return null;
+                    else if(placePos.equals(targetPos))
+                        player.displayClientMessage(TextComponents.translation("entangled.entangled_block.self").color(TextFormatting.RED).get(), true);
+                    else
+                        player.displayClientMessage(TextComponents.translation("entangled.entangled_block.too_far").color(TextFormatting.RED).get(), true);
                 }
+                return null;
             }
-            return this.defaultBlockState().setValue(ON, true);
+            return this.defaultBlockState().setValue(STATE_PROPERTY, State.BOUND_VALID);
         }
         return this.defaultBlockState();
     }
@@ -158,7 +174,7 @@ public class EntangledBlock extends BaseBlock implements EntityHoldingBlock {
     }
 
     @Override
-    public boolean isSignalSource(BlockState p_60571_){
+    public boolean isSignalSource(BlockState state){
         return true;
     }
 
@@ -172,5 +188,20 @@ public class EntangledBlock extends BaseBlock implements EntityHoldingBlock {
     public int getDirectSignal(BlockState state, IBlockReader world, BlockPos pos, Direction direction){
         TileEntity entity = world.getBlockEntity(pos);
         return entity instanceof EntangledBlockEntity ? ((EntangledBlockEntity)entity).getDirectRedstoneSignal(direction) : 0;
+    }
+
+    public enum State implements IStringSerializable {
+        UNBOUND,
+        BOUND_VALID,
+        BOUND_INVALID;
+
+        public boolean isBound(){
+            return this != UNBOUND;
+        }
+
+        @Override
+        public String getSerializedName(){
+            return this.name().toLowerCase(Locale.ROOT);
+        }
     }
 }

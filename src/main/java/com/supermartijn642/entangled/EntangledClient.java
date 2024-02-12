@@ -34,6 +34,8 @@ public class EntangledClient {
         handler.registerCustomItemRenderer(() -> Entangled.block.asItem(), EntangledBlockItemRenderer::new);
         // Entangled block item model
         handler.registerModelOverwrite("entangled", "block", "inventory", CustomRendererBakedModelWrapper::wrap);
+        // Entangled block render type
+        handler.registerBlockModelCutoutRenderType(() -> Entangled.block);
     }
 
     @Mod.EventBusSubscriber(value = Dist.CLIENT, bus = Mod.EventBusSubscriber.Bus.FORGE)
@@ -84,7 +86,7 @@ public class EntangledClient {
 
             World world = Minecraft.getInstance().level;
             TileEntity tile = world.getBlockEntity(e.getTarget().getBlockPos());
-            if(tile instanceof EntangledBlockEntity && ((EntangledBlockEntity)tile).isBound() && ((EntangledBlockEntity)tile).getBoundDimensionIdentifier() == world.getDimension().getType().getId()){
+            if(tile instanceof EntangledBlockEntity && ((EntangledBlockEntity)tile).isBound() && ((EntangledBlockEntity)tile).getBoundDimensionType() == world.getDimension().getType()){
                 BlockPos pos = ((EntangledBlockEntity)tile).getBoundBlockPos();
 
                 e.getMatrix().pushPose();
