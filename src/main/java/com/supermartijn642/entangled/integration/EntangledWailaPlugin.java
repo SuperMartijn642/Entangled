@@ -40,13 +40,15 @@ public class EntangledWailaPlugin implements IBlockComponentProvider, IWailaPlug
                 Component y = TextComponents.string(Integer.toString(boundPos.getY())).color(ChatFormatting.GOLD).get();
                 Component z = TextComponents.string(Integer.toString(boundPos.getZ())).color(ChatFormatting.GOLD).get();
                 if(((EntangledBlockEntity)tile).getBoundDimensionIdentifier() == accessor.getLevel().dimension())
-                    tooltip.add(TextComponents.translation("entangled.waila.bound_same_dimension", boundBlock, x, y, z).color(ChatFormatting.YELLOW).get());
+                    tooltip.add(TextComponents.translation("entangled.waila.bound_same_dimension", boundBlock, x, y, z).get());
                 else{
                     Component dimension = TextComponents.dimension(((EntangledBlockEntity)tile).getBoundDimensionIdentifier()).color(ChatFormatting.GOLD).get();
-                    tooltip.add(TextComponents.translation("entangled.waila.bound_other_dimension", boundBlock, x, y, z, dimension).color(ChatFormatting.YELLOW).get());
+                    tooltip.add(TextComponents.translation("entangled.waila.bound_other_dimension", boundBlock, x, y, z, dimension).get());
                 }
+                if(!((EntangledBlockEntity)tile).isBoundAndValid())
+                    tooltip.add(TextComponents.translation("entangled.waila.invalid_block", boundBlock).color(ChatFormatting.RED).get());
             }else
-                tooltip.add(TextComponents.translation("entangled.waila.unbound").color(ChatFormatting.YELLOW).get());
+                tooltip.add(TextComponents.translation("entangled.waila.unbound").get());
         }
     }
 }
