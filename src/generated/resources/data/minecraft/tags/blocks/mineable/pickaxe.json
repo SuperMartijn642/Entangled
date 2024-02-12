@@ -1,6 +1,9 @@
 {
   "replace": false,
   "values": [
-    "entangled:block"
+    {
+      "id": "entangled:block",
+      "required": true
+    }
   ]
 }
