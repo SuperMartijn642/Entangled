@@ -114,7 +114,7 @@ public class EntangledBlockEntity extends BaseBlockEntity implements TickableBlo
     }
 
     private boolean isValidBlock(IBlockState state){
-        return TagLoader.getTag(Registries.BLOCKS, BLACKLISTED_BLOCKS).contains(Registries.BLOCKS.getIdentifier(state.getBlock()));
+        return !TagLoader.getTag(Registries.BLOCKS, BLACKLISTED_BLOCKS).contains(Registries.BLOCKS.getIdentifier(state.getBlock()));
     }
 
     public boolean isBound(){
@@ -256,6 +256,11 @@ public class EntangledBlockEntity extends BaseBlockEntity implements TickableBlo
             return Math.max(this.analogOutputSignal, 0);
         }
         return Math.max(this.analogOutputSignal, 0);
+    }
+
+    @Override
+    public boolean shouldRefresh(World level, BlockPos pos, IBlockState oldState, IBlockState newSate){
+        return oldState.getBlock() != newSate.getBlock();
     }
 
     @Override
