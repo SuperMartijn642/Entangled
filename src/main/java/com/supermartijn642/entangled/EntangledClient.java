@@ -39,6 +39,8 @@ public class EntangledClient implements ClientModInitializer {
         handler.registerCustomItemRenderer(() -> Entangled.block.asItem(), EntangledBlockItemRenderer::new);
         // Entangled block item model
         handler.registerModelOverwrite("entangled", "block", "inventory", CustomRendererBakedModelWrapper::wrap);
+        // Entangled block render type
+        handler.registerBlockModelCutoutRenderType(() -> Entangled.block);
     }
 
     public static void onDrawPlayerEvent(RenderWorldEvent e){
