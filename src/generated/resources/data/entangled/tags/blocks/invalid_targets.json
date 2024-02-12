@@ -3,11 +3,11 @@
   "values": [
     {
       "type": "supermartijn642corelib:namespace",
-      "namespace": "ae2"
+      "namespace": "refinedstorage"
     },
     {
       "type": "supermartijn642corelib:namespace",
-      "namespace": "refinedstorage"
+      "namespace": "ae2"
     }
   ]
 }

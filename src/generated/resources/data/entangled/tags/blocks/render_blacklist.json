@@ -1,4 +1,9 @@
 {
   "replace": false,
-  "values": []
+  "values": [
+    {
+      "type": "supermartijn642corelib:namespace",
+      "namespace": "fluidtank"
+    }
+  ]
 }
