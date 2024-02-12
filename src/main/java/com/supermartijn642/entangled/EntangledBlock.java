@@ -36,7 +36,7 @@ public class EntangledBlock extends BaseBlock implements EntityHoldingBlock {
 
     public static boolean canBindTo(int blockDimension, BlockPos blockPosition, int targetDimension, BlockPos targetPosition){
         // Validate dimension exists
-        if(DimensionManager.isDimensionRegistered(targetDimension))
+        if(!DimensionManager.isDimensionRegistered(targetDimension))
             return false;
         // Check dimension
         if(blockDimension != targetDimension)
