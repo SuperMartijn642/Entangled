@@ -10,8 +10,8 @@
       ],
       "entries": [
         {
-          "type": "minecraft:item",
-          "name": "entangled:block"
+          "name": "entangled:block",
+          "type": "minecraft:item"
         }
       ]
     }

@@ -1,6 +1,6 @@
 {
   "parent": "minecraft:item/handheld",
   "textures": {
-    "layer0": "entangled:items/item"
+    "layer0": "entangled:items/binder"
   }
 }
