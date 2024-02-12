@@ -60,7 +60,7 @@ public class EntangledBlock extends BaseBlock implements EntityHoldingBlock {
     public static final EnumProperty<State> STATE_PROPERTY = EnumProperty.create("state", State.class);
 
     public EntangledBlock(){
-        super(true, BlockProperties.create(new Material.Builder(MaterialColor.COLOR_BROWN).noCollider().build()).sound(SoundType.STONE).destroyTime(1).explosionResistance(2));
+        super(true, BlockProperties.create(new Material.Builder(MaterialColor.COLOR_BROWN).noCollider().build()).sound(SoundType.STONE).destroyTime(1).explosionResistance(2).noOcclusion());
         this.registerDefaultState(this.defaultBlockState().setValue(STATE_PROPERTY, State.UNBOUND));
     }
 
