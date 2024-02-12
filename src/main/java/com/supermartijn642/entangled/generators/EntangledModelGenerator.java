@@ -17,10 +17,10 @@ public class EntangledModelGenerator extends ModelGenerator {
     @Override
     public void generate(){
         // Entangled Block
-        this.cubeAll("block/off", new ResourceLocation("entangled", "blocks/off"));
-        this.model("item/block").parent("block/off");
+        this.cubeAll("block/unbound", new ResourceLocation("entangled", "blocks/side"));
+        this.model("item/block").parent("block/unbound");
 
         // Entangled Binder
-        this.itemHandheld(Entangled.item, new ResourceLocation("entangled", "items/item"));
+        this.itemHandheld(Entangled.item, new ResourceLocation("entangled", "items/binder"));
     }
 }
