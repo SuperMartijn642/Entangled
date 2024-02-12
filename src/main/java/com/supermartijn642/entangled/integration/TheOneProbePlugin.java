@@ -7,6 +7,7 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.DimensionType;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.event.FMLInterModComms;
@@ -46,12 +47,14 @@ public class TheOneProbePlugin {
                     String x = TextStyleClass.WARNING.toString() + boundPos.getX() + TextStyleClass.INFO;
                     String y = TextStyleClass.WARNING.toString() + boundPos.getY() + TextStyleClass.INFO;
                     String z = TextStyleClass.WARNING.toString() + boundPos.getZ() + TextStyleClass.INFO;
-                    if(((EntangledBlockEntity)tile).getBoundDimensionIdentifier() == world.provider.getDimensionType().getId())
+                    if(((EntangledBlockEntity)tile).getBoundDimensionIdentifier() == world.provider.getDimension())
                         probeInfo.vertical().text(TextComponents.translation("entangled.waila.bound_same_dimension", boundBlock, x, y, z).format());
                     else{
                         String dimension = TextStyleClass.WARNING + TextComponents.dimension(DimensionType.getById(((EntangledBlockEntity)tile).getBoundDimensionIdentifier())).format() + TextStyleClass.INFO;
                         probeInfo.text(TextComponents.translation("entangled.waila.bound_other_dimension", boundBlock, x, y, z, dimension).format());
                     }
+                    if(!((EntangledBlockEntity)tile).isBoundAndValid())
+                        probeInfo.text(TextStyleClass.WARNING + TextComponents.translation("entangled.waila.invalid_block", boundBlock).color(TextFormatting.RED).format());
                 }else
                     probeInfo.text(TextComponents.translation("entangled.waila.unbound").format());
             }

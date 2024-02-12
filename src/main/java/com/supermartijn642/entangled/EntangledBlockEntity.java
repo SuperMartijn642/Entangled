@@ -2,22 +2,36 @@ package com.supermartijn642.entangled;
 
 import com.supermartijn642.core.block.BaseBlockEntity;
 import com.supermartijn642.core.block.TickableBlockEntity;
+import com.supermartijn642.core.data.TagLoader;
+import com.supermartijn642.core.registry.Registries;
 import net.minecraft.block.Block;
 import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.util.Constants;
 
 import javax.annotation.Nullable;
 
 public class EntangledBlockEntity extends BaseBlockEntity implements TickableBlockEntity {
 
+    public static final ResourceLocation BLACKLISTED_BLOCKS = new ResourceLocation("entangled", "invalid_targets");
+
+    /**
+     * Whether the block is bound to a position
+     */
     private boolean bound = false;
+    /**
+     * Whether the block at the bound position is valid
+     */
+    private boolean valid = false;
+    private boolean revalidate = false;
     private BlockPos boundPos;
     private int boundDimension;
     private IBlockState boundBlockState;
@@ -65,6 +79,8 @@ public class EntangledBlockEntity extends BaseBlockEntity implements TickableBlo
                 this.boundBlockState = state;
                 this.boundBlockEntity = entity;
                 this.analogOutputSignal = analogOutputSignal;
+                if(!this.world.isRemote)
+                    this.valid = this.isValidBlock(state);
                 sendUpdate = true;
             }
         }else{
@@ -77,9 +93,8 @@ public class EntangledBlockEntity extends BaseBlockEntity implements TickableBlo
 
         // Update the surrounding blocks
         if(sendUpdate){
+            this.updateStateAndNeighbors();
             this.dataChanged();
-            this.world.updateComparatorOutputLevel(this.pos, this.getBlockState().getBlock());
-            this.world.notifyNeighborsOfStateChange(this.pos, this.getBlockState().getBlock(), false);
         }
     }
 
@@ -89,10 +104,25 @@ public class EntangledBlockEntity extends BaseBlockEntity implements TickableBlo
             || (this.boundBlockEntity == null ? this.boundBlockState instanceof ITileEntityProvider : this.boundBlockEntity.isInvalid())
             || this.analogOutputSignal == -1;
         this.updateBoundBlockData(forceLoad);
+        if(!this.world.isRemote && this.revalidate){
+            if(this.bound){
+                this.valid = this.boundBlockState != null && this.isValidBlock(this.boundBlockState);
+                this.updateStateAndNeighbors();
+            }
+            this.revalidate = false;
+        }
+    }
+
+    private boolean isValidBlock(IBlockState state){
+        return TagLoader.getTag(Registries.BLOCKS, BLACKLISTED_BLOCKS).contains(Registries.BLOCKS.getIdentifier(state.getBlock()));
     }
 
     public boolean isBound(){
         return this.bound;
+    }
+
+    public boolean isBoundAndValid(){
+        return this.bound && this.valid;
     }
 
     @Nullable
@@ -110,7 +140,7 @@ public class EntangledBlockEntity extends BaseBlockEntity implements TickableBlo
 
     @Override
     public boolean hasCapability(Capability<?> capability, @Nullable EnumFacing facing){
-        if(this.bound && this.callDepth < 10){
+        if(this.isBoundAndValid() && this.callDepth < 10){
             if(this.boundBlockEntity == null ? this.boundBlockState == null || this.boundBlockState instanceof ITileEntityProvider : this.boundBlockEntity.isInvalid())
                 this.updateBoundBlockData(false);
             if(this.boundBlockEntity != null && !this.boundBlockEntity.isInvalid()){
@@ -126,7 +156,7 @@ public class EntangledBlockEntity extends BaseBlockEntity implements TickableBlo
     @Nullable
     @Override
     public <T> T getCapability(Capability<T> capability, @Nullable EnumFacing facing){
-        if(this.bound && this.callDepth < 10){
+        if(this.isBoundAndValid() && this.callDepth < 10){
             if(this.boundBlockEntity == null ? this.boundBlockState == null || this.boundBlockState instanceof ITileEntityProvider : this.boundBlockEntity.isInvalid())
                 this.updateBoundBlockData(false);
             if(this.boundBlockEntity != null && !this.boundBlockEntity.isInvalid()){
@@ -139,42 +169,58 @@ public class EntangledBlockEntity extends BaseBlockEntity implements TickableBlo
         return null;
     }
 
-    public boolean bind(BlockPos pos, int dimension){
-        if(!this.canBindTo(pos, dimension))
-            return false;
-        this.boundPos = pos == null ? null : new BlockPos(pos);
+    public void bind(BlockPos pos, int dimension){
+        this.bound = true;
+        this.valid = true;
+        this.boundPos = new BlockPos(pos);
         this.boundDimension = dimension;
-        this.bound = pos != null;
         this.boundBlockState = null;
         this.boundBlockEntity = null;
-        this.world.notifyNeighborsOfStateChange(this.getPos(), this.getBlockState().getBlock(), false);
+        this.updateStateAndNeighbors();
         this.dataChanged();
-        return true;
     }
 
-    public boolean canBindTo(BlockPos pos, int dimension){
-        return (pos == null && dimension == 0) ||
-            dimension == this.world.provider.getDimensionType().getId() ?
-            EntangledConfig.maxDistance.get() == -1 || super.pos.distanceSq(pos) <= (EntangledConfig.maxDistance.get() + 0.5) * (EntangledConfig.maxDistance.get() + 0.5) :
-            EntangledConfig.allowDimensional.get();
+    public void unbind(){
+        this.bound = false;
+        this.valid = true;
+        this.boundPos = null;
+        this.boundDimension = 0;
+        this.boundBlockState = null;
+        this.boundBlockEntity = null;
+        this.updateStateAndNeighbors();
+        this.dataChanged();
+    }
+
+    private void updateStateAndNeighbors(){
+        if(this.world.isRemote)
+            return;
+        EntangledBlock.State properState = this.bound && this.valid ? EntangledBlock.State.BOUND_VALID : this.bound ? EntangledBlock.State.BOUND_INVALID : EntangledBlock.State.UNBOUND;
+        if(this.getBlockState().getValue(EntangledBlock.STATE_PROPERTY) != properState)
+            this.world.setBlockState(this.pos, this.getBlockState().withProperty(EntangledBlock.STATE_PROPERTY, properState));
+        else{
+            this.world.updateComparatorOutputLevel(this.pos, this.getBlockState().getBlock());
+            this.world.notifyNeighborsOfStateChange(this.pos, this.getBlockState().getBlock(), false);
+        }
     }
 
     private World getBoundDimension(){
+        if(!this.isBound() || !DimensionManager.isDimensionRegistered(this.boundDimension))
+            return null;
         return this.world.isRemote ?
-            this.world.provider.getDimensionType().getId() == this.boundDimension ? this.world : null :
+            this.world.provider.getDimension() == this.boundDimension ? this.world : null :
             DimensionManager.getWorld(this.boundDimension);
     }
 
     private boolean isTargetLoaded(){
-        if(this.world.isRemote || !this.bound)
+        if(this.world.isRemote || !this.isBound())
             return false;
-        World level = this.world.provider.getDimensionType().getId() == this.boundDimension ?
+        World level = this.world.provider.getDimension() == this.boundDimension ?
             this.world : DimensionManager.getWorld(this.boundDimension);
         return level != null && level.isBlockLoaded(this.boundPos);
     }
 
     public int getRedstoneSignal(EnumFacing side){
-        if(!this.bound)
+        if(!this.isBoundAndValid())
             return 0;
         if(this.isTargetLoaded() && this.callDepth < 10){
             this.callDepth++;
@@ -187,7 +233,7 @@ public class EntangledBlockEntity extends BaseBlockEntity implements TickableBlo
     }
 
     public int getDirectRedstoneSignal(EnumFacing side){
-        if(!this.bound)
+        if(!this.isBoundAndValid())
             return 0;
         if(this.isTargetLoaded() && this.callDepth < 10){
             this.callDepth++;
@@ -200,7 +246,7 @@ public class EntangledBlockEntity extends BaseBlockEntity implements TickableBlo
     }
 
     public int getAnalogOutputSignal(){
-        if(!this.bound)
+        if(!this.isBoundAndValid())
             return 0;
         if(this.isTargetLoaded() && this.callDepth < 10){
             this.callDepth++;
@@ -231,6 +277,7 @@ public class EntangledBlockEntity extends BaseBlockEntity implements TickableBlo
         NBTTagCompound compound = new NBTTagCompound();
         if(this.bound){
             compound.setBoolean("bound", true);
+            compound.setBoolean("valid", this.valid);
             compound.setInteger("boundx", this.boundPos.getX());
             compound.setInteger("boundy", this.boundPos.getY());
             compound.setInteger("boundz", this.boundPos.getZ());
@@ -251,6 +298,8 @@ public class EntangledBlockEntity extends BaseBlockEntity implements TickableBlo
     protected void readData(NBTTagCompound compound){
         this.bound = compound.getBoolean("bound");
         if(this.bound){
+            this.valid = !compound.hasKey("valid", Constants.NBT.TAG_BYTE) || compound.getBoolean("valid");
+            this.revalidate = true;
             this.boundPos = new BlockPos(compound.getInteger("boundx"), compound.getInteger("boundy"), compound.getInteger("boundz"));
             this.boundDimension = compound.getInteger("dimension");
             this.boundBlockState = compound.hasKey("blockstate") ? Block.getStateById(compound.getInteger("blockstate")) : null;

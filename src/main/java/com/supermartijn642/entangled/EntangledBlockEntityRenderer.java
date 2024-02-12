@@ -1,6 +1,7 @@
 package com.supermartijn642.entangled;
 
 import com.supermartijn642.core.ClientUtils;
+import com.supermartijn642.core.data.TagLoader;
 import com.supermartijn642.core.registry.Registries;
 import com.supermartijn642.core.render.CustomBlockEntityRenderer;
 import com.supermartijn642.core.render.RenderConfiguration;
@@ -31,6 +32,7 @@ import java.util.Set;
  */
 public class EntangledBlockEntityRenderer implements CustomBlockEntityRenderer<EntangledBlockEntity> {
 
+    public static final ResourceLocation BLACKLISTED_BLOCKS = new ResourceLocation("entangled", "render_blacklist");
     private static final Set<Class<? extends TileEntity>> ERRORED_BLOCK_ENTITIES = Collections.synchronizedSet(new HashSet<>());
     private static final Set<IBlockState> ERRORED_BLOCK_STATES = Collections.synchronizedSet(new HashSet<>());
 
@@ -57,15 +59,18 @@ public class EntangledBlockEntityRenderer implements CustomBlockEntityRenderer<E
         if(!entity.isBound())
             return;
 
-        TileEntity boundTile = entity.getWorld().provider.getDimensionType().getId() == entity.getBoundDimensionIdentifier() ? entity.getWorld().getTileEntity(entity.getBoundBlockPos()) : null;
+        TileEntity boundTile = entity.getWorld().provider.getDimension() == entity.getBoundDimensionIdentifier() ? entity.getWorld().getTileEntity(entity.getBoundBlockPos()) : null;
         IBlockState boundState = entity.getBoundBlockState();
 
-        boolean renderTile = boundTile != null && canRenderTileEntity(Registries.BLOCK_ENTITY_CLASSES.getIdentifier(boundTile.getClass())) && !ERRORED_BLOCK_ENTITIES.contains(boundTile.getClass());
-        boolean renderBlock = boundState != null && boundState.getRenderType() == EnumBlockRenderType.MODEL && canRenderBlock(Registries.BLOCKS.getIdentifier(boundState.getBlock())) && !ERRORED_BLOCK_STATES.contains(boundState);
+        boolean renderTile = boundTile != null
+            && !ERRORED_BLOCK_ENTITIES.contains(boundTile.getClass());
+        boolean renderBlock = boundState != null && boundState.getRenderType() == EnumBlockRenderType.MODEL
+            && !TagLoader.getTag(Registries.BLOCKS, BLACKLISTED_BLOCKS).contains(Registries.BLOCKS.getIdentifier(boundState.getBlock()))
+            && !ERRORED_BLOCK_STATES.contains(boundState);
 
         // get the bounding box
         AxisAlignedBB bounds = new AxisAlignedBB(0, 0, 0, 1, 1, 1);
-        if(renderBlock && entity.getWorld().provider.getDimensionType().getId() == entity.getBoundDimensionIdentifier()){
+        if(renderBlock && entity.getWorld().provider.getDimension() == entity.getBoundDimensionIdentifier()){
             AxisAlignedBB shape = boundState.getBoundingBox(entity.getWorld(), entity.getBoundBlockPos());
             if(shape.minX != shape.maxX || shape.minY != shape.maxY || shape.minZ != shape.maxZ)
                 bounds = shape;
@@ -125,13 +130,5 @@ public class EntangledBlockEntityRenderer implements CustomBlockEntityRenderer<E
         }
 
         GlStateManager.popMatrix();
-    }
-
-    private static boolean canRenderBlock(ResourceLocation block){
-        return !Entangled.RENDER_BLACKLISTED_MODS.contains(block.getResourceDomain()) && !Entangled.RENDER_BLACKLISTED_BLOCKS.contains(block);
-    }
-
-    private static boolean canRenderTileEntity(ResourceLocation tile){
-        return !Entangled.RENDER_BLACKLISTED_MODS.contains(tile.getResourceDomain()) && !Entangled.RENDER_BLACKLISTED_TILE_ENTITIES.contains(tile);
     }
 }

@@ -33,6 +33,8 @@ public class EntangledClient {
         handler.registerCustomItemRenderer(() -> Item.getItemFromBlock(Entangled.block), EntangledBlockItemRenderer::new);
         // Entangled block item model
         handler.registerModelOverwrite("entangled", "block", "inventory", CustomRendererBakedModelWrapper::wrap);
+        // Entangled block render type
+        handler.registerBlockModelCutoutRenderType(() -> Entangled.block);
     }
 
     @Mod.EventBusSubscriber(Side.CLIENT)
@@ -45,7 +47,7 @@ public class EntangledClient {
 
             if(stack.getItem() instanceof ItemBlock && ((ItemBlock)stack.getItem()).getBlock() == Entangled.block && stack.hasTagCompound() && stack.getTagCompound().hasKey("tileData")){
                 NBTTagCompound compound = stack.getTagCompound().getCompoundTag("tileData");
-                if(compound.getBoolean("bound") && compound.getInteger("dimension") == world.provider.getDimensionType().getId()){
+                if(compound.getBoolean("bound") && compound.getInteger("dimension") == world.provider.getDimension()){
                     BlockPos pos = new BlockPos(compound.getInteger("boundx"), compound.getInteger("boundy"), compound.getInteger("boundz"));
 
                     BufferBuilder buffer = Tessellator.getInstance().getBuffer();
@@ -59,7 +61,7 @@ public class EntangledClient {
                 }
             }else if(stack.getItem() == Entangled.item && stack.hasTagCompound()){
                 NBTTagCompound compound = stack.getTagCompound();
-                if(compound.getBoolean("bound") && compound.getInteger("dimension") == world.provider.getDimensionType().getId()){
+                if(compound.getBoolean("bound") && compound.getInteger("dimension") == world.provider.getDimension()){
                     BlockPos pos = new BlockPos(compound.getInteger("boundx"), compound.getInteger("boundy"), compound.getInteger("boundz"));
 
                     BufferBuilder buffer = Tessellator.getInstance().getBuffer();
@@ -81,7 +83,7 @@ public class EntangledClient {
 
             World world = ClientUtils.getMinecraft().world;
             TileEntity tile = world.getTileEntity(e.getTarget().getBlockPos());
-            if(tile instanceof EntangledBlockEntity && ((EntangledBlockEntity)tile).isBound() && ((EntangledBlockEntity)tile).getBoundDimensionIdentifier() == world.provider.getDimensionType().getId()){
+            if(tile instanceof EntangledBlockEntity && ((EntangledBlockEntity)tile).isBound() && ((EntangledBlockEntity)tile).getBoundDimensionIdentifier() == world.provider.getDimension()){
                 BlockPos pos = ((EntangledBlockEntity)tile).getBoundBlockPos();
 
                 BufferBuilder buffer = Tessellator.getInstance().getBuffer();

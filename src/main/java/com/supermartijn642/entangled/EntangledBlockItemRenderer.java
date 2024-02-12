@@ -32,7 +32,7 @@ public class EntangledBlockItemRenderer extends BlockEntityCustomItemRenderer<En
             return;
         }
 
-        IBakedModel model = ClientUtils.getBlockRenderer().getModelForState(Entangled.block.getDefaultState().withProperty(EntangledBlock.ON, true));
+        IBakedModel model = ClientUtils.getBlockRenderer().getModelForState(Entangled.block.getDefaultState().withProperty(EntangledBlock.STATE_PROPERTY, EntangledBlock.State.BOUND_VALID));
         renderItemModel(itemStack, model);
         super.render(itemStack);
     }
