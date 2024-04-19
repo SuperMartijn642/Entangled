@@ -2,7 +2,7 @@ a1a668f27caa0802a70b33635114956b1309c8b0 assets\entangled\recipes\item.json
 6f92a0e885c6e26f030ecaf3ac244366fc10096c assets\entangled\models\item\block.json
 664cab40e1d9a351f0397c17e06f050a1eba1075 assets\entangled\models\block\unbound.json
 15c5fda5e5966a6256c65e65692e60a71686058b assets\entangled\loot_tables\blocks\block.json
-bc6555c8198132436c3c9866c2d46fc47036bc95 data\entangled\tags\blocks\invalid_targets.json
+8a23702b05296c8af5014d6aa6e9265ded85c7d9 data\entangled\tags\blocks\invalid_targets.json
 fea66e15ae8bd882e33a32e2096354f4fa295e5e assets\entangled\advancements\recipes\block.json
 bf2d30f42526118913bdf0cda29892c88a347a55 assets\entangled\recipes\entangled_clear_nbt.json
 41c497a10b4b2e79c4f24e453f848f2da8e0e89a assets\entangled\recipes\block.json
