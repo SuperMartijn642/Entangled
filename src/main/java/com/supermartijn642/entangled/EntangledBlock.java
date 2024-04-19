@@ -23,7 +23,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
-import net.minecraft.world.DimensionType;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.common.DimensionManager;
@@ -129,7 +128,9 @@ public class EntangledBlock extends BaseBlock implements EntityHoldingBlock {
         NBTTagCompound tag = stack.hasTagCompound() ? stack.getTagCompound().getCompoundTag("tileData") : new NBTTagCompound();
         if(tag.hasKey("bound") && tag.getBoolean("bound")){
             int x = tag.getInteger("boundx"), y = tag.getInteger("boundy"), z = tag.getInteger("boundz");
-            ITextComponent dimension = TextComponents.dimension(DimensionType.getById(tag.getInteger("dimension"))).color(TextFormatting.GOLD).get();
+            ITextComponent dimension = DimensionManager.isDimensionRegistered(tag.getInteger("dimension")) ?
+                TextComponents.dimension(DimensionManager.getProvider(tag.getInteger("dimension")).getDimensionType()).color(TextFormatting.GOLD).get() :
+                TextComponents.number(tag.getInteger("dimension")).color(TextFormatting.RED).get();
             ITextComponent name = TextComponents.blockState(Block.getStateById(tag.getInteger("blockstate"))).color(TextFormatting.GOLD).get();
             ITextComponent xText = TextComponents.string(Integer.toString(x)).color(TextFormatting.GOLD).get();
             ITextComponent yText = TextComponents.string(Integer.toString(y)).color(TextFormatting.GOLD).get();
