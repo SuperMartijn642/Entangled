@@ -1,3 +1,10 @@
+### Entangled 1.3.18
+- Removed blacklist entries for Applied Energistics and Refined Storage blocks
+- Networking capabilities from Refined Storage will no longer be passed on by entangled blocks
+- Fixed already bound entangled block items not being placeable
+- Fixed crash when generating tooltip for entangled blocks bound to a custom dimension
+- Fixed entangled binder's selected block not actually clearing when it says so
+
 ### Entangled 1.3.17
 - Added a tag for invalid target blocks
 - Added a tag blocks and block entities which should not be rendered
