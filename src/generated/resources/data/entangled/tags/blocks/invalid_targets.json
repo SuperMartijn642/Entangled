@@ -1,13 +1,4 @@
 {
   "replace": false,
-  "values": [
-    {
-      "type": "supermartijn642corelib:namespace",
-      "namespace": "refinedstorage"
-    },
-    {
-      "type": "supermartijn642corelib:namespace",
-      "namespace": "ae2"
-    }
-  ]
+  "values": []
 }
