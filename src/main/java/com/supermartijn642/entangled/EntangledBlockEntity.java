@@ -1,5 +1,7 @@
 package com.supermartijn642.entangled;
 
+import com.refinedmods.refinedstorage.capability.NetworkNodeProxyCapability;
+import com.supermartijn642.core.CommonUtils;
 import com.supermartijn642.core.block.BaseBlockEntity;
 import com.supermartijn642.core.block.TickableBlockEntity;
 import net.minecraft.block.Block;
@@ -149,9 +151,15 @@ public class EntangledBlockEntity extends BaseBlockEntity implements TickableBlo
         return this.boundBlockState;
     }
 
+    private boolean isValidCapability(Capability<?> capability){
+        return !CommonUtils.isModLoaded("refinedstorage") || capability != NetworkNodeProxyCapability.NETWORK_NODE_PROXY_CAPABILITY;
+    }
+
     @Nonnull
     @Override
     public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> capability){
+        if(!this.isValidCapability(capability))
+            return LazyOptional.empty();
         if(this.isBoundAndValid() && this.callDepth < 10){
             if(this.boundBlockEntity == null ? this.boundBlockState == null || this.boundBlockState.hasTileEntity() : this.boundBlockEntity.isRemoved())
                 this.updateBoundBlockData(false);
@@ -168,6 +176,8 @@ public class EntangledBlockEntity extends BaseBlockEntity implements TickableBlo
     @Nonnull
     @Override
     public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> capability, @Nullable Direction facing){
+        if(!this.isValidCapability(capability))
+            return LazyOptional.empty();
         if(this.isBoundAndValid() && this.callDepth < 10){
             if(this.boundBlockEntity == null ? this.boundBlockState == null || this.boundBlockState.hasTileEntity() : this.boundBlockEntity.isRemoved())
                 this.updateBoundBlockData(false);
