@@ -125,7 +125,7 @@ public class EntangledBlock extends BaseBlock implements EntityHoldingBlock {
         CompoundNBT tag = stack.getOrCreateTag().getCompound("tileData");
         if(tag.contains("bound") && tag.getBoolean("bound")){
             int x = tag.getInt("boundx"), y = tag.getInt("boundy"), z = tag.getInt("boundz");
-            ITextComponent dimension = TextComponents.dimension(DimensionType.getById(tag.getInt("dimension"))).color(TextFormatting.GOLD).get();
+            ITextComponent dimension = TextComponents.string(tag.getString("dimension")).color(TextFormatting.GOLD).get();
             ITextComponent name = TextComponents.blockState(Block.stateById(tag.getInt("blockstate"))).color(TextFormatting.GOLD).get();
             ITextComponent xText = TextComponents.string(Integer.toString(x)).color(TextFormatting.GOLD).get();
             ITextComponent yText = TextComponents.string(Integer.toString(y)).color(TextFormatting.GOLD).get();
