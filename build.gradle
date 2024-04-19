@@ -59,6 +59,9 @@ dependencies {
     // The One Probe
     compileOnly fg.deobf("curse.maven:the-one-probe-245211:${project.the_one_probe_file}")
 
+    // Refined Storage
+    compileOnly fg.deobf("curse.maven:refined-storage-243076:${project.refined_storage_file}")
+
     // Just Enough Items
 //    runtimeOnly fg.deobf("curse.maven:jei-238222:${project.just_enough_items_file}")
 }
