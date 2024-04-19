@@ -142,8 +142,8 @@ public class EntangledBlock extends BaseBlock implements EntityHoldingBlock {
         if(compound.getBoolean("bound")){
             ResourceLocation placeDimension = context.getLevel().dimension().location();
             BlockPos placePos = context.getClickedPos();
-            ResourceLocation targetDimension = EntangledBinderItem.getBoundDimension(stack);
-            BlockPos targetPos = EntangledBinderItem.getBoundPosition(stack);
+            ResourceLocation targetDimension = new ResourceLocation(compound.getString("dimension"));
+            BlockPos targetPos = new BlockPos(compound.getInt("boundx"), compound.getInt("boundy"), compound.getInt("boundz"));
             if(!canBindTo(placeDimension, placePos, targetDimension, targetPos)){
                 Player player = context.getPlayer();
                 if(player != null){
