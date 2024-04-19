@@ -145,8 +145,8 @@ public class EntangledBlock extends BaseBlock implements EntityHoldingBlock {
         NBTTagCompound compound = stack.hasTagCompound() ? stack.getTagCompound().getCompoundTag("tileData") : new NBTTagCompound();
         if(compound.getBoolean("bound")){
             int placeDimension = level.provider.getDimension();
-            int targetDimension = EntangledBinderItem.getBoundDimension(stack);
-            BlockPos targetPos = EntangledBinderItem.getBoundPosition(stack);
+            int targetDimension = compound.getInteger("dimension");
+            BlockPos targetPos = new BlockPos(compound.getInteger("boundx"), compound.getInteger("boundy"), compound.getInteger("boundz"));
             if(!canBindTo(placeDimension, placePos, targetDimension, targetPos)){
                 if(player instanceof EntityPlayer){
                     if(!DimensionManager.isDimensionRegistered(targetDimension))
