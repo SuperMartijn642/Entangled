@@ -78,12 +78,13 @@ public class EntangledBinderItem extends BaseItem {
         NBTTagCompound compound = stack.getTagCompound();
         if(player.isSneaking() && compound != null && compound.getBoolean("bound")){
             if(!level.isRemote){
-                stack.removeSubCompound("bound");
-                stack.removeSubCompound("dimension");
-                stack.removeSubCompound("boundx");
-                stack.removeSubCompound("boundy");
-                stack.removeSubCompound("boundz");
-                stack.removeSubCompound("blockstate");
+                NBTTagCompound data = stack.getTagCompound();
+                data.removeTag("bound");
+                data.removeTag("dimension");
+                data.removeTag("boundx");
+                data.removeTag("boundy");
+                data.removeTag("boundz");
+                data.removeTag("blockstate");
                 player.sendStatusMessage(TextComponents.translation("entangled.entangled_binder.clear").color(TextFormatting.YELLOW).get(), true);
             }
             return ItemUseResult.consume(stack);
