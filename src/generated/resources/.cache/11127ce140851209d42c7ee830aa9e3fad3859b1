@@ -1,10 +1,10 @@
-// 1.19.2	2024-02-12T23:02:13.6003733	Core Lib Generators
+// 1.19.2	2024-04-19T23:16:12.1429079	Core Lib Generators
 862b895954a049b4bbef29db4770e94e881b2ee7 data\entangled\advancements\recipes\decorations\block.json
 f6255284e6b8e791baf3819f34941dbc4daf4b92 data\entangled\loot_tables\blocks\block.json
 44109d54ae635f86fd1aa98de23cb927ae7d041c data\entangled\recipes\item.json
 6f92a0e885c6e26f030ecaf3ac244366fc10096c assets\entangled\models\item\block.json
 664cab40e1d9a351f0397c17e06f050a1eba1075 assets\entangled\models\block\unbound.json
-dae384bb3307fa97493c49aadc73a6888e661c79 data\entangled\tags\blocks\invalid_targets.json
+8a23702b05296c8af5014d6aa6e9265ded85c7d9 data\entangled\tags\blocks\invalid_targets.json
 a4757ef9e6a3e8191d9296da402c2d7f37b92611 assets\entangled\lang\en_us.json
 20aafb362824ec9e7be212a4b687191e22bf8650 data\entangled\tags\block_entity_type\render_blacklist.json
 4d3314d9af89e32440c0624fcd66fff5d392f900 data\minecraft\tags\blocks\mineable\pickaxe.json
