@@ -9,6 +9,6 @@ da10f64d0adc2a904eaf7f19085225d2dcb6311e data\entangled\advancements\recipes\mis
 fae0e38ce56275b251a24a5797c60984551281e3 data\entangled\recipes\block.json
 22d28d9dfb70bc146aadee27535f5fab820e3ebb data\entangled\recipes\entangled_clear_nbt.json
 bed4609088a63adf30dbcc5850155e47aa680b6e data\entangled\recipes\item.json
-bc6555c8198132436c3c9866c2d46fc47036bc95 data\entangled\tags\blocks\invalid_targets.json
+8a23702b05296c8af5014d6aa6e9265ded85c7d9 data\entangled\tags\blocks\invalid_targets.json
 8a23702b05296c8af5014d6aa6e9265ded85c7d9 data\entangled\tags\blocks\render_blacklist.json
 4d3314d9af89e32440c0624fcd66fff5d392f900 data\minecraft\tags\blocks\mineable\pickaxe.json
