@@ -1,7 +1,7 @@
 22d28d9dfb70bc146aadee27535f5fab820e3ebb data\entangled\recipes\entangled_clear_nbt.json
 664cab40e1d9a351f0397c17e06f050a1eba1075 assets\entangled\models\block\unbound.json
 862b895954a049b4bbef29db4770e94e881b2ee7 data\entangled\advancements\recipes\decorations\block.json
-dae384bb3307fa97493c49aadc73a6888e661c79 data\entangled\tags\blocks\invalid_targets.json
+8a23702b05296c8af5014d6aa6e9265ded85c7d9 data\entangled\tags\blocks\invalid_targets.json
 07b17197274e26d9aa09324ddc2b3171872b86ef assets\entangled\blockstates\block.json
 8a23702b05296c8af5014d6aa6e9265ded85c7d9 data\entangled\tags\blocks\render_blacklist.json
 fe2b502274146167a0cd2a38d7a7d7cca925fdf1 data\entangled\advancements\recipes\misc\item.json
@@ -12,4 +12,4 @@ f6255284e6b8e791baf3819f34941dbc4daf4b92 data\entangled\loot_tables\blocks\block
 a4757ef9e6a3e8191d9296da402c2d7f37b92611 assets\entangled\lang\en_us.json
 4d3314d9af89e32440c0624fcd66fff5d392f900 data\minecraft\tags\blocks\mineable\pickaxe.json
 44109d54ae635f86fd1aa98de23cb927ae7d041c data\entangled\recipes\item.json
-20aafb362824ec9e7be212a4b687191e22bf8650 data\entangled\tags\block_entity_type\render_blacklist.json
+61d322571b594dc4d9b1f5d1951080fb9f9fd4ed data\entangled\tags\block_entity_type\render_blacklist.json
