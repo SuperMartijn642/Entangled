@@ -21,9 +21,7 @@ public class EntangledTagGenerator extends TagGenerator {
         this.blockMineableWithPickaxe().add(Entangled.block);
 
         // Blacklist tags
-        this.blockTag(EntangledBlockEntity.BLACKLISTED_BLOCKS)
-            .addOptional(new NamespaceTagEntry("ae2"))
-            .addOptional(new NamespaceTagEntry("refinedstorage"));
+        this.blockTag(EntangledBlockEntity.BLACKLISTED_BLOCKS);
         this.blockTag(EntangledBlockEntityRenderer.BLACKLISTED_BLOCKS)
             .addOptional(new NamespaceTagEntry("fluidtank"));
     }
