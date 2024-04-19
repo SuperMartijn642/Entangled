@@ -1,5 +1,7 @@
 package com.supermartijn642.entangled;
 
+import com.raoulvdberge.refinedstorage.capability.CapabilityNetworkNodeProxy;
+import com.supermartijn642.core.CommonUtils;
 import com.supermartijn642.core.block.BaseBlockEntity;
 import com.supermartijn642.core.block.TickableBlockEntity;
 import com.supermartijn642.core.data.TagLoader;
@@ -138,8 +140,14 @@ public class EntangledBlockEntity extends BaseBlockEntity implements TickableBlo
         return this.boundBlockState;
     }
 
+    private boolean isValidCapability(Capability<?> capability){
+        return !CommonUtils.isModLoaded("refinedstorage") || capability != CapabilityNetworkNodeProxy.NETWORK_NODE_PROXY_CAPABILITY;
+    }
+
     @Override
     public boolean hasCapability(Capability<?> capability, @Nullable EnumFacing facing){
+        if(!this.isValidCapability(capability))
+            return false;
         if(this.isBoundAndValid() && this.callDepth < 10){
             if(this.boundBlockEntity == null ? this.boundBlockState == null || this.boundBlockState instanceof ITileEntityProvider : this.boundBlockEntity.isInvalid())
                 this.updateBoundBlockData(false);
@@ -156,6 +164,8 @@ public class EntangledBlockEntity extends BaseBlockEntity implements TickableBlo
     @Nullable
     @Override
     public <T> T getCapability(Capability<T> capability, @Nullable EnumFacing facing){
+        if(!this.isValidCapability(capability))
+            return null;
         if(this.isBoundAndValid() && this.callDepth < 10){
             if(this.boundBlockEntity == null ? this.boundBlockState == null || this.boundBlockState instanceof ITileEntityProvider : this.boundBlockEntity.isInvalid())
                 this.updateBoundBlockData(false);
