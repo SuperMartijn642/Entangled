@@ -1,4 +1,4 @@
-// 1.19.4	2024-02-12T18:15:04.8296025	Core Lib Generators
+// 1.19.4	2024-04-19T23:07:48.7682828	Core Lib Generators
 07b17197274e26d9aa09324ddc2b3171872b86ef assets/entangled/blockstates/block.json
 a4757ef9e6a3e8191d9296da402c2d7f37b92611 assets/entangled/lang/en_us.json
 664cab40e1d9a351f0397c17e06f050a1eba1075 assets/entangled/models/block/unbound.json
@@ -11,7 +11,7 @@ f6255284e6b8e791baf3819f34941dbc4daf4b92 data/entangled/loot_tables/blocks/block
 fae0e38ce56275b251a24a5797c60984551281e3 data/entangled/recipes/block.json
 22d28d9dfb70bc146aadee27535f5fab820e3ebb data/entangled/recipes/entangled_clear_nbt.json
 bed4609088a63adf30dbcc5850155e47aa680b6e data/entangled/recipes/item.json
-bc6555c8198132436c3c9866c2d46fc47036bc95 data/entangled/tags/blocks/invalid_targets.json
+8a23702b05296c8af5014d6aa6e9265ded85c7d9 data/entangled/tags/blocks/invalid_targets.json
 8a23702b05296c8af5014d6aa6e9265ded85c7d9 data/entangled/tags/blocks/render_blacklist.json
-61d322571b594dc4d9b1f5d1951080fb9f9fd4ed data/entangled/tags/block_entity_type/render_blacklist.json
+20aafb362824ec9e7be212a4b687191e22bf8650 data/entangled/tags/block_entity_type/render_blacklist.json
 4d3314d9af89e32440c0624fcd66fff5d392f900 data/minecraft/tags/blocks/mineable/pickaxe.json
