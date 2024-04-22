@@ -1,3 +1,6 @@
+### Entangled 1.3.18a
+- Fixed crash when generating tooltip for entangled binder bound to a custom dimension
+
 ### Entangled 1.3.18
 - Removed blacklist entries for Applied Energistics and Refined Storage blocks
 - Networking capabilities from Refined Storage will no longer be passed on by entangled blocks
