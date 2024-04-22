@@ -14,9 +14,9 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
-import net.minecraft.world.DimensionType;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.common.util.Constants;
 
 import javax.annotation.Nullable;
@@ -99,7 +99,9 @@ public class EntangledBinderItem extends BaseItem {
         if(isBound(stack)){
             NBTTagCompound tag = stack.getTagCompound();
             int x = tag.getInteger("boundx"), y = tag.getInteger("boundy"), z = tag.getInteger("boundz");
-            ITextComponent dimension = TextComponents.dimension(DimensionType.getById(tag.getInteger("dimension"))).color(TextFormatting.GOLD).get();
+            ITextComponent dimension = DimensionManager.isDimensionRegistered(tag.getInteger("dimension")) ?
+                TextComponents.dimension(DimensionManager.getProvider(tag.getInteger("dimension")).getDimensionType()).color(TextFormatting.GOLD).get() :
+                TextComponents.number(tag.getInteger("dimension")).color(TextFormatting.RED).get();
             ITextComponent xText = TextComponents.string(Integer.toString(x)).color(TextFormatting.GOLD).get();
             ITextComponent yText = TextComponents.string(Integer.toString(y)).color(TextFormatting.GOLD).get();
             ITextComponent zText = TextComponents.string(Integer.toString(z)).color(TextFormatting.GOLD).get();
