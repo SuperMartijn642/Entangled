@@ -15,8 +15,9 @@ public class EntangledConfig {
 
     public static final Supplier<Boolean> allowDimensional;
     public static final Supplier<Integer> maxDistance;
+    public static final Supplier<Boolean> useWhitelist;
 
-    static{
+    static {
         IConfigBuilder builder = ConfigBuilders.newTomlConfig("entangled", null, false);
         builder.push("Client");
         renderBlockHighlight = builder
@@ -35,6 +36,9 @@ public class EntangledConfig {
         maxDistance = builder
             .comment("What is the max range in which entangled blocks can be bound? Only affects blocks in the same dimension. -1 for infinite range. Previously bound entangled blocks won't be affected.")
             .define("maxDistance", -1, -1, Integer.MAX_VALUE);
+        useWhitelist = builder
+            .comment("Whether to use whitelist, if true, use invalid_targets block tag as whitelist.")
+            .define("useWhitelist", false);
         builder.pop();
         builder.build();
     }
