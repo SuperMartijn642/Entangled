@@ -48,9 +48,9 @@ public class EntangledBlock extends BaseBlock implements EntityHoldingBlock {
         // Check Block is in blacklist or whitelist
         BlockState state = level.getBlockState(targetPosition);
         if (EntangledConfig.useWhitelist.get()) {
-            if (!EntangledConfig.blacklist.get().contains(state.getBlock())) return false;
+            if (!EntangledConfig.inBlacklist.test(state.getBlock())) return false;
         } else {
-            if (EntangledConfig.blacklist.get().contains(state.getBlock())) return false;
+            if (EntangledConfig.inBlacklist.test(state.getBlock())) return false;
         }
         // Check dimension
         if (!blockDimension.equals(targetDimension))
@@ -95,9 +95,9 @@ public class EntangledBlock extends BaseBlock implements EntityHoldingBlock {
                         player.displayClientMessage(TextComponents.translation("entangled.entangled_binder.unknown_dimension", targetDimension).color(ChatFormatting.RED).get(), true);
                     else if (!level.dimension().location().equals(targetDimension) && !EntangledConfig.allowDimensional.get())
                         player.displayClientMessage(TextComponents.translation("entangled.entangled_block.wrong_dimension").color(ChatFormatting.RED).get(), true);
-                    else if (EntangledConfig.useWhitelist.get() && !EntangledConfig.blacklist.get().contains(targetStace.getBlock()))
+                    else if (EntangledConfig.useWhitelist.get() && !EntangledConfig.inBlacklist.test(targetStace.getBlock()))
                         player.displayClientMessage(TextComponents.translation("entangled.entangled_block.not_in_whitelist").color(ChatFormatting.RED).get(), true);
-                    else if (!EntangledConfig.useWhitelist.get() && EntangledConfig.blacklist.get().contains(targetStace.getBlock()))
+                    else if (!EntangledConfig.useWhitelist.get() && EntangledConfig.inBlacklist.test(targetStace.getBlock()))
                         player.displayClientMessage(TextComponents.translation("entangled.entangled_block.not_in_blacklist").color(ChatFormatting.RED).get(), true);
                     else if (pos.equals(targetPos))
                         player.displayClientMessage(TextComponents.translation("entangled.entangled_block.self").color(ChatFormatting.RED).get(), true);
@@ -162,9 +162,9 @@ public class EntangledBlock extends BaseBlock implements EntityHoldingBlock {
                 if (player != null) {
                     if (CommonUtils.getLevel(ResourceKey.create(Registries.DIMENSION, targetDimension)) == null)
                         player.displayClientMessage(TextComponents.translation("entangled.entangled_binder.unknown_dimension", targetDimension).color(ChatFormatting.RED).get(), true);
-                    else if (EntangledConfig.useWhitelist.get() && !EntangledConfig.blacklist.get().contains(targetStace.getBlock()))
+                    else if (EntangledConfig.useWhitelist.get() && !EntangledConfig.inBlacklist.test(targetStace.getBlock()))
                         player.displayClientMessage(TextComponents.translation("entangled.entangled_block.not_in_whitelist").color(ChatFormatting.RED).get(), true);
-                    else if (!EntangledConfig.useWhitelist.get() && EntangledConfig.blacklist.get().contains(targetStace.getBlock()))
+                    else if (!EntangledConfig.useWhitelist.get() && EntangledConfig.inBlacklist.test(targetStace.getBlock()))
                         player.displayClientMessage(TextComponents.translation("entangled.entangled_block.not_in_blacklist").color(ChatFormatting.RED).get(), true);
                     else if (!placeDimension.equals(targetDimension) && !EntangledConfig.allowDimensional.get())
                         player.displayClientMessage(TextComponents.translation("entangled.entangled_block.wrong_dimension").color(ChatFormatting.RED).get(), true);

@@ -2,14 +2,11 @@ package com.supermartijn642.entangled;
 
 import com.supermartijn642.configlib.api.ConfigBuilders;
 import com.supermartijn642.configlib.api.IConfigBuilder;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Block;
 import net.minecraftforge.registries.ForgeRegistries;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 /**
@@ -24,16 +21,18 @@ public class EntangledConfig {
     public static final Supplier<Integer> maxDistance;
     public static final Supplier<Boolean> useWhitelist;
     private static Supplier<String> blacklistString;
-    public static final Supplier<List<Block>> blacklist = () -> {
-        List<Block> list = new ArrayList<>();
+    public static final Predicate<Block> inBlacklist = (block) -> {
         if (blacklistString != null) {
-            for (String key : blacklistString.get().split(",")) {
-                if (ForgeRegistries.BLOCKS.containsKey(new ResourceLocation(key))) {
-                    list.add(ForgeRegistries.BLOCKS.getValue(new ResourceLocation(key)));
+            ResourceLocation key = ForgeRegistries.BLOCKS.getKey(block);
+            if (key != null) {
+                for (String regex : blacklistString.get().split(",")) {
+                    if (key.toString().matches(regex)) {
+                        return true;
+                    }
                 }
             }
         }
-        return list;
+        return false;
     };
 
     static {
