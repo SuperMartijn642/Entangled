@@ -31,6 +31,8 @@ public class EntangledLanguageGenerator extends LanguageGenerator {
         this.translation("entangled.entangled_block.bind", "Block bound!");
         this.translation("entangled.entangled_block.wrong_dimension", "The targeted block must be in the same dimension!");
         this.translation("entangled.entangled_block.too_far", "The targeted block is too far away!");
+        this.translation("entangled.entangled_block.not_in_whitelist", "The targeted block is not in the whitelist!");
+        this.translation("entangled.entangled_block.not_in_blacklist", "The targeted block is not in the blacklist!");
         this.translation("entangled.entangled_binder.info", "Can bind entangled blocks to other blocks");
         this.translation("entangled.entangled_binder.info.target.unknown", "Linked to a block in the %4$s at (%1$d, %2$d, %3$d)");
         this.translation("entangled.entangled_binder.info.target.known", "Linked to %1$s in the %5$s at (%2$d, %3$d, %4$d)");

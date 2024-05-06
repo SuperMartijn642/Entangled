@@ -2,7 +2,14 @@ package com.supermartijn642.entangled;
 
 import com.supermartijn642.configlib.api.ConfigBuilders;
 import com.supermartijn642.configlib.api.IConfigBuilder;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.block.Block;
+import net.minecraftforge.registries.ForgeRegistries;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Supplier;
 
 /**
@@ -15,8 +22,21 @@ public class EntangledConfig {
 
     public static final Supplier<Boolean> allowDimensional;
     public static final Supplier<Integer> maxDistance;
+    public static final Supplier<Boolean> useWhitelist;
+    private static Supplier<String> blacklistString;
+    public static final Supplier<List<Block>> blacklist = () -> {
+        List<Block> list = new ArrayList<>();
+        if (blacklistString != null) {
+            for (String key : blacklistString.get().split(",")) {
+                if (ForgeRegistries.BLOCKS.containsKey(new ResourceLocation(key))) {
+                    list.add(ForgeRegistries.BLOCKS.getValue(new ResourceLocation(key)));
+                }
+            }
+        }
+        return list;
+    };
 
-    static{
+    static {
         IConfigBuilder builder = ConfigBuilders.newTomlConfig("entangled", null, false);
         builder.push("Client");
         renderBlockHighlight = builder
@@ -35,6 +55,12 @@ public class EntangledConfig {
         maxDistance = builder
             .comment("What is the max range in which entangled blocks can be bound? Only affects blocks in the same dimension. -1 for infinite range. Previously bound entangled blocks won't be affected.")
             .define("maxDistance", -1, -1, Integer.MAX_VALUE);
+        useWhitelist = builder
+            .comment("Whether to use whitelist, if true, use blacklist as whitelist")
+            .define("useWhitelist", false);
+        blacklistString = builder
+            .comment("Add blacklist to Entangled Block, when useWhitelist is true, it will as whitelist. Separate with commas(,).")
+            .define("blacklist", "", 0, Integer.MAX_VALUE);
         builder.pop();
         builder.build();
     }

@@ -12,6 +12,8 @@
   "entangled.entangled_block.bind": "方块已绑定！",
   "entangled.entangled_block.wrong_dimension": "目标方块必须在同一维度！",
   "entangled.entangled_block.too_far": "目标方块太远了！",
+  "entangled.entangled_block.not_in_whitelist": "目标方块不在白名单内！",
+  "entangled.entangled_block.not_in_blacklist": "目标方块不在黑名单内！",
   "entangled.entangled_binder.info": "可以将纠缠方块绑定到其他方块",
   "entangled.entangled_binder.info.target.unknown": "链接到 %4$s 中的方块 (%1$d, %2$d, %3$d)",
   "entangled.entangled_binder.info.target.known": "链接到 %5$s 中的 %1$s (%2$d, %3$d, %4$d)",

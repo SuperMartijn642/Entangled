@@ -41,15 +41,22 @@ import java.util.function.Consumer;
  */
 public class EntangledBlock extends BaseBlock implements EntityHoldingBlock {
 
-    public static boolean canBindTo(ResourceLocation blockDimension, BlockPos blockPosition, ResourceLocation targetDimension, BlockPos targetPosition){
+    public static boolean canBindTo(ResourceLocation blockDimension, BlockPos blockPosition, ResourceLocation targetDimension, BlockPos targetPosition, Level level) {
         // Validate dimension exists
-        if(CommonUtils.getLevel(ResourceKey.create(Registries.DIMENSION, targetDimension)) == null)
+        if (CommonUtils.getLevel(ResourceKey.create(Registries.DIMENSION, targetDimension)) == null)
             return false;
+        // Check Block is in blacklist or whitelist
+        BlockState state = level.getBlockState(targetPosition);
+        if (EntangledConfig.useWhitelist.get()) {
+            if (!EntangledConfig.blacklist.get().contains(state.getBlock())) return false;
+        } else {
+            if (EntangledConfig.blacklist.get().contains(state.getBlock())) return false;
+        }
         // Check dimension
-        if(!blockDimension.equals(targetDimension))
+        if (!blockDimension.equals(targetDimension))
             return EntangledConfig.allowDimensional.get();
         // Check not itself
-        if(blockPosition.equals(targetPosition))
+        if (blockPosition.equals(targetPosition))
             return false;
         // Check distance
         int maxDistance = EntangledConfig.maxDistance.get();
@@ -58,40 +65,45 @@ public class EntangledBlock extends BaseBlock implements EntityHoldingBlock {
 
     public static final EnumProperty<State> STATE_PROPERTY = EnumProperty.create("state", State.class);
 
-    public EntangledBlock(){
+    public EntangledBlock() {
         super(true, BlockProperties.create().mapColor(MapColor.COLOR_BROWN).sound(SoundType.STONE).destroyTime(1).explosionResistance(2).noOcclusion());
         this.registerDefaultState(this.defaultBlockState().setValue(STATE_PROPERTY, State.UNBOUND));
     }
 
     @Override
-    protected InteractionFeedback interact(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, Direction hitSide, Vec3 hitLocation){
+    protected InteractionFeedback interact(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, Direction hitSide, Vec3 hitLocation) {
         BlockEntity entity = level.getBlockEntity(pos);
-        if(!(entity instanceof EntangledBlockEntity))
+        if (!(entity instanceof EntangledBlockEntity))
             return InteractionFeedback.PASS;
         ItemStack stack = player.getItemInHand(hand);
-        if(player.isCrouching() && stack.isEmpty() && ((EntangledBlockEntity)entity).isBound()){
-            if(!level.isClientSide){
-                ((EntangledBlockEntity)entity).unbind();
+        if (player.isCrouching() && stack.isEmpty() && ((EntangledBlockEntity) entity).isBound()) {
+            if (!level.isClientSide) {
+                ((EntangledBlockEntity) entity).unbind();
                 player.displayClientMessage(TextComponents.translation("entangled.entangled_block.unbind").color(ChatFormatting.YELLOW).get(), true);
             }
             return InteractionFeedback.SUCCESS;
-        }else if(stack.getItem() == Entangled.item){
-            if(!level.isClientSide){
-                if(EntangledBinderItem.isBound(stack)){
+        } else if (stack.getItem() == Entangled.item) {
+            if (!level.isClientSide) {
+                if (EntangledBinderItem.isBound(stack)) {
                     ResourceLocation targetDimension = EntangledBinderItem.getBoundDimension(stack);
                     BlockPos targetPos = EntangledBinderItem.getBoundPosition(stack);
-                    if(canBindTo(level.dimension().location(), pos, targetDimension, targetPos)){
-                        ((EntangledBlockEntity)entity).bind(targetPos, targetDimension);
+                    BlockState targetStace = level.getBlockState(targetPos);
+                    if (canBindTo(level.dimension().location(), pos, targetDimension, targetPos, level)) {
+                        ((EntangledBlockEntity) entity).bind(targetPos, targetDimension);
                         player.displayClientMessage(TextComponents.translation("entangled.entangled_block.bind").color(ChatFormatting.YELLOW).get(), true);
-                    }else if(CommonUtils.getLevel(ResourceKey.create(Registries.DIMENSION, targetDimension)) == null)
+                    } else if (CommonUtils.getLevel(ResourceKey.create(Registries.DIMENSION, targetDimension)) == null)
                         player.displayClientMessage(TextComponents.translation("entangled.entangled_binder.unknown_dimension", targetDimension).color(ChatFormatting.RED).get(), true);
-                    else if(!level.dimension().location().equals(targetDimension) && !EntangledConfig.allowDimensional.get())
+                    else if (!level.dimension().location().equals(targetDimension) && !EntangledConfig.allowDimensional.get())
                         player.displayClientMessage(TextComponents.translation("entangled.entangled_block.wrong_dimension").color(ChatFormatting.RED).get(), true);
-                    else if(pos.equals(targetPos))
+                    else if (EntangledConfig.useWhitelist.get() && !EntangledConfig.blacklist.get().contains(targetStace.getBlock()))
+                        player.displayClientMessage(TextComponents.translation("entangled.entangled_block.not_in_whitelist").color(ChatFormatting.RED).get(), true);
+                    else if (!EntangledConfig.useWhitelist.get() && EntangledConfig.blacklist.get().contains(targetStace.getBlock()))
+                        player.displayClientMessage(TextComponents.translation("entangled.entangled_block.not_in_blacklist").color(ChatFormatting.RED).get(), true);
+                    else if (pos.equals(targetPos))
                         player.displayClientMessage(TextComponents.translation("entangled.entangled_block.self").color(ChatFormatting.RED).get(), true);
                     else
                         player.displayClientMessage(TextComponents.translation("entangled.entangled_block.too_far").color(ChatFormatting.RED).get(), true);
-                }else
+                } else
                     player.displayClientMessage(TextComponents.translation("entangled.entangled_block.no_selection").color(ChatFormatting.RED).get(), true);
             }
             return InteractionFeedback.SUCCESS;
@@ -100,22 +112,22 @@ public class EntangledBlock extends BaseBlock implements EntityHoldingBlock {
     }
 
     @Override
-    public BlockEntity createNewBlockEntity(BlockPos pos, BlockState state){
+    public BlockEntity createNewBlockEntity(BlockPos pos, BlockState state) {
         return new EntangledBlockEntity(pos, state);
     }
 
     @Override
-    protected void createBlockStateDefinition(StateDefinition.Builder<Block,BlockState> builder){
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(STATE_PROPERTY);
     }
 
     @Override
-    public VoxelShape getVisualShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context){
+    public VoxelShape getVisualShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
         return state.getValue(STATE_PROPERTY).isBound() ? Shapes.empty() : Shapes.block();
     }
 
     @Override
-    protected void appendItemInformation(ItemStack stack, @Nullable BlockGetter level, Consumer<Component> info, boolean advanced){
+    protected void appendItemInformation(ItemStack stack, @Nullable BlockGetter level, Consumer<Component> info, boolean advanced) {
         String key = EntangledConfig.allowDimensional.get() ?
             EntangledConfig.maxDistance.get() == -1 ? "infinite_other_dimension" : "ranged_other_dimension" :
             EntangledConfig.maxDistance.get() == -1 ? "infinite_same_dimension" : "ranged_same_dimension";
@@ -123,7 +135,7 @@ public class EntangledBlock extends BaseBlock implements EntityHoldingBlock {
         info.accept(TextComponents.translation("entangled.entangled_block.info." + key, maxDistance).color(ChatFormatting.AQUA).get());
 
         CompoundTag tag = stack.getOrCreateTag().getCompound("tileData");
-        if(tag.contains("bound") && tag.getBoolean("bound")){
+        if (tag.contains("bound") && tag.getBoolean("bound")) {
             int x = tag.getInt("boundx"), y = tag.getInt("boundy"), z = tag.getInt("boundz");
             Component dimension = TextComponents.dimension(ResourceKey.create(Registries.DIMENSION, new ResourceLocation(tag.getString("dimension")))).color(ChatFormatting.GOLD).get();
             Component name = TextComponents.blockState(Block.stateById(tag.getInt("blockstate"))).color(ChatFormatting.GOLD).get();
@@ -135,22 +147,28 @@ public class EntangledBlock extends BaseBlock implements EntityHoldingBlock {
     }
 
     @Override
-    public BlockState getStateForPlacement(BlockPlaceContext context){
+    public BlockState getStateForPlacement(BlockPlaceContext context) {
         ItemStack stack = context.getItemInHand();
         CompoundTag compound = stack.getOrCreateTag().getCompound("tileData");
-        if(compound.getBoolean("bound")){
+        if (compound.getBoolean("bound")) {
             ResourceLocation placeDimension = context.getLevel().dimension().location();
             BlockPos placePos = context.getClickedPos();
+
             ResourceLocation targetDimension = new ResourceLocation(compound.getString("dimension"));
             BlockPos targetPos = new BlockPos(compound.getInt("boundx"), compound.getInt("boundy"), compound.getInt("boundz"));
-            if(!canBindTo(placeDimension, placePos, targetDimension, targetPos)){
+            BlockState targetStace = context.getLevel().getBlockState(targetPos);
+            if (!canBindTo(placeDimension, placePos, targetDimension, targetPos, context.getLevel())) {
                 Player player = context.getPlayer();
-                if(player != null){
-                    if(CommonUtils.getLevel(ResourceKey.create(Registries.DIMENSION, targetDimension)) == null)
+                if (player != null) {
+                    if (CommonUtils.getLevel(ResourceKey.create(Registries.DIMENSION, targetDimension)) == null)
                         player.displayClientMessage(TextComponents.translation("entangled.entangled_binder.unknown_dimension", targetDimension).color(ChatFormatting.RED).get(), true);
-                    else if(!placeDimension.equals(targetDimension) && !EntangledConfig.allowDimensional.get())
+                    else if (EntangledConfig.useWhitelist.get() && !EntangledConfig.blacklist.get().contains(targetStace.getBlock()))
+                        player.displayClientMessage(TextComponents.translation("entangled.entangled_block.not_in_whitelist").color(ChatFormatting.RED).get(), true);
+                    else if (!EntangledConfig.useWhitelist.get() && EntangledConfig.blacklist.get().contains(targetStace.getBlock()))
+                        player.displayClientMessage(TextComponents.translation("entangled.entangled_block.not_in_blacklist").color(ChatFormatting.RED).get(), true);
+                    else if (!placeDimension.equals(targetDimension) && !EntangledConfig.allowDimensional.get())
                         player.displayClientMessage(TextComponents.translation("entangled.entangled_block.wrong_dimension").color(ChatFormatting.RED).get(), true);
-                    else if(placePos.equals(targetPos))
+                    else if (placePos.equals(targetPos))
                         player.displayClientMessage(TextComponents.translation("entangled.entangled_block.self").color(ChatFormatting.RED).get(), true);
                     else
                         player.displayClientMessage(TextComponents.translation("entangled.entangled_block.too_far").color(ChatFormatting.RED).get(), true);
@@ -163,31 +181,31 @@ public class EntangledBlock extends BaseBlock implements EntityHoldingBlock {
     }
 
     @Override
-    public boolean hasAnalogOutputSignal(BlockState state){
+    public boolean hasAnalogOutputSignal(BlockState state) {
         return true;
     }
 
     @Override
-    public int getAnalogOutputSignal(BlockState state, Level world, BlockPos pos){
+    public int getAnalogOutputSignal(BlockState state, Level world, BlockPos pos) {
         BlockEntity entity = world.getBlockEntity(pos);
-        return entity instanceof EntangledBlockEntity ? ((EntangledBlockEntity)entity).getAnalogOutputSignal() : 0;
+        return entity instanceof EntangledBlockEntity ? ((EntangledBlockEntity) entity).getAnalogOutputSignal() : 0;
     }
 
     @Override
-    public boolean isSignalSource(BlockState state){
+    public boolean isSignalSource(BlockState state) {
         return true;
     }
 
     @Override
-    public int getSignal(BlockState state, BlockGetter world, BlockPos pos, Direction direction){
+    public int getSignal(BlockState state, BlockGetter world, BlockPos pos, Direction direction) {
         BlockEntity entity = world.getBlockEntity(pos);
-        return entity instanceof EntangledBlockEntity ? ((EntangledBlockEntity)entity).getRedstoneSignal(direction) : 0;
+        return entity instanceof EntangledBlockEntity ? ((EntangledBlockEntity) entity).getRedstoneSignal(direction) : 0;
     }
 
     @Override
-    public int getDirectSignal(BlockState state, BlockGetter world, BlockPos pos, Direction direction){
+    public int getDirectSignal(BlockState state, BlockGetter world, BlockPos pos, Direction direction) {
         BlockEntity entity = world.getBlockEntity(pos);
-        return entity instanceof EntangledBlockEntity ? ((EntangledBlockEntity)entity).getDirectRedstoneSignal(direction) : 0;
+        return entity instanceof EntangledBlockEntity ? ((EntangledBlockEntity) entity).getDirectRedstoneSignal(direction) : 0;
     }
 
     public enum State implements StringRepresentable {
@@ -195,12 +213,12 @@ public class EntangledBlock extends BaseBlock implements EntityHoldingBlock {
         BOUND_VALID,
         BOUND_INVALID;
 
-        public boolean isBound(){
+        public boolean isBound() {
             return this != UNBOUND;
         }
 
         @Override
-        public String getSerializedName(){
+        public String getSerializedName() {
             return this.name().toLowerCase(Locale.ROOT);
         }
     }
