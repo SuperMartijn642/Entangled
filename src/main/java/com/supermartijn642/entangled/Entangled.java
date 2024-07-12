@@ -44,6 +44,8 @@ public class Entangled implements ModInitializer {
         handler.registerBlockEntityTypeCallback(helper -> EntangledBlockApiProviders.register());
         // Entangled binder
         handler.registerItem("item", EntangledBinderItem::new);
+        // Entangled binder target data
+        handler.registerDataComponentType("binder_target", EntangledBinderItem.BINDER_TARGET);
     }
 
     private static void registerGenerators(){
@@ -56,5 +58,6 @@ public class Entangled implements ModInitializer {
         handler.addGenerator(EntangledLootTableGenerator::new);
         handler.addGenerator(EntangledRecipeGenerator::new);
         handler.addGenerator(EntangledTagGenerator::new);
+        handler.addGenerator(EntangledAtlasSourceGenerator::new);
     }
 }

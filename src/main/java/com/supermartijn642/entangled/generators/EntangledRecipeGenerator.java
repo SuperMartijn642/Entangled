@@ -3,7 +3,7 @@ package com.supermartijn642.entangled.generators;
 import com.supermartijn642.core.generator.RecipeGenerator;
 import com.supermartijn642.core.generator.ResourceCache;
 import com.supermartijn642.entangled.Entangled;
-import net.fabricmc.fabric.api.tag.convention.v1.ConventionalItemTags;
+import net.fabricmc.fabric.api.tag.convention.v2.ConventionalItemTags;
 import net.minecraft.world.item.Items;
 
 /**
@@ -24,7 +24,7 @@ public class EntangledRecipeGenerator extends RecipeGenerator {
             .pattern("ABA")
             .input('A', Items.ENDER_PEARL)
             .input('B', Items.OBSIDIAN)
-            .input('C', Items.CHEST)
+            .input('C', ConventionalItemTags.CHESTS)
             .unlockedBy(Items.ENDER_PEARL);
         this.shapeless("entangled_clear_nbt", Entangled.block)
             .input(Entangled.block)
@@ -36,7 +36,7 @@ public class EntangledRecipeGenerator extends RecipeGenerator {
             .pattern(" CA")
             .pattern("C  ")
             .input('A', Items.ENDER_PEARL)
-            .input('B', ConventionalItemTags.DIAMONDS)
+            .input('B', ConventionalItemTags.DIAMOND_GEMS)
             .input('C', Items.OBSIDIAN)
             .unlockedBy(Items.ENDER_PEARL);
     }

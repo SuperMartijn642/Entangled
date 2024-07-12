@@ -1,17 +1,17 @@
-// this.cache.versionId	2024-04-19T23:19:48.4683893	Core Lib Generators
+// this.cache.versionId	2024-07-12T23:37:10.8393527	Core Lib Generators
 304967c3bd2249b12e7a926ed54ac9cf2dcae8ad data\entangled\loot_tables\blocks\block.json
-44109d54ae635f86fd1aa98de23cb927ae7d041c data\entangled\recipes\item.json
+8492eff504dc7d77f965a2b41ef512c677bec5e5 data\entangled\recipes\item.json
 6f92a0e885c6e26f030ecaf3ac244366fc10096c assets\entangled\models\item\block.json
-e2378afa8614be26c1f8d64791e08b3101ce7134 data\entangled\advancements\recipes\misc\block.json
+de80cd678ac674f3260050cd6ee76775325af241 data\entangled\advancements\recipes\misc\block.json
 664cab40e1d9a351f0397c17e06f050a1eba1075 assets\entangled\models\block\unbound.json
 8a23702b05296c8af5014d6aa6e9265ded85c7d9 data\entangled\tags\blocks\invalid_targets.json
 a4757ef9e6a3e8191d9296da402c2d7f37b92611 assets\entangled\lang\en_us.json
-61d322571b594dc4d9b1f5d1951080fb9f9fd4ed data\entangled\tags\block_entity_type\render_blacklist.json
+20aafb362824ec9e7be212a4b687191e22bf8650 data\entangled\tags\block_entity_type\render_blacklist.json
 4d3314d9af89e32440c0624fcd66fff5d392f900 data\minecraft\tags\blocks\mineable\pickaxe.json
-22d28d9dfb70bc146aadee27535f5fab820e3ebb data\entangled\recipes\entangled_clear_nbt.json
-13dca7aaab4760806aaef98a2139800d4d8b52fb data\entangled\recipes\block.json
+94cd535c52d7956c333fbb495b441378668a6e1d data\entangled\recipes\entangled_clear_nbt.json
+9cc9e76c2dde19737637eec6134564d8e869cbe5 data\entangled\recipes\block.json
 769b1c358ac225e266e6c77130bac04f67e53bdb assets\entangled\models\item\item.json
 8a23702b05296c8af5014d6aa6e9265ded85c7d9 data\entangled\tags\blocks\render_blacklist.json
 07b17197274e26d9aa09324ddc2b3171872b86ef assets\entangled\blockstates\block.json
-cf4402f1229c5d5853821bc4e7db15829dee584d assets\minecraft\atlases\blocks.json
-fe2b502274146167a0cd2a38d7a7d7cca925fdf1 data\entangled\advancements\recipes\misc\item.json
+de19abd6f5d7148b13dc4e02d1c694c7bc2950fb assets\minecraft\atlases\blocks.json
+0b4837d55ef49a10b8a40142dbb9b7d3269c71b9 data\entangled\advancements\recipes\misc\item.json

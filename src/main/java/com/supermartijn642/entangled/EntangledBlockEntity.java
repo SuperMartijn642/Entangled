@@ -5,6 +5,7 @@ import com.supermartijn642.core.block.TickableBlockEntity;
 import net.fabricmc.fabric.api.lookup.v1.block.BlockApiLookup;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.core.SectionPos;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
@@ -249,7 +250,7 @@ public class EntangledBlockEntity extends BaseBlockEntity implements TickableBlo
     }
 
     @Override
-    public void load(CompoundTag compound){
+    protected void loadAdditional(CompoundTag compound, HolderLookup.Provider provider){
         if(compound.contains("bound")){ // Saved on an older version
             CompoundTag data = new CompoundTag();
             data.putBoolean("bound", compound.getBoolean("bound"));
@@ -259,7 +260,7 @@ public class EntangledBlockEntity extends BaseBlockEntity implements TickableBlo
             data.putString("dimension", compound.getString("dimension"));
             compound.put("data", data);
         }
-        super.load(compound);
+        super.loadAdditional(compound, provider);
     }
 
     @Override

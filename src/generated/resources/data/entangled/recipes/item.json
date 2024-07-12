@@ -10,13 +10,13 @@
       "item": "minecraft:ender_pearl"
     },
     "B": {
-      "tag": "c:diamonds"
+      "tag": "c:gems/diamond"
     },
     "C": {
       "item": "minecraft:obsidian"
     }
   },
   "result": {
-    "item": "entangled:item"
+    "id": "entangled:item"
   }
 }

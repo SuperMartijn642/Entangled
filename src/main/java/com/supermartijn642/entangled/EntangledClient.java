@@ -1,6 +1,7 @@
 package com.supermartijn642.entangled;
 
 import com.supermartijn642.core.ClientUtils;
+import com.supermartijn642.core.block.BaseBlock;
 import com.supermartijn642.core.registry.ClientRegistrationHandler;
 import com.supermartijn642.core.render.CustomRendererBakedModelWrapper;
 import com.supermartijn642.core.render.RenderUtils;
@@ -47,8 +48,8 @@ public class EntangledClient implements ClientModInitializer {
         ItemStack stack = ClientUtils.getPlayer().getItemInHand(InteractionHand.MAIN_HAND);
         Level world = ClientUtils.getWorld();
 
-        if(stack.getItem() instanceof BlockItem && ((BlockItem)stack.getItem()).getBlock() == Entangled.block && stack.hasTag() && stack.getOrCreateTag().contains("tileData")){
-            CompoundTag compound = stack.getOrCreateTag().getCompound("tileData");
+        if(stack.getItem() instanceof BlockItem && ((BlockItem)stack.getItem()).getBlock() == Entangled.block && stack.get(BaseBlock.TILE_DATA) != null){
+            CompoundTag compound = stack.get(BaseBlock.TILE_DATA);
             if(compound.getBoolean("bound") && compound.getString("dimension").equals(world.dimension().location().toString())){
                 BlockPos pos = new BlockPos(compound.getInt("boundx"), compound.getInt("boundy"), compound.getInt("boundz"));
 
@@ -63,9 +64,9 @@ public class EntangledClient implements ClientModInitializer {
                 e.getPoseStack().popPose();
             }
         }else if(stack.getItem() == Entangled.item){
-            CompoundTag compound = stack.getOrCreateTag();
-            if(compound.getBoolean("bound") && compound.getString("dimension").equals(world.dimension().location().toString())){
-                BlockPos pos = new BlockPos(compound.getInt("boundx"), compound.getInt("boundy"), compound.getInt("boundz"));
+            EntangledBinderItem.BinderTarget target = stack.get(EntangledBinderItem.BINDER_TARGET);
+            if(target != null && target.dimension().equals(world.dimension().location())){
+                BlockPos pos = target.pos();
 
                 e.getPoseStack().pushPose();
                 Vec3 camera = RenderUtils.getCameraPosition();
