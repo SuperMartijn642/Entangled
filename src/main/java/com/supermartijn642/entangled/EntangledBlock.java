@@ -124,7 +124,7 @@ public class EntangledBlock extends BaseBlock implements EntityHoldingBlock {
         CompoundTag tag = stack.get(BaseBlock.TILE_DATA);
         if(tag != null && tag.contains("bound") && tag.getBoolean("bound")){
             int x = tag.getInt("boundx"), y = tag.getInt("boundy"), z = tag.getInt("boundz");
-            Component dimension = TextComponents.dimension(ResourceKey.create(Registries.DIMENSION, new ResourceLocation(tag.getString("dimension")))).color(ChatFormatting.GOLD).get();
+            Component dimension = TextComponents.dimension(ResourceKey.create(Registries.DIMENSION, ResourceLocation.parse(tag.getString("dimension")))).color(ChatFormatting.GOLD).get();
             Component name = TextComponents.blockState(Block.stateById(tag.getInt("blockstate"))).color(ChatFormatting.GOLD).get();
             Component xText = TextComponents.string(Integer.toString(x)).color(ChatFormatting.GOLD).get();
             Component yText = TextComponents.string(Integer.toString(y)).color(ChatFormatting.GOLD).get();
@@ -140,7 +140,7 @@ public class EntangledBlock extends BaseBlock implements EntityHoldingBlock {
         if(compound != null && compound.getBoolean("bound")){
             ResourceLocation placeDimension = context.getLevel().dimension().location();
             BlockPos placePos = context.getClickedPos();
-            ResourceLocation targetDimension = new ResourceLocation(compound.getString("dimension"));
+            ResourceLocation targetDimension = ResourceLocation.parse(compound.getString("dimension"));
             BlockPos targetPos = new BlockPos(compound.getInt("boundx"), compound.getInt("boundy"), compound.getInt("boundz"));
             if(!canBindTo(placeDimension, placePos, targetDimension, targetPos)){
                 Player player = context.getPlayer();

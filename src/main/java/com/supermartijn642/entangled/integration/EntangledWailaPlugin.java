@@ -20,7 +20,7 @@ public class EntangledWailaPlugin implements IBlockComponentProvider, IWailaPlug
 
     @Override
     public ResourceLocation getUid(){
-        return new ResourceLocation("entangled", "entangled_block_component");
+        return ResourceLocation.fromNamespaceAndPath("entangled", "entangled_block_component");
     }
 
     @Override

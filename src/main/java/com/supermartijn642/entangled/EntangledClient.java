@@ -95,9 +95,9 @@ public class EntangledClient implements ClientModInitializer {
             renderContext.matrixStack().translate(-camera.x, -camera.y, -camera.z);
             renderContext.matrixStack().translate(pos.getX(), pos.getY(), pos.getZ());
 
-            RenderUtils.renderShape(renderContext.matrixStack(), world.getBlockState(pos).getOcclusionShape(world, pos), 86 / 255f, 0 / 255f, 156 / 255f, false);
-            RenderUtils.renderShapeSides(renderContext.matrixStack(), world.getBlockState(pos).getOcclusionShape(world, pos), 86 / 255f, 0 / 255f, 156 / 255f, 30 / 255f, false);
-
+//            RenderUtils.renderShape(renderContext.matrixStack(), world.getBlockState(pos).getOcclusionShape(world, pos), 86 / 255f, 0 / 255f, 156 / 255f, false);
+//            RenderUtils.renderShapeSides(renderContext.matrixStack(), world.getBlockState(pos).getOcclusionShape(world, pos), 86 / 255f, 0 / 255f, 156 / 255f, 30 / 255f, false);
+// TODO
             renderContext.matrixStack().popPose();
         }
 

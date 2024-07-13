@@ -1,17 +1,17 @@
-// this.cache.versionId	2024-07-12T23:37:10.8393527	Core Lib Generators
-304967c3bd2249b12e7a926ed54ac9cf2dcae8ad data\entangled\loot_tables\blocks\block.json
-8492eff504dc7d77f965a2b41ef512c677bec5e5 data\entangled\recipes\item.json
+// this.cache.versionId	2024-07-13T19:37:43.3015755	Core Lib Generators
+8492eff504dc7d77f965a2b41ef512c677bec5e5 data\entangled\recipe\item.json
+4d3314d9af89e32440c0624fcd66fff5d392f900 data\minecraft\tags\block\mineable\pickaxe.json
+9cc9e76c2dde19737637eec6134564d8e869cbe5 data\entangled\recipe\block.json
+94cd535c52d7956c333fbb495b441378668a6e1d data\entangled\recipe\entangled_clear_nbt.json
 6f92a0e885c6e26f030ecaf3ac244366fc10096c assets\entangled\models\item\block.json
-de80cd678ac674f3260050cd6ee76775325af241 data\entangled\advancements\recipes\misc\block.json
+de80cd678ac674f3260050cd6ee76775325af241 data\entangled\advancement\recipes\misc\block.json
+8a23702b05296c8af5014d6aa6e9265ded85c7d9 data\entangled\tags\block\invalid_targets.json
 664cab40e1d9a351f0397c17e06f050a1eba1075 assets\entangled\models\block\unbound.json
-8a23702b05296c8af5014d6aa6e9265ded85c7d9 data\entangled\tags\blocks\invalid_targets.json
+0b4837d55ef49a10b8a40142dbb9b7d3269c71b9 data\entangled\advancement\recipes\misc\item.json
 a4757ef9e6a3e8191d9296da402c2d7f37b92611 assets\entangled\lang\en_us.json
 20aafb362824ec9e7be212a4b687191e22bf8650 data\entangled\tags\block_entity_type\render_blacklist.json
-4d3314d9af89e32440c0624fcd66fff5d392f900 data\minecraft\tags\blocks\mineable\pickaxe.json
-94cd535c52d7956c333fbb495b441378668a6e1d data\entangled\recipes\entangled_clear_nbt.json
-9cc9e76c2dde19737637eec6134564d8e869cbe5 data\entangled\recipes\block.json
+8a23702b05296c8af5014d6aa6e9265ded85c7d9 data\entangled\tags\block\render_blacklist.json
 769b1c358ac225e266e6c77130bac04f67e53bdb assets\entangled\models\item\item.json
-8a23702b05296c8af5014d6aa6e9265ded85c7d9 data\entangled\tags\blocks\render_blacklist.json
+304967c3bd2249b12e7a926ed54ac9cf2dcae8ad data\entangled\loot_table\blocks\block.json
 07b17197274e26d9aa09324ddc2b3171872b86ef assets\entangled\blockstates\block.json
 de19abd6f5d7148b13dc4e02d1c694c7bc2950fb assets\minecraft\atlases\blocks.json
-0b4837d55ef49a10b8a40142dbb9b7d3269c71b9 data\entangled\advancements\recipes\misc\item.json
