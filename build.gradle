@@ -95,12 +95,27 @@ minecraft {
         }
 
         data {
-            //noinspection GroovyAssignabilityCheck
-            parent runs.client
             args "--mod", mod_id
             args "--all"
             args "--output", file("src/generated/resources/")
             args "--existing", layout.buildDirectory.file("/data_resources").map { it.asFile }.get()
+        }
+    }
+}
+
+// Rename the IntelliJ run configs
+gradle.taskGraph.whenReady {
+    tasks.genIntellijRuns.doLast {
+        def configDir = it.getRunConfigurationsFolder().get().getAsFile()
+        minecraft.runs.each {
+            //noinspection GroovyAssignabilityCheck
+            def configFile = new File(configDir, it.getUniqueFileName() + ".xml")
+            if(configFile.exists()){
+                def xml = new groovy.xml.XmlSlurper().parse(configFile)
+                //noinspection GrUnresolvedAccess
+                xml.configuration.@name = "Forge " + it.name.capitalize()
+                configFile.withWriter { groovy.xml.XmlUtil.serialize(xml, it) }
+            }
         }
     }
 }
