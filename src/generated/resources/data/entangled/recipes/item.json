@@ -7,16 +7,16 @@
   ],
   "key": {
     "A": {
-      "tag": "forge:ender_pearls"
+      "tag": "c:ender_pearls"
     },
     "B": {
-      "tag": "forge:gems/diamond"
+      "tag": "c:gems/diamond"
     },
     "C": {
-      "tag": "forge:obsidian"
+      "tag": "c:obsidians"
     }
   },
   "result": {
-    "item": "entangled:item"
+    "id": "entangled:item"
   }
 }

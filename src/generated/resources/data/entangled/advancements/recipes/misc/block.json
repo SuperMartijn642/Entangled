@@ -2,7 +2,7 @@
   "parent": "minecraft:recipes/root",
   "display": {
     "icon": {
-      "item": "entangled:block"
+      "id": "entangled:block"
     },
     "title": {
       "translate": "entangled.advancement.recipes/misc/block.title"
@@ -27,7 +27,7 @@
       "conditions": {
         "items": [
           {
-            "tag": "forge:ender_pearls"
+            "items": "#c:ender_pearls"
           }
         ]
       }

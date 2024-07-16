@@ -47,6 +47,8 @@ public class Entangled {
         handler.registerBlockEntityTypeCallback(helper -> EntangledBlockApiProviders.register());
         // Entangled binder
         handler.registerItem("item", EntangledBinderItem::new);
+        // Entangled binder target data
+        handler.registerDataComponentType("binder_target", EntangledBinderItem.BINDER_TARGET);
     }
 
     private static void registerGenerators(){

@@ -31,7 +31,6 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.Locale;
 import java.util.function.Consumer;
@@ -115,15 +114,15 @@ public class EntangledBlock extends BaseBlock implements EntityHoldingBlock {
     }
 
     @Override
-    protected void appendItemInformation(ItemStack stack, @Nullable BlockGetter level, Consumer<Component> info, boolean advanced){
+    protected void appendItemInformation(ItemStack stack, Consumer<Component> info, boolean advanced){
         String key = EntangledConfig.allowDimensional.get() ?
             EntangledConfig.maxDistance.get() == -1 ? "infinite_other_dimension" : "ranged_other_dimension" :
             EntangledConfig.maxDistance.get() == -1 ? "infinite_same_dimension" : "ranged_same_dimension";
         Component maxDistance = TextComponents.string(Integer.toString(EntangledConfig.maxDistance.get())).color(ChatFormatting.GOLD).get();
         info.accept(TextComponents.translation("entangled.entangled_block.info." + key, maxDistance).color(ChatFormatting.AQUA).get());
 
-        CompoundTag tag = stack.getOrCreateTag().getCompound("tileData");
-        if(tag.contains("bound") && tag.getBoolean("bound")){
+        CompoundTag tag = stack.get(BaseBlock.TILE_DATA);
+        if(tag != null && tag.contains("bound") && tag.getBoolean("bound")){
             int x = tag.getInt("boundx"), y = tag.getInt("boundy"), z = tag.getInt("boundz");
             Component dimension = TextComponents.dimension(ResourceKey.create(Registries.DIMENSION, new ResourceLocation(tag.getString("dimension")))).color(ChatFormatting.GOLD).get();
             Component name = TextComponents.blockState(Block.stateById(tag.getInt("blockstate"))).color(ChatFormatting.GOLD).get();
@@ -137,8 +136,8 @@ public class EntangledBlock extends BaseBlock implements EntityHoldingBlock {
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext context){
         ItemStack stack = context.getItemInHand();
-        CompoundTag compound = stack.getOrCreateTag().getCompound("tileData");
-        if(compound.getBoolean("bound")){
+        CompoundTag compound = stack.get(BaseBlock.TILE_DATA);
+        if(compound != null && compound.getBoolean("bound")){
             ResourceLocation placeDimension = context.getLevel().dimension().location();
             BlockPos placePos = context.getClickedPos();
             ResourceLocation targetDimension = new ResourceLocation(compound.getString("dimension"));
