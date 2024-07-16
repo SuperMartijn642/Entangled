@@ -103,9 +103,7 @@ minecraft {
         server {
         }
 
-        datagen {
-            //noinspection GroovyAssignabilityCheck
-            parent runs.client
+        data {
             args "--mod", mod_id
             args "--all"
             args "--output", file("src/generated/resources/")
