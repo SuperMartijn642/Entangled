@@ -27,8 +27,8 @@ import java.util.Set;
  */
 public class EntangledBlockEntityRenderer implements CustomBlockEntityRenderer<EntangledBlockEntity> {
 
-    public static final TagKey<Block> BLACKLISTED_BLOCKS = TagKey.create(net.minecraft.core.registries.Registries.BLOCK, new ResourceLocation("entangled", "render_blacklist"));
-    public static final TagKey<BlockEntityType<?>> BLACKLISTED_ENTITIES = TagKey.create(net.minecraft.core.registries.Registries.BLOCK_ENTITY_TYPE, new ResourceLocation("entangled", "render_blacklist"));
+    public static final TagKey<Block> BLACKLISTED_BLOCKS = TagKey.create(net.minecraft.core.registries.Registries.BLOCK, ResourceLocation.fromNamespaceAndPath("entangled", "render_blacklist"));
+    public static final TagKey<BlockEntityType<?>> BLACKLISTED_ENTITIES = TagKey.create(net.minecraft.core.registries.Registries.BLOCK_ENTITY_TYPE, ResourceLocation.fromNamespaceAndPath("entangled", "render_blacklist"));
     private static final Set<BlockEntityType<?>> ERRORED_BLOCK_ENTITIES = Collections.synchronizedSet(new HashSet<>());
     private static final Set<BlockState> ERRORED_BLOCK_STATES = Collections.synchronizedSet(new HashSet<>());
 

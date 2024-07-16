@@ -36,7 +36,7 @@ public class TheOneProbePlugin {
 
         @Override
         public ResourceLocation getID(){
-            return new ResourceLocation("entangled", "entangled_block");
+            return ResourceLocation.fromNamespaceAndPath("entangled", "entangled_block");
         }
 
         @Override

@@ -2,11 +2,11 @@
   "replace": false,
   "values": [
     {
-      "id": "tconstruct:smeltery",
+      "id": "tconstruct:foundry",
       "required": false
     },
     {
-      "id": "tconstruct:foundry",
+      "id": "tconstruct:smeltery",
       "required": false
     }
   ]

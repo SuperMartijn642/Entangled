@@ -29,7 +29,7 @@ import javax.annotation.Nullable;
  */
 public class EntangledBlockEntity extends BaseBlockEntity implements TickableBlockEntity {
 
-    public static final TagKey<Block> BLACKLISTED_BLOCKS = TagKey.create(Registries.BLOCK, new ResourceLocation("entangled", "invalid_targets"));
+    public static final TagKey<Block> BLACKLISTED_BLOCKS = TagKey.create(Registries.BLOCK, ResourceLocation.fromNamespaceAndPath("entangled", "invalid_targets"));
 
     /**
      * Whether the block is bound to a position
@@ -310,7 +310,7 @@ public class EntangledBlockEntity extends BaseBlockEntity implements TickableBlo
             this.valid = !compound.contains("valid", Tag.TAG_BYTE) || compound.getBoolean("valid");
             this.revalidate = true;
             this.boundPos = new BlockPos(compound.getInt("boundx"), compound.getInt("boundy"), compound.getInt("boundz"));
-            this.boundDimension = ResourceKey.create(Registries.DIMENSION, new ResourceLocation(compound.getString("dimension")));
+            this.boundDimension = ResourceKey.create(Registries.DIMENSION, ResourceLocation.parse(compound.getString("dimension")));
             this.boundBlockState = Block.stateById(compound.getInt("blockstate"));
             for(Direction direction : Direction.values()){
                 int index = direction.get3DDataValue();
