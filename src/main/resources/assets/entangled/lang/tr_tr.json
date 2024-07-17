@@ -1,0 +1,30 @@
+{
+  "entangled.block.block": "Dolanmış Blok",
+  
+  "entangled.item.item": "Dolanmış Bağlayıcı",
+  
+  "entangled.entangled_block.info.ranged_same_dimension": "Aynı boyuttaki bloklara %d blok uzaklığa kadar bağlanabilir",
+  "entangled.entangled_block.info.infinite_same_dimension": "Aynı boyuttaki bloklara bağlanabilir",
+  "entangled.entangled_block.info.ranged_other_dimension": "En fazla %d blok uzaklıktaki bloklara veya diğer boyutlardaki bloklara bağlanabilir",
+  "entangled.entangled_block.info.infinite_other_dimension": "Diğer bloklara bağlanabilir",
+  "entangled.entangled_block.info.bound": "(%2$d, %3$d, %4$d) konumunda %5$s içinde %1$s 'ye bağlandı",
+  "entangled.entangled_block.unbind": "Blok bağlanmamış!",
+  "entangled.entangled_block.no_selection": "Blok seçilmedi!",
+  "entangled.entangled_block.self": "Bir bloğu kendine bağlayamazsın!",
+  "entangled.entangled_block.bind": "Blok bağlandı!",
+  "entangled.entangled_block.wrong_dimension": "Hedeflenen blok aynı boyutta olmalıdır!",
+  "entangled.entangled_block.too_far": "Hedeflenen blok çok uzakta!",
+  "entangled.entangled_binder.info": "Dolanmış bloklar, diğer bloklara bağlanabilir",
+  "entangled.entangled_binder.info.target.unknown": "(%1$d, %2$d, %3$d) konumunda %4$s içindeki bir bloğa bağlı",
+  "entangled.entangled_binder.info.target.known": "(%2$d, %3$d, %4$d) konumunda %5$s içindeki %1$s ile bağlantılı",
+  "entangled.entangled_binder.select": "Blok seçildi!",
+  "entangled.entangled_binder.clear": "Bağlantı temizlendi!",
+  "entangled.entangled_binder.unknown_dimension": "Bağlayıcı bilinmeyen boyuta bağlı '%s'!",
+  
+  "entangled.waila.bound_same_dimension": "(%2$d, %3$d, %4$d) konumunda %1$s 'ye bağlandı",
+  "entangled.waila.bound_other_dimension": "(%2$d, %3$d, %4$d) konumunda %5$s içinde %1$s'ye bağlandı",
+  "entangled.waila.unbound": "Bağlanmamış",
+  "entangled.waila.invalid_block": "Geçersiz blok '%s'!",
+  
+  "config.jade.plugin_entangled.entangled_block_component": "Dolanmış Blok"
+}
