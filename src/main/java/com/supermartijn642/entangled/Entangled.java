@@ -9,11 +9,9 @@ import com.supermartijn642.core.registry.GeneratorRegistrationHandler;
 import com.supermartijn642.core.registry.RegistrationHandler;
 import com.supermartijn642.core.registry.RegistryEntryAcceptor;
 import com.supermartijn642.entangled.generators.*;
-import com.supermartijn642.entangled.integration.TheOneProbePlugin;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.slf4j.Logger;
 
 @Mod("entangled")
@@ -29,8 +27,6 @@ public class Entangled {
     public static EntangledBinderItem item;
 
     public Entangled(){
-        FMLJavaModLoadingContext.get().getModEventBus().addListener(TheOneProbePlugin::interModEnqueue);
-
         register();
         DistExecutor.safeRunWhenOn(Dist.CLIENT, () -> EntangledClient::register);
         registerGenerators();
@@ -46,6 +42,8 @@ public class Entangled {
         handler.registerBlockEntityType("tile", () -> BaseBlockEntityType.create(EntangledBlockEntity::new, block));
         // Entangled binder
         handler.registerItem("item", EntangledBinderItem::new);
+        // Entangled binder target data
+        handler.registerDataComponentType("binder_target", EntangledBinderItem.BINDER_TARGET);
     }
 
     private static void registerGenerators(){
