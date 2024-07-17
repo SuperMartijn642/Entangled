@@ -14,6 +14,6 @@ public class EntangledAtlasSourceGenerator extends AtlasSourceGenerator {
 
     @Override
     public void generate(){
-        this.blockAtlas().texture("blocks/warning");
+        this.blockAtlas().texturesFromModel("block/bound_invalid");
     }
 }
