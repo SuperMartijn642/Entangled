@@ -100,7 +100,7 @@ public class EntangledBinderItem extends BaseItem {
             NBTTagCompound tag = stack.getTagCompound();
             int x = tag.getInteger("boundx"), y = tag.getInteger("boundy"), z = tag.getInteger("boundz");
             ITextComponent dimension = DimensionManager.isDimensionRegistered(tag.getInteger("dimension")) ?
-                TextComponents.dimension(DimensionManager.getProvider(tag.getInteger("dimension")).getDimensionType()).color(TextFormatting.GOLD).get() :
+                TextComponents.dimension(DimensionManager.getProviderType(tag.getInteger("dimension"))).color(TextFormatting.GOLD).get() :
                 TextComponents.number(tag.getInteger("dimension")).color(TextFormatting.RED).get();
             ITextComponent xText = TextComponents.string(Integer.toString(x)).color(TextFormatting.GOLD).get();
             ITextComponent yText = TextComponents.string(Integer.toString(y)).color(TextFormatting.GOLD).get();
