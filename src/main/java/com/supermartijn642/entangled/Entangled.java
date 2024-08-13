@@ -30,6 +30,7 @@ public class Entangled {
         register();
         DistExecutor.safeRunWhenOn(Dist.CLIENT, () -> EntangledClient::register);
         registerGenerators();
+        EntangledConfig.init();
     }
 
     private static void register(){
