@@ -30,6 +30,7 @@ public class Entangled implements ModInitializer {
     public void onInitialize(){
         register();
         registerGenerators();
+        EntangledConfig.init();
     }
 
     private static void register(){
