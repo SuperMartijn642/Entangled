@@ -38,4 +38,8 @@ public class EntangledConfig {
         builder.pop();
         builder.build();
     }
+
+    public static void init(){
+        // Cause this class to be loaded
+    }
 }
