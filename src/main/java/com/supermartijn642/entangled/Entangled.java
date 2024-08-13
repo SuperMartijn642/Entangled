@@ -33,6 +33,7 @@ public class Entangled {
         if(CommonUtils.getEnvironmentSide().isClient())
             EntangledClient.register();
         registerGenerators();
+        EntangledConfig.init();
     }
 
     private static void register(){
