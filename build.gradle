@@ -84,15 +84,15 @@ runs {
     }
 
     server {
-        programArgument "-nogui"
+        argument "-nogui"
     }
 
     data {
         //noinspection GroovyAssignabilityCheck
-        programArguments "--mod", mod_id
-        programArguments "--all"
-        programArguments "--output", file("src/generated/resources/").getAbsolutePath()
-        programArguments "--existing", file("src/main/resources").getAbsolutePath()
+        arguments "--mod", mod_id
+        arguments "--all"
+        arguments "--output", file("src/generated/resources/").getAbsolutePath()
+        arguments "--existing", file("src/main/resources").getAbsolutePath()
     }
 }
 
