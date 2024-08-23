@@ -37,7 +37,7 @@ public class EntangledConfig {
             .comment("What is the max range in which entangled blocks can be bound? Only affects blocks in the same dimension. -1 for infinite range. Previously bound entangled blocks won't be affected.")
             .define("maxDistance", -1, -1, Integer.MAX_VALUE);
         useWhitelist = builder
-            .comment("Whether to use whitelist, if true, use invalid_targets block tag as whitelist.")
+            .comment("Should the `entangled:invalid_targets` tag be treated as a whitelist rather than a blacklist? If true, entangled blocks can only be bound to blocks in the tag.")
             .define("useWhitelist", false);
         builder.pop();
         builder.build();
