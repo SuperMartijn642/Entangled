@@ -72,6 +72,10 @@ public class EntangledBlockEntity extends BaseBlockEntity implements TickableBlo
                 public boolean onInvalidate(){
                     if(this != EntangledBlockEntity.this.capabilityListener)
                         return false;
+                    if(EntangledBlockEntity.this.remove){
+                        EntangledBlockEntity.this.capabilityListener = null;
+                        return false;
+                    }
                     EntangledBlockEntity.this.invalidateCapabilities();
                     return true;
                 }
