@@ -1,3 +1,11 @@
+### Entangled 1.3.19
+- Added a config option to allow whitelisting blocks rather than blacklisting
+- Added Russian translations (thanks to EnderDrag0n!)
+- Added Turkish translations (thanks to RuyaSavascisi!)
+- Updated Simplified Chinese translations (thanks to UraraChiya!)
+- Fixed crash when generating tooltip for entangled binder bound to a custom dimension
+- Fixed The One Probe integration showing translation keys when on a dedicated server
+
 ### Entangled 1.3.18a
 - Fixed crash when generating tooltip for entangled binder bound to a custom dimension
 
