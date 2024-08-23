@@ -121,7 +121,7 @@ public class EntangledBlockEntity extends BaseBlockEntity implements TickableBlo
     }
 
     private boolean isValidBlock(BlockState state){
-        return !state.is(BLACKLISTED_BLOCKS);
+        return EntangledConfig.useWhitelist.get() == state.is(BLACKLISTED_BLOCKS);
     }
 
     public boolean isBound(){
