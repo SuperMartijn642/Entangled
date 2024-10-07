@@ -172,7 +172,7 @@ public class EntangledBlockEntity extends BaseBlockEntity implements TickableBlo
                 this.updateBoundBlockData(false);
             if(this.boundBlockEntity != null && !this.boundBlockEntity.isRemoved()){
                 this.callDepth++;
-                A value = this.level.getCapability(capability, this.boundPos, this.boundBlockState, this.boundBlockEntity, context);
+                A value = this.getBoundDimension().getCapability(capability, this.boundPos, this.boundBlockState, this.boundBlockEntity, context);
                 this.callDepth--;
                 return value;
             }
