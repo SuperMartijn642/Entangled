@@ -1,3 +1,6 @@
+### Entangled 1.3.19a
+- Fixed entangled block querying capabilities from its dimension, rather than the bound block's dimension
+
 ### Entangled 1.3.19
 - Added a config option to allow whitelisting blocks rather than blacklisting
 - Added Russian translations (thanks to EnderDrag0n!)
