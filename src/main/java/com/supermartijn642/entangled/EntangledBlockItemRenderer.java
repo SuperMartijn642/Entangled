@@ -48,8 +48,8 @@ public class EntangledBlockItemRenderer extends BlockEntityCustomItemRenderer<En
     private static void renderItemModel(ItemStack itemStack, PoseStack poseStack, MultiBufferSource renderTypeBuffer, int combinedLight, int combinedOverlay, BakedModel model){
         ItemRenderer renderer = ClientUtils.getMinecraft().getItemRenderer();
 
-        RenderType renderType = ItemBlockRenderTypes.getRenderType(itemStack, true);
-        VertexConsumer vertexConsumer = ItemRenderer.getFoilBufferDirect(renderTypeBuffer, renderType, true, itemStack.hasFoil());
+        RenderType renderType = ItemBlockRenderTypes.getRenderType(itemStack);
+        VertexConsumer vertexConsumer = ItemRenderer.getFoilBuffer(renderTypeBuffer, renderType, true, itemStack.hasFoil());
         renderer.renderModelLists(model, itemStack, combinedLight, combinedOverlay, poseStack, vertexConsumer);
     }
 }

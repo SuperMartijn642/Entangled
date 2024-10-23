@@ -43,7 +43,7 @@ public class EntangledBlockEntityRenderer implements CustomBlockEntityRenderer<E
         BlockState boundState = entity.getBoundBlockState();
 
         boolean renderTile = boundTile != null
-            && !BuiltInRegistries.BLOCK_ENTITY_TYPE.getTag(BLACKLISTED_ENTITIES).map(tag -> tag.contains(BuiltInRegistries.BLOCK_ENTITY_TYPE.getHolder(ResourceKey.create(net.minecraft.core.registries.Registries.BLOCK_ENTITY_TYPE, BuiltInRegistries.BLOCK_ENTITY_TYPE.getKey(boundTile.getType()))).orElseThrow())).orElse(false) // Dude who the fuck makes this garbage system, I just want to check if something's in a tag
+            && !BuiltInRegistries.BLOCK_ENTITY_TYPE.get(BLACKLISTED_ENTITIES).map(tag -> tag.contains(BuiltInRegistries.BLOCK_ENTITY_TYPE.get(ResourceKey.create(net.minecraft.core.registries.Registries.BLOCK_ENTITY_TYPE, BuiltInRegistries.BLOCK_ENTITY_TYPE.getKey(boundTile.getType()))).orElseThrow())).orElse(false) // Dude who the fuck makes this garbage system, I just want to check if something's in a tag
             && !ERRORED_BLOCK_ENTITIES.contains(boundTile.getType());
         boolean renderBlock = boundState != null && boundState.getRenderShape() == RenderShape.MODEL
             && !boundState.is(BLACKLISTED_BLOCKS)
@@ -52,7 +52,7 @@ public class EntangledBlockEntityRenderer implements CustomBlockEntityRenderer<E
         // get the bounding box
         AABB bounds = new AABB(0, 0, 0, 1, 1, 1);
         if(renderBlock && entity.getLevel().dimension() == entity.getBoundDimensionIdentifier()){
-            VoxelShape shape = boundState.getOcclusionShape(entity.getLevel(), entity.getBoundBlockPos());
+            VoxelShape shape = boundState.getOcclusionShape();
             if(!shape.isEmpty())
                 bounds = shape.bounds();
         }
