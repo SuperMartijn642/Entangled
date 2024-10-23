@@ -6,15 +6,9 @@
     "C  "
   ],
   "key": {
-    "A": {
-      "tag": "c:ender_pearls"
-    },
-    "B": {
-      "tag": "c:gems/diamond"
-    },
-    "C": {
-      "tag": "c:obsidians"
-    }
+    "A": "#c:ender_pearls",
+    "B": "#c:gems/diamond",
+    "C": "#c:obsidians"
   },
   "result": {
     "id": "entangled:item"

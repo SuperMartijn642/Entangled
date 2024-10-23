@@ -1,4 +1,4 @@
-// 1.21	2024-07-16T17:36:17.0848827	Core Lib Generators
+// 1.21.3	2024-10-23T20:40:58.6238475	Core Lib Generators
 07b17197274e26d9aa09324ddc2b3171872b86ef assets/entangled/blockstates/block.json
 a4757ef9e6a3e8191d9296da402c2d7f37b92611 assets/entangled/lang/en_us.json
 664cab40e1d9a351f0397c17e06f050a1eba1075 assets/entangled/models/block/unbound.json
@@ -8,9 +8,9 @@ a4757ef9e6a3e8191d9296da402c2d7f37b92611 assets/entangled/lang/en_us.json
 e35b5df7457a223b2d52e444f983e57f14e186ff data/entangled/advancement/recipes/misc/block.json
 8dee58d9194d3677a4e4997aefdf837aaa14a371 data/entangled/advancement/recipes/misc/item.json
 304967c3bd2249b12e7a926ed54ac9cf2dcae8ad data/entangled/loot_table/blocks/block.json
-f10e196a59e5a0da4c58698e958662e19acdf4c4 data/entangled/recipe/block.json
-94cd535c52d7956c333fbb495b441378668a6e1d data/entangled/recipe/entangled_clear_nbt.json
-915ffcfeef107ef40b5a897a88a9ab38ce679f49 data/entangled/recipe/item.json
+c38cda04b4b15cf020534bb67febab9d4127c31e data/entangled/recipe/block.json
+eae7e6e7939b641d8b80a72cc49cf6147dbd2d54 data/entangled/recipe/entangled_clear_nbt.json
+d7f146d9ed8c23a99b19fb7a3cb3f50dc1cf6f6c data/entangled/recipe/item.json
 8a23702b05296c8af5014d6aa6e9265ded85c7d9 data/entangled/tags/block/invalid_targets.json
 8a23702b05296c8af5014d6aa6e9265ded85c7d9 data/entangled/tags/block/render_blacklist.json
 61d322571b594dc4d9b1f5d1951080fb9f9fd4ed data/entangled/tags/block_entity_type/render_blacklist.json
