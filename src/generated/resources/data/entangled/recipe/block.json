@@ -6,15 +6,9 @@
     "ABA"
   ],
   "key": {
-    "A": {
-      "item": "minecraft:ender_pearl"
-    },
-    "B": {
-      "item": "minecraft:obsidian"
-    },
-    "C": {
-      "tag": "c:chests"
-    }
+    "A": "minecraft:ender_pearl",
+    "B": "minecraft:obsidian",
+    "C": "#c:chests"
   },
   "result": {
     "id": "entangled:block"

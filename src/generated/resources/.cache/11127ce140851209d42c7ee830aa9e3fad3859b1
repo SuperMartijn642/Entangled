@@ -1,8 +1,8 @@
-// this.cache.versionId	2024-07-13T19:37:43.3015755	Core Lib Generators
-8492eff504dc7d77f965a2b41ef512c677bec5e5 data\entangled\recipe\item.json
+// this.cache.versionId	2024-10-23T17:29:47.7056119	Core Lib Generators
+396ec909ccfd379c037360a342c174b95bb81190 data\entangled\recipe\item.json
 4d3314d9af89e32440c0624fcd66fff5d392f900 data\minecraft\tags\block\mineable\pickaxe.json
-9cc9e76c2dde19737637eec6134564d8e869cbe5 data\entangled\recipe\block.json
-94cd535c52d7956c333fbb495b441378668a6e1d data\entangled\recipe\entangled_clear_nbt.json
+6e1ac723a0c61631d7c8484fb057a499d45fbae4 data\entangled\recipe\block.json
+eae7e6e7939b641d8b80a72cc49cf6147dbd2d54 data\entangled\recipe\entangled_clear_nbt.json
 6f92a0e885c6e26f030ecaf3ac244366fc10096c assets\entangled\models\item\block.json
 de80cd678ac674f3260050cd6ee76775325af241 data\entangled\advancement\recipes\misc\block.json
 8a23702b05296c8af5014d6aa6e9265ded85c7d9 data\entangled\tags\block\invalid_targets.json

@@ -1,9 +1,7 @@
 {
   "type": "minecraft:crafting_shapeless",
   "ingredients": [
-    {
-      "item": "entangled:block"
-    }
+    "entangled:block"
   ],
   "result": {
     "id": "entangled:block"
