@@ -49,7 +49,7 @@ public class EntangledBlockItemRenderer extends BlockEntityCustomItemRenderer<En
 
         for(BakedModel passModel : model.getRenderPasses(itemStack, true)){
             for(RenderType renderType : passModel.getRenderTypes(itemStack, true)){
-                VertexConsumer vertexConsumer = ItemRenderer.getFoilBufferDirect(renderTypeBuffer, renderType, true, itemStack.hasFoil());
+                VertexConsumer vertexConsumer = ItemRenderer.getFoilBuffer(renderTypeBuffer, renderType, true, itemStack.hasFoil());
                 renderer.renderModelLists(passModel, itemStack, combinedLight, combinedOverlay, poseStack, vertexConsumer);
             }
         }

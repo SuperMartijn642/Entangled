@@ -51,7 +51,7 @@ public class EntangledBlockEntityRenderer implements CustomBlockEntityRenderer<E
         // get the bounding box
         AABB bounds = new AABB(0, 0, 0, 1, 1, 1);
         if(renderBlock && entity.getLevel().dimension() == entity.getBoundDimensionIdentifier()){
-            VoxelShape shape = boundState.getOcclusionShape(entity.getLevel(), entity.getBoundBlockPos());
+            VoxelShape shape = boundState.getOcclusionShape();
             if(!shape.isEmpty())
                 bounds = shape.bounds();
         }

@@ -6,15 +6,9 @@
     "ABA"
   ],
   "key": {
-    "A": {
-      "tag": "forge:ender_pearls"
-    },
-    "B": {
-      "tag": "forge:obsidian"
-    },
-    "C": {
-      "tag": "forge:chests/wooden"
-    }
+    "A": "#c:ender_pearls",
+    "B": "#c:obsidians",
+    "C": "#c:chests/wooden"
   },
   "result": {
     "id": "entangled:block"

@@ -22,7 +22,7 @@ public class EntangledRecipeGenerator extends RecipeGenerator {
             .pattern("BCB")
             .pattern("ABA")
             .input('A', Tags.Items.ENDER_PEARLS)
-            .input('B', Tags.Items.OBSIDIAN)
+            .input('B', Tags.Items.OBSIDIANS)
             .input('C', Tags.Items.CHESTS_WOODEN)
             .unlockedBy(Tags.Items.ENDER_PEARLS);
         this.shapeless("entangled_clear_nbt", Entangled.block)
@@ -36,7 +36,7 @@ public class EntangledRecipeGenerator extends RecipeGenerator {
             .pattern("C  ")
             .input('A', Tags.Items.ENDER_PEARLS)
             .input('B', Tags.Items.GEMS_DIAMOND)
-            .input('C', Tags.Items.OBSIDIAN)
+            .input('C', Tags.Items.OBSIDIANS)
             .unlockedBy(Tags.Items.ENDER_PEARLS);
     }
 }
