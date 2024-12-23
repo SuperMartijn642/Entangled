@@ -18,8 +18,6 @@ public class EntangledModelGenerator extends ModelGenerator {
     public void generate(){
         // Entangled Block
         this.cubeAll("block/unbound", ResourceLocation.fromNamespaceAndPath("entangled", "blocks/side"));
-        this.model("item/block").parent("block/unbound");
-
         // Entangled Binder
         this.itemHandheld(Entangled.item, ResourceLocation.fromNamespaceAndPath("entangled", "items/binder"));
     }
