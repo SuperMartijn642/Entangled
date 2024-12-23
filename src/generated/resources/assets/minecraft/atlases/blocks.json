@@ -6,11 +6,11 @@
     },
     {
       "type": "minecraft:single",
-      "resource": "entangled:blocks/warning"
+      "resource": "entangled:items/binder"
     },
     {
       "type": "minecraft:single",
-      "resource": "entangled:items/binder"
+      "resource": "entangled:blocks/warning"
     }
   ]
 }

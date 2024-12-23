@@ -3,7 +3,6 @@ package com.supermartijn642.entangled;
 import com.supermartijn642.core.ClientUtils;
 import com.supermartijn642.core.block.BaseBlock;
 import com.supermartijn642.core.registry.ClientRegistrationHandler;
-import com.supermartijn642.core.render.CustomRendererBakedModelWrapper;
 import com.supermartijn642.core.render.RenderUtils;
 import com.supermartijn642.core.render.RenderWorldEvent;
 import net.minecraft.client.Minecraft;
@@ -31,9 +30,8 @@ public class EntangledClient {
 
         // Entangled block renderer
         handler.registerCustomBlockEntityRenderer(() -> Entangled.tile, EntangledBlockEntityRenderer::new);
-        handler.registerCustomItemRenderer(() -> Entangled.block.asItem(), EntangledBlockItemRenderer::new);
         // Entangled block item model
-        handler.registerModelOverwrite("entangled", "block", "inventory", CustomRendererBakedModelWrapper::wrap);
+        handler.registerItemModelType("block", EntangledBlockItemModel.CODEC);
         // Entangled block render type
         handler.registerBlockModelCutoutRenderType(() -> Entangled.block);
     }
