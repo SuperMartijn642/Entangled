@@ -51,12 +51,13 @@ public class Entangled {
         GeneratorRegistrationHandler handler = GeneratorRegistrationHandler.get("entangled");
 
         // Add all the generators
-        handler.addGenerator(EntangledAtlasSourceGenerator::new);
         handler.addGenerator(EntangledBlockStateGenerator::new);
         handler.addGenerator(EntangledModelGenerator::new);
         handler.addGenerator(EntangledLanguageGenerator::new);
         handler.addGenerator(EntangledLootTableGenerator::new);
         handler.addGenerator(EntangledRecipeGenerator::new);
         handler.addGenerator(EntangledTagGenerator::new);
+        handler.addGenerator(EntangledAtlasSourceGenerator::new);
+        handler.addGenerator(EntangledItemInfoGenerator::new);
     }
 }
