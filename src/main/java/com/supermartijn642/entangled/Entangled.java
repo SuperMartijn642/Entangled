@@ -43,8 +43,6 @@ public class Entangled {
         handler.registerItem("block", () -> new BaseBlockItem(block, ItemProperties.create().group(CreativeItemGroup.getFunctionalBlocks())));
         // Entangled block entity type
         handler.registerBlockEntityType("tile", () -> BaseBlockEntityType.create(EntangledBlockEntity::new, block));
-        // Entangled block api providers
-        handler.registerBlockEntityTypeCallback(helper -> EntangledBlockApiProviders.register());
         // Entangled binder
         handler.registerItem("item", EntangledBinderItem::new);
     }
