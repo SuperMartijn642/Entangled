@@ -60,6 +60,7 @@ public class Entangled implements ModInitializer {
         handler.addGenerator(EntangledRecipeGenerator::new);
         handler.addGenerator(EntangledTagGenerator::new);
         handler.addGenerator(EntangledAtlasSourceGenerator::new);
-        handler.addGenerator(EntangledItemInfoGenerator::new);
+        //noinspection Convert2MethodRef
+        handler.addGenerator(cache -> new EntangledItemInfoGenerator(cache));
     }
 }
