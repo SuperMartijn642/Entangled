@@ -14,5 +14,5 @@ eae7e6e7939b641d8b80a72cc49cf6147dbd2d54 data/entangled/recipe/entangled_clear_n
 396ec909ccfd379c037360a342c174b95bb81190 data/entangled/recipe/item.json
 8a23702b05296c8af5014d6aa6e9265ded85c7d9 data/entangled/tags/block/invalid_targets.json
 8a23702b05296c8af5014d6aa6e9265ded85c7d9 data/entangled/tags/block/render_blacklist.json
-61d322571b594dc4d9b1f5d1951080fb9f9fd4ed data/entangled/tags/block_entity_type/render_blacklist.json
+20aafb362824ec9e7be212a4b687191e22bf8650 data/entangled/tags/block_entity_type/render_blacklist.json
 4d3314d9af89e32440c0624fcd66fff5d392f900 data/minecraft/tags/block/mineable/pickaxe.json
