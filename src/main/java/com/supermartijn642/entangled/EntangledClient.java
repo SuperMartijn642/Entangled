@@ -47,8 +47,8 @@ public class EntangledClient {
 
             if(stack.getItem() instanceof BlockItem && ((BlockItem)stack.getItem()).getBlock() == Entangled.block && stack.get(BaseBlock.TILE_DATA) != null){
                 CompoundTag compound = stack.get(BaseBlock.TILE_DATA);
-                if(compound.getBoolean("bound") && compound.getString("dimension").equals(world.dimension().location().toString())){
-                    BlockPos pos = new BlockPos(compound.getInt("boundx"), compound.getInt("boundy"), compound.getInt("boundz"));
+                if(compound.getBooleanOr("bound", false) && compound.getStringOr("dimension", "").equals(world.dimension().location().toString())){
+                    BlockPos pos = new BlockPos(compound.getIntOr("boundx", 0), compound.getIntOr("boundy", 0), compound.getIntOr("boundz", 0));
 
                     e.getPoseStack().pushPose();
                     Vec3 camera = RenderUtils.getCameraPosition();

@@ -9,8 +9,6 @@ import com.supermartijn642.core.registry.GeneratorRegistrationHandler;
 import com.supermartijn642.core.registry.RegistrationHandler;
 import com.supermartijn642.core.registry.RegistryEntryAcceptor;
 import com.supermartijn642.entangled.generators.*;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.common.Mod;
 import org.slf4j.Logger;
 
@@ -28,7 +26,8 @@ public class Entangled {
 
     public Entangled(){
         register();
-        DistExecutor.safeRunWhenOn(Dist.CLIENT, () -> EntangledClient::register);
+        if(CommonUtils.getEnvironmentSide().isClient())
+            EntangledClient.register();
         registerGenerators();
         EntangledConfig.init();
     }
