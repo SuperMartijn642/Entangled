@@ -4,9 +4,7 @@
   "package": "${mod_package}.${mixin_package}",
   "compatibilityLevel": "${mixin_compatibility_level}",
   "mixins": [
-    "neoforge.BlockCapabilityMixin",
-    "neoforge.CapabilityHooksMixin",
-    "neoforge.RegisterCapabilitiesEventMixin"
+    "neoforge.BlockCapabilityMixin"
   ],
   "client": [],
   "server": [],

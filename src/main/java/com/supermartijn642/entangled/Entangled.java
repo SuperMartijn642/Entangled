@@ -10,6 +10,7 @@ import com.supermartijn642.core.registry.RegistrationHandler;
 import com.supermartijn642.core.registry.RegistryEntryAcceptor;
 import com.supermartijn642.entangled.generators.*;
 import com.supermartijn642.entangled.integration.TheOneProbePlugin;
+import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;
 import org.slf4j.Logger;
@@ -28,6 +29,7 @@ public class Entangled {
 
     public Entangled(IEventBus eventBus){
         eventBus.addListener(TheOneProbePlugin::interModEnqueue);
+        eventBus.addListener(EventPriority.LOWEST, EntangledBlockApiProviders::registerApiProviders);
 
         register();
         if(CommonUtils.getEnvironmentSide().isClient())

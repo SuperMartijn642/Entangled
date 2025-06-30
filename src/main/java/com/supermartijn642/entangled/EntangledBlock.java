@@ -114,7 +114,7 @@ public class EntangledBlock extends BaseBlock implements EntityHoldingBlock {
     }
 
     @Override
-    protected void appendItemInformation(ItemStack stack, Consumer<Component> info, boolean advanced){
+    public void appendItemInformation(ItemStack stack, Consumer<Component> info, boolean advanced){
         String key = EntangledConfig.allowDimensional.get() ?
             EntangledConfig.maxDistance.get() == -1 ? "infinite_other_dimension" : "ranged_other_dimension" :
             EntangledConfig.maxDistance.get() == -1 ? "infinite_same_dimension" : "ranged_same_dimension";
@@ -122,10 +122,10 @@ public class EntangledBlock extends BaseBlock implements EntityHoldingBlock {
         info.accept(TextComponents.translation("entangled.entangled_block.info." + key, maxDistance).color(ChatFormatting.AQUA).get());
 
         CompoundTag tag = stack.get(BaseBlock.TILE_DATA);
-        if(tag != null && tag.contains("bound") && tag.getBoolean("bound")){
-            int x = tag.getInt("boundx"), y = tag.getInt("boundy"), z = tag.getInt("boundz");
-            Component dimension = TextComponents.dimension(ResourceKey.create(Registries.DIMENSION, ResourceLocation.parse(tag.getString("dimension")))).color(ChatFormatting.GOLD).get();
-            Component name = TextComponents.blockState(Block.stateById(tag.getInt("blockstate"))).color(ChatFormatting.GOLD).get();
+        if(tag != null && tag.contains("bound") && tag.getBooleanOr("bound", false)){
+            int x = tag.getIntOr("boundx", 0), y = tag.getIntOr("boundy", 0), z = tag.getIntOr("boundz", 0);
+            Component dimension = TextComponents.dimension(ResourceKey.create(Registries.DIMENSION, ResourceLocation.parse(tag.getStringOr("dimension", "")))).color(ChatFormatting.GOLD).get();
+            Component name = TextComponents.blockState(Block.stateById(tag.getIntOr("blockstate", 0))).color(ChatFormatting.GOLD).get();
             Component xText = TextComponents.string(Integer.toString(x)).color(ChatFormatting.GOLD).get();
             Component yText = TextComponents.string(Integer.toString(y)).color(ChatFormatting.GOLD).get();
             Component zText = TextComponents.string(Integer.toString(z)).color(ChatFormatting.GOLD).get();
@@ -137,11 +137,11 @@ public class EntangledBlock extends BaseBlock implements EntityHoldingBlock {
     public BlockState getStateForPlacement(BlockPlaceContext context){
         ItemStack stack = context.getItemInHand();
         CompoundTag compound = stack.get(BaseBlock.TILE_DATA);
-        if(compound != null && compound.getBoolean("bound")){
+        if(compound != null && compound.getBooleanOr("bound", false)){
             ResourceLocation placeDimension = context.getLevel().dimension().location();
             BlockPos placePos = context.getClickedPos();
-            ResourceLocation targetDimension = ResourceLocation.parse(compound.getString("dimension"));
-            BlockPos targetPos = new BlockPos(compound.getInt("boundx"), compound.getInt("boundy"), compound.getInt("boundz"));
+            ResourceLocation targetDimension = ResourceLocation.parse(compound.getStringOr("dimension", ""));
+            BlockPos targetPos = new BlockPos(compound.getIntOr("boundx", 0), compound.getIntOr("boundy", 0), compound.getIntOr("boundz", 0));
             if(!canBindTo(placeDimension, placePos, targetDimension, targetPos)){
                 Player player = context.getPlayer();
                 if(player != null){
