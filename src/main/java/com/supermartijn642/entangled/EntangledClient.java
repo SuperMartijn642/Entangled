@@ -36,7 +36,7 @@ public class EntangledClient {
         handler.registerBlockModelCutoutRenderType(() -> Entangled.block);
     }
 
-    @EventBusSubscriber(value = Dist.CLIENT, bus = EventBusSubscriber.Bus.GAME)
+    @EventBusSubscriber(value = Dist.CLIENT)
     public static class Events {
 
         @SubscribeEvent
