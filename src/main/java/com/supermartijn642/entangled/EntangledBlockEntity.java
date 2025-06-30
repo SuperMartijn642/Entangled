@@ -4,10 +4,8 @@ import com.supermartijn642.core.block.BaseBlockEntity;
 import com.supermartijn642.core.block.TickableBlockEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.HolderLookup;
 import net.minecraft.core.SectionPos;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerChunkCache;
@@ -17,6 +15,8 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.ChunkSource;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
 
@@ -280,55 +280,39 @@ public class EntangledBlockEntity extends BaseBlockEntity implements TickableBlo
     }
 
     @Override
-    protected void loadAdditional(CompoundTag compound, HolderLookup.Provider provider){
-        if(compound.contains("bound")){ // Saved on an older version
-            CompoundTag data = new CompoundTag();
-            data.putBoolean("bound", compound.getBooleanOr("bound", false));
-            data.putInt("boundx", compound.getIntOr("boundx", 0));
-            data.putInt("boundy", compound.getIntOr("boundy", 0));
-            data.putInt("boundz", compound.getIntOr("boundz", 0));
-            data.putString("dimension", compound.getStringOr("dimension", ""));
-            compound.put("data", data);
-        }
-        super.loadAdditional(compound, provider);
-    }
-
-    @Override
-    protected CompoundTag writeData(){
-        CompoundTag compound = new CompoundTag();
+    protected void writeData(ValueOutput output){
         if(this.bound){
-            compound.putBoolean("bound", true);
-            compound.putBoolean("valid", this.valid);
-            compound.putInt("boundx", this.boundPos.getX());
-            compound.putInt("boundy", this.boundPos.getY());
-            compound.putInt("boundz", this.boundPos.getZ());
-            compound.putString("dimension", this.boundDimension.location().toString());
-            compound.putInt("blockstate", Block.getId(this.boundBlockState));
+            output.putBoolean("bound", true);
+            output.putBoolean("valid", this.valid);
+            output.putInt("boundx", this.boundPos.getX());
+            output.putInt("boundy", this.boundPos.getY());
+            output.putInt("boundz", this.boundPos.getZ());
+            output.putString("dimension", this.boundDimension.location().toString());
+            output.putInt("blockstate", Block.getId(this.boundBlockState));
             for(Direction direction : Direction.values()){
                 int index = direction.get3DDataValue();
-                compound.putInt("redstoneSignal" + index, this.redstoneSignal[index]);
-                compound.putInt("directRedstoneSignal" + index, this.directRedstoneSignal[index]);
+                output.putInt("redstoneSignal" + index, this.redstoneSignal[index]);
+                output.putInt("directRedstoneSignal" + index, this.directRedstoneSignal[index]);
             }
-            compound.putInt("analogOutputSignal", this.analogOutputSignal);
+            output.putInt("analogOutputSignal", this.analogOutputSignal);
         }
-        return compound;
     }
 
     @Override
-    protected void readData(CompoundTag compound){
-        this.bound = compound.getBooleanOr("bound", false);
+    protected void readData(ValueInput input){
+        this.bound = input.getBooleanOr("bound", false);
         if(this.bound){
-            this.valid = compound.getBooleanOr("valid", true);
+            this.valid = input.getBooleanOr("valid", true);
             this.revalidate = true;
-            this.boundPos = new BlockPos(compound.getIntOr("boundx", 0), compound.getIntOr("boundy", 0), compound.getIntOr("boundz", 0));
-            this.boundDimension = ResourceKey.create(Registries.DIMENSION, ResourceLocation.parse(compound.getStringOr("dimension", "")));
-            this.boundBlockState = Block.stateById(compound.getIntOr("blockstate", 0));
+            this.boundPos = new BlockPos(input.getIntOr("boundx", 0), input.getIntOr("boundy", 0), input.getIntOr("boundz", 0));
+            this.boundDimension = ResourceKey.create(Registries.DIMENSION, ResourceLocation.parse(input.getStringOr("dimension", "")));
+            this.boundBlockState = Block.stateById(input.getIntOr("blockstate", 0));
             for(Direction direction : Direction.values()){
                 int index = direction.get3DDataValue();
-                this.redstoneSignal[index] = compound.getIntOr("redstoneSignal" + index, 0);
-                this.directRedstoneSignal[index] = compound.getIntOr("directRedstoneSignal" + index, 0);
+                this.redstoneSignal[index] = input.getIntOr("redstoneSignal" + index, 0);
+                this.directRedstoneSignal[index] = input.getIntOr("directRedstoneSignal" + index, 0);
             }
-            this.analogOutputSignal = compound.getIntOr("analogOutputSignal", 0);
+            this.analogOutputSignal = input.getIntOr("analogOutputSignal", 0);
         }
     }
 }

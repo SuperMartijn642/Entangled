@@ -22,13 +22,19 @@ import net.minecraft.client.resources.model.ResolvedModel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.ProblemReporter;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.TagValueInput;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created 23/12/2024 by SuperMartijn642
@@ -43,11 +49,16 @@ public class EntangledBlockItemModel implements ItemModel.Unbaked {
         public void render(CompoundTag data, ItemDisplayContext displayContext, PoseStack poseStack, MultiBufferSource bufferSource, int combinedLight, int combinedOverlay, boolean hasFoil){
             if(entity == null)
                 entity = new EntangledBlockEntity(BlockPos.ZERO, Entangled.block.defaultBlockState());
-            entity.setLevel(ClientUtils.getWorld());
-            entity.readData(data);
+            Level level = ClientUtils.getWorld();
+            entity.setLevel(level);
+            entity.readData(TagValueInput.create(new ProblemReporter.ScopedCollector(entity.problemPath(), Entangled.LOGGER), level.registryAccess(), data));
             BlockEntityRenderer<EntangledBlockEntity> renderer = ClientUtils.getMinecraft().getBlockEntityRenderDispatcher().getRenderer(entity);
             //noinspection DataFlowIssue
             renderer.render(entity, ClientUtils.getPartialTicks(), poseStack, bufferSource, combinedLight, combinedOverlay, Vec3.ZERO);
+        }
+
+        @Override
+        public void getExtents(Set<Vector3f> set){
         }
 
         @Override
@@ -77,6 +88,7 @@ public class EntangledBlockItemModel implements ItemModel.Unbaked {
                 layer.setRenderType(renderType);
                 unbound.right().applyToLayer(layer, displayContext);
                 layer.prepareQuadList().addAll(unbound.left());
+                renderState.appendModelIdentityElement(Pair.of(this, false));
                 return;
             }
 
@@ -90,6 +102,10 @@ public class EntangledBlockItemModel implements ItemModel.Unbaked {
             layer = renderState.newLayer();
             layer.setTransform(bound.right().transforms().getTransform(displayContext));
             layer.setupSpecialModel(ENTITY_RENDERER, data);
+
+            BlockState state = Block.stateById(data.getIntOr("blockstate", 0));
+            renderState.appendModelIdentityElement(Pair.of(this, state));
+            renderState.setAnimated();
         };
     }
 
