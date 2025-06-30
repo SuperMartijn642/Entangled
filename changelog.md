@@ -1,2 +1,2 @@
 ### Entangled 1.3.20
-- Initial release of Entangled for Forge 1.21.5
+- Initial release of Entangled for Minecraft 1.21.5
