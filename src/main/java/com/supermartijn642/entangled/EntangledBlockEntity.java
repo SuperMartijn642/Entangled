@@ -326,6 +326,12 @@ public class EntangledBlockEntity extends BaseBlockEntity implements TickableBlo
                 this.directRedstoneSignal[index] = compound.getInteger("directRedstoneSignal" + index);
             }
             this.analogOutputSignal = compound.getInteger("analogOutputSignal");
+            // Clear bound block entity if it does not match the read dimension or position
+            if(this.boundBlockEntity != null && (this.boundBlockEntity.isInvalid()
+                || !this.boundBlockEntity.hasWorld()
+                || !this.boundPos.equals(this.boundBlockEntity.getPos())
+                || this.boundDimension != this.boundBlockEntity.getWorld().provider.getDimension()))
+                this.boundBlockEntity = null;
         }
     }
 }
