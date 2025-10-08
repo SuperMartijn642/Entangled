@@ -1,14 +1,19 @@
 package com.supermartijn642.entangled;
 
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.supermartijn642.core.ClientUtils;
 import com.supermartijn642.core.block.BaseBlock;
+import com.supermartijn642.core.block.BlockShape;
 import com.supermartijn642.core.registry.ClientRegistrationHandler;
 import com.supermartijn642.core.render.RenderUtils;
 import com.supermartijn642.core.render.RenderWorldEvent;
 import net.fabricmc.api.ClientModInitializer;
-import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext;
-import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
-import net.minecraft.client.Minecraft;
+import net.fabricmc.fabric.api.client.rendering.v1.RenderStateDataKey;
+import net.fabricmc.fabric.api.client.rendering.v1.world.WorldExtractionContext;
+import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderContext;
+import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderEvents;
+import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.client.renderer.state.BlockOutlineRenderState;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.InteractionHand;
@@ -16,17 +21,24 @@ import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.phys.shapes.VoxelShape;
 
 /**
  * Created 3/16/2020 by SuperMartijn642
  */
 public class EntangledClient implements ClientModInitializer {
 
+    private static final RenderStateDataKey<BlockHighlightState> BLOCK_HIGHLIGHT_DATA = RenderStateDataKey.create(() -> "entangled:bound_block_highlight");
+    private static final PoseStack POSE_STACK = new PoseStack();
+
     @Override
     public void onInitializeClient(){
         RenderWorldEvent.EVENT.register(EntangledClient::onDrawPlayerEvent);
-        WorldRenderEvents.BLOCK_OUTLINE.register(EntangledClient::onBlockHighlight);
+        WorldRenderEvents.AFTER_BLOCK_OUTLINE_EXTRACTION.register(EntangledClient::onBlockHighlightExtract);
+        WorldRenderEvents.BEFORE_BLOCK_OUTLINE.register(EntangledClient::onBlockHighlightDraw);
 
         register();
     }
@@ -79,26 +91,53 @@ public class EntangledClient implements ClientModInitializer {
         }
     }
 
-    public static boolean onBlockHighlight(WorldRenderContext renderContext, WorldRenderContext.BlockOutlineContext blockOutlineContext){
-        if(blockOutlineContext.blockPos() == null || !EntangledConfig.renderBlockHighlight.get())
+    private static void onBlockHighlightExtract(WorldExtractionContext context, HitResult result){
+        BlockHighlightState state = context.worldState().getData(BLOCK_HIGHLIGHT_DATA);
+        if(state == null){
+            state = new BlockHighlightState();
+            context.worldState().setData(BLOCK_HIGHLIGHT_DATA, state);
+        }
+        state.shouldRender = false;
+        if(!EntangledConfig.renderBlockHighlight.get())
+            return;
+
+        if(result instanceof BlockHitResult){
+            BlockPos pos = ((BlockHitResult)result).getBlockPos();
+            //noinspection resource
+            ClientLevel level = context.world();
+            BlockEntity entity = level.getBlockEntity(pos);
+            if(entity instanceof EntangledBlockEntity && ((EntangledBlockEntity)entity).isBound() && ((EntangledBlockEntity)entity).getBoundDimensionIdentifier() == level.dimension()){
+                BlockPos boundPos = ((EntangledBlockEntity)entity).getBoundBlockPos();
+                VoxelShape shape = level.getBlockState(boundPos).getOcclusionShape();
+                if(!shape.isEmpty()){
+                    state.shouldRender = true;
+                    state.pos = boundPos;
+                    state.shape = BlockShape.create(shape);
+                }
+            }
+        }
+    }
+
+    private static boolean onBlockHighlightDraw(WorldRenderContext context, BlockOutlineRenderState outlineRenderState){
+        BlockHighlightState state = context.worldState().getData(BLOCK_HIGHLIGHT_DATA);
+        if(state == null || !state.shouldRender)
             return true;
 
-        Level world = Minecraft.getInstance().level;
-        BlockEntity tile = world.getBlockEntity(blockOutlineContext.blockPos());
-        if(tile instanceof EntangledBlockEntity && ((EntangledBlockEntity)tile).isBound() && ((EntangledBlockEntity)tile).getBoundDimensionIdentifier() == world.dimension()){
-            BlockPos pos = ((EntangledBlockEntity)tile).getBoundBlockPos();
+        POSE_STACK.pushPose();
+        Vec3 playerPos = context.worldState().cameraRenderState.pos;
+        POSE_STACK.translate(-playerPos.x, -playerPos.y, -playerPos.z);
+        POSE_STACK.translate(state.pos.getX(), state.pos.getY(), state.pos.getZ());
 
-            renderContext.matrixStack().pushPose();
-            Vec3 camera = RenderUtils.getCameraPosition();
-            renderContext.matrixStack().translate(-camera.x, -camera.y, -camera.z);
-            renderContext.matrixStack().translate(pos.getX(), pos.getY(), pos.getZ());
+        RenderUtils.renderShape(POSE_STACK, state.shape, 86 / 255f, 0 / 255f, 156 / 255f, false);
+        RenderUtils.renderShapeSides(POSE_STACK, state.shape, 86 / 255f, 0 / 255f, 156 / 255f, 30 / 255f, false);
 
-//            RenderUtils.renderShape(renderContext.matrixStack(), world.getBlockState(pos).getOcclusionShape(world, pos), 86 / 255f, 0 / 255f, 156 / 255f, false);
-//            RenderUtils.renderShapeSides(renderContext.matrixStack(), world.getBlockState(pos).getOcclusionShape(world, pos), 86 / 255f, 0 / 255f, 156 / 255f, 30 / 255f, false);
-// TODO
-            renderContext.matrixStack().popPose();
-        }
-
+        POSE_STACK.popPose();
         return true;
+    }
+
+    private static class BlockHighlightState {
+        boolean shouldRender;
+        BlockPos pos;
+        BlockShape shape;
     }
 }
