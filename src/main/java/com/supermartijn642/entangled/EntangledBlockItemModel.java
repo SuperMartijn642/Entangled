@@ -6,16 +6,18 @@ import com.supermartijn642.core.ClientUtils;
 import com.supermartijn642.core.block.BaseBlock;
 import com.supermartijn642.core.util.Pair;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
-import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.TextureSlots;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
+import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
 import net.minecraft.client.renderer.item.BlockModelWrapper;
 import net.minecraft.client.renderer.item.ItemModel;
 import net.minecraft.client.renderer.item.ItemStackRenderState;
 import net.minecraft.client.renderer.item.ModelRenderProperties;
 import net.minecraft.client.renderer.special.SpecialModelRenderer;
+import net.minecraft.client.renderer.state.CameraRenderState;
 import net.minecraft.client.resources.model.BlockModelRotation;
 import net.minecraft.client.resources.model.ModelBaker;
 import net.minecraft.client.resources.model.ResolvedModel;
@@ -42,19 +44,27 @@ import java.util.Set;
 public class EntangledBlockItemModel implements ItemModel.Unbaked {
 
     public static final MapCodec<EntangledBlockItemModel> CODEC = MapCodec.unit(new EntangledBlockItemModel());
+    private static final CameraRenderState DUMMY_CAMERA_RENDER_STATE = new CameraRenderState();
     private static final SpecialModelRenderer<CompoundTag> ENTITY_RENDERER = new SpecialModelRenderer<>() {
         static EntangledBlockEntity entity;
+        static BlockEntityRenderState entityRenderState;
 
         @Override
-        public void render(CompoundTag data, ItemDisplayContext displayContext, PoseStack poseStack, MultiBufferSource bufferSource, int combinedLight, int combinedOverlay, boolean hasFoil){
+        public void submit(CompoundTag data, ItemDisplayContext displayContext, PoseStack poseStack, SubmitNodeCollector output, int combinedLight, int combinedOverlay, boolean hasFoil, int k){
             if(entity == null)
                 entity = new EntangledBlockEntity(BlockPos.ZERO, Entangled.block.defaultBlockState());
             Level level = ClientUtils.getWorld();
             entity.setLevel(level);
             entity.readData(TagValueInput.create(new ProblemReporter.ScopedCollector(entity.problemPath(), Entangled.LOGGER), level.registryAccess(), data));
-            BlockEntityRenderer<EntangledBlockEntity> renderer = ClientUtils.getMinecraft().getBlockEntityRenderDispatcher().getRenderer(entity);
-            //noinspection DataFlowIssue
-            renderer.render(entity, ClientUtils.getPartialTicks(), poseStack, bufferSource, combinedLight, combinedOverlay, Vec3.ZERO);
+            BlockEntityRenderer<EntangledBlockEntity,BlockEntityRenderState> renderer = ClientUtils.getMinecraft().getBlockEntityRenderDispatcher().getRenderer(entity);
+            if(renderer == null)
+                return;
+            if(entityRenderState == null)
+                entityRenderState = renderer.createRenderState();
+            renderer.extractRenderState(entity, entityRenderState, ClientUtils.getPartialTicks(), Vec3.ZERO, null);
+            entityRenderState.lightCoords = combinedLight;
+            entityRenderState.breakProgress = null;
+            renderer.submit(entityRenderState, poseStack, output, DUMMY_CAMERA_RENDER_STATE);
         }
 
         @Override
