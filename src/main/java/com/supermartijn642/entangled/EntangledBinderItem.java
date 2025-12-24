@@ -70,7 +70,7 @@ public class EntangledBinderItem extends BaseItem {
             return InteractionFeedback.CONSUME;
 
         // Bind to clicked position
-        if(!level.isClientSide){
+        if(!level.isClientSide()){
             stack.set(BINDER_TARGET, new BinderTarget(level.dimension().location(), hitPos, Optional.of(level.getBlockState(hitPos))));
             player.displayClientMessage(TextComponents.translation("entangled.entangled_binder.select").color(ChatFormatting.YELLOW).get(), true);
         }
@@ -80,7 +80,7 @@ public class EntangledBinderItem extends BaseItem {
     @Override
     public ItemUseResult interact(ItemStack stack, Player player, InteractionHand hand, Level level){
         if(player.isCrouching() && stack.has(BINDER_TARGET)){
-            if(!level.isClientSide){
+            if(!level.isClientSide()){
                 stack.remove(BINDER_TARGET);
                 player.displayClientMessage(TextComponents.translation("entangled.entangled_binder.clear").color(ChatFormatting.YELLOW).get(), true);
             }

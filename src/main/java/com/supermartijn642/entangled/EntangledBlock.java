@@ -69,13 +69,13 @@ public class EntangledBlock extends BaseBlock implements EntityHoldingBlock {
             return InteractionFeedback.PASS;
         ItemStack stack = player.getItemInHand(hand);
         if(player.isCrouching() && stack.isEmpty() && ((EntangledBlockEntity)entity).isBound()){
-            if(!level.isClientSide){
+            if(!level.isClientSide()){
                 ((EntangledBlockEntity)entity).unbind();
                 player.displayClientMessage(TextComponents.translation("entangled.entangled_block.unbind").color(ChatFormatting.YELLOW).get(), true);
             }
             return InteractionFeedback.SUCCESS;
         }else if(stack.getItem() == Entangled.item){
-            if(!level.isClientSide){
+            if(!level.isClientSide()){
                 if(EntangledBinderItem.isBound(stack)){
                     ResourceLocation targetDimension = EntangledBinderItem.getBoundDimension(stack);
                     BlockPos targetPos = EntangledBinderItem.getBoundPosition(stack);
@@ -167,9 +167,9 @@ public class EntangledBlock extends BaseBlock implements EntityHoldingBlock {
     }
 
     @Override
-    public int getAnalogOutputSignal(BlockState state, Level world, BlockPos pos){
+    public int getAnalogOutputSignal(BlockState state, Level world, BlockPos pos, Direction side){
         BlockEntity entity = world.getBlockEntity(pos);
-        return entity instanceof EntangledBlockEntity ? ((EntangledBlockEntity)entity).getAnalogOutputSignal() : 0;
+        return entity instanceof EntangledBlockEntity ? ((EntangledBlockEntity)entity).getAnalogOutputSignal(side) : 0;
     }
 
     @Override
