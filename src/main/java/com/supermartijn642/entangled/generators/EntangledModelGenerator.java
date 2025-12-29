@@ -3,7 +3,7 @@ package com.supermartijn642.entangled.generators;
 import com.supermartijn642.core.generator.ModelGenerator;
 import com.supermartijn642.core.generator.ResourceCache;
 import com.supermartijn642.entangled.Entangled;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 /**
  * Created 02/09/2022 by SuperMartijn642
@@ -17,8 +17,8 @@ public class EntangledModelGenerator extends ModelGenerator {
     @Override
     public void generate(){
         // Entangled Block
-        this.cubeAll("block/unbound", ResourceLocation.fromNamespaceAndPath("entangled", "blocks/side"));
+        this.cubeAll("block/unbound", Identifier.fromNamespaceAndPath("entangled", "blocks/side"));
         // Entangled Binder
-        this.itemHandheld(Entangled.item, ResourceLocation.fromNamespaceAndPath("entangled", "items/binder"));
+        this.itemHandheld(Entangled.item, Identifier.fromNamespaceAndPath("entangled", "items/binder"));
     }
 }

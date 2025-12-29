@@ -1,4 +1,6 @@
 accessWidener v1 named
 
+# BlockModelWrapper
+accessible method net/minecraft/client/renderer/item/BlockModelWrapper detectRenderType (Ljava/util/List;)Ljava/util/function/Function;
 # ServerChunkCache
 accessible field net/minecraft/server/level/ServerChunkCache mainThread Ljava/lang/Thread;

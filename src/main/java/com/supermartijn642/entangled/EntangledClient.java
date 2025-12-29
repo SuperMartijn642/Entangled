@@ -60,7 +60,7 @@ public class EntangledClient implements ClientModInitializer {
 
         if(stack.getItem() instanceof BlockItem && ((BlockItem)stack.getItem()).getBlock() == Entangled.block && stack.get(BaseBlock.TILE_DATA) != null){
             CompoundTag compound = stack.get(BaseBlock.TILE_DATA);
-            if(compound.getBooleanOr("bound", false) && compound.getStringOr("dimension", "").equals(world.dimension().location().toString())){
+            if(compound.getBooleanOr("bound", false) && compound.getStringOr("dimension", "").equals(world.dimension().identifier().toString())){
                 BlockPos pos = new BlockPos(compound.getIntOr("boundx", 0), compound.getIntOr("boundy", 0), compound.getIntOr("boundz", 0));
 
                 e.getPoseStack().pushPose();
@@ -75,7 +75,7 @@ public class EntangledClient implements ClientModInitializer {
             }
         }else if(stack.getItem() == Entangled.item){
             EntangledBinderItem.BinderTarget target = stack.get(EntangledBinderItem.BINDER_TARGET);
-            if(target != null && target.dimension().equals(world.dimension().location())){
+            if(target != null && target.dimension().equals(world.dimension().identifier())){
                 BlockPos pos = target.pos();
 
                 e.getPoseStack().pushPose();

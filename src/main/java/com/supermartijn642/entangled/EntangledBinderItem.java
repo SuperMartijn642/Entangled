@@ -13,8 +13,8 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -33,12 +33,12 @@ public class EntangledBinderItem extends BaseItem {
 
     public static final DataComponentType<BinderTarget> BINDER_TARGET = DataComponentType.<BinderTarget>builder()
         .persistent(RecordCodecBuilder.create(instance -> instance.group(
-            ResourceLocation.CODEC.fieldOf("dimension").forGetter(BinderTarget::dimension),
+            Identifier.CODEC.fieldOf("dimension").forGetter(BinderTarget::dimension),
             BlockPos.CODEC.fieldOf("pos").forGetter(BinderTarget::pos),
             BlockState.CODEC.optionalFieldOf("state").forGetter(BinderTarget::state)
         ).apply(instance, BinderTarget::new)))
         .networkSynchronized(StreamCodec.composite(
-            ResourceLocation.STREAM_CODEC, BinderTarget::dimension,
+            Identifier.STREAM_CODEC, BinderTarget::dimension,
             BlockPos.STREAM_CODEC, BinderTarget::pos,
             ByteBufCodecs.INT, t -> t.state().map(Block::getId).orElse(-1),
             (dim, pos, id) -> new BinderTarget(dim, pos, id >= 0 ? Optional.ofNullable(Block.BLOCK_STATE_REGISTRY.byId(id)) : Optional.empty())
@@ -53,7 +53,7 @@ public class EntangledBinderItem extends BaseItem {
         return stack.get(BINDER_TARGET).pos;
     }
 
-    public static ResourceLocation getBoundDimension(ItemStack stack){
+    public static Identifier getBoundDimension(ItemStack stack){
         //noinspection DataFlowIssue
         return stack.get(BINDER_TARGET).dimension;
     }
@@ -66,12 +66,12 @@ public class EntangledBinderItem extends BaseItem {
     public InteractionFeedback interactWithBlock(ItemStack stack, Player player, InteractionHand hand, Level level, BlockPos hitPos, Direction hitSide, Vec3 hitLocation){
         // Check if already bound to the clicked position
         BinderTarget target = stack.get(BINDER_TARGET);
-        if(target != null && target.dimension.equals(level.dimension().location()) && target.pos.equals(hitPos))
+        if(target != null && target.dimension.equals(level.dimension().identifier()) && target.pos.equals(hitPos))
             return InteractionFeedback.CONSUME;
 
         // Bind to clicked position
         if(!level.isClientSide()){
-            stack.set(BINDER_TARGET, new BinderTarget(level.dimension().location(), hitPos, Optional.of(level.getBlockState(hitPos))));
+            stack.set(BINDER_TARGET, new BinderTarget(level.dimension().identifier(), hitPos, Optional.of(level.getBlockState(hitPos))));
             player.displayClientMessage(TextComponents.translation("entangled.entangled_binder.select").color(ChatFormatting.YELLOW).get(), true);
         }
         return InteractionFeedback.SUCCESS;
@@ -107,6 +107,6 @@ public class EntangledBinderItem extends BaseItem {
         }
     }
 
-    public record BinderTarget(ResourceLocation dimension, BlockPos pos, Optional<BlockState> state) {
+    public record BinderTarget(Identifier dimension, BlockPos pos, Optional<BlockState> state) {
     }
 }
