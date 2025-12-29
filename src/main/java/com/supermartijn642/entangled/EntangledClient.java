@@ -13,7 +13,7 @@ import net.minecraft.client.renderer.state.BlockOutlineRenderState;
 import net.minecraft.client.renderer.state.LevelRenderState;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.context.ContextKey;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.BlockItem;
@@ -33,7 +33,7 @@ import net.neoforged.neoforge.client.event.ExtractBlockOutlineRenderStateEvent;
 @EventBusSubscriber(Dist.CLIENT)
 public class EntangledClient {
 
-    private static final ContextKey<BlockHighlightState> BLOCK_HIGHLIGHT_DATA = new ContextKey(ResourceLocation.fromNamespaceAndPath("entangled", "bound_block_highlight"));
+    private static final ContextKey<BlockHighlightState> BLOCK_HIGHLIGHT_DATA = new ContextKey(Identifier.fromNamespaceAndPath("entangled", "bound_block_highlight"));
     private static final PoseStack POSE_STACK = new PoseStack();
 
     public static void register(){
@@ -54,7 +54,7 @@ public class EntangledClient {
 
         if(stack.getItem() instanceof BlockItem && ((BlockItem)stack.getItem()).getBlock() == Entangled.block && stack.get(BaseBlock.TILE_DATA) != null){
             CompoundTag compound = stack.get(BaseBlock.TILE_DATA);
-            if(compound.getBooleanOr("bound", false) && compound.getStringOr("dimension", "").equals(world.dimension().location().toString())){
+            if(compound.getBooleanOr("bound", false) && compound.getStringOr("dimension", "").equals(world.dimension().identifier().toString())){
                 BlockPos pos = new BlockPos(compound.getIntOr("boundx", 0), compound.getIntOr("boundy", 0), compound.getIntOr("boundz", 0));
 
                 e.getPoseStack().pushPose();
@@ -69,7 +69,7 @@ public class EntangledClient {
             }
         }else if(stack.getItem() == Entangled.item){
             EntangledBinderItem.BinderTarget target = stack.get(EntangledBinderItem.BINDER_TARGET);
-            if(target != null && target.dimension().equals(world.dimension().location())){
+            if(target != null && target.dimension().equals(world.dimension().identifier())){
                 BlockPos pos = target.pos();
 
                 e.getPoseStack().pushPose();

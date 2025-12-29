@@ -14,8 +14,8 @@ import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.ARGB;
 import net.minecraft.world.level.block.Block;
@@ -38,8 +38,8 @@ public class EntangledBlockEntityRenderer implements CustomBlockEntityRenderer<E
 
     private static final AABB FULL_BLOCK_BOUNDS = new AABB(0, 0, 0, 1, 1, 1);
 
-    public static final TagKey<Block> BLACKLISTED_BLOCKS = TagKey.create(net.minecraft.core.registries.Registries.BLOCK, ResourceLocation.fromNamespaceAndPath("entangled", "render_blacklist"));
-    public static final TagKey<BlockEntityType<?>> BLACKLISTED_ENTITIES = TagKey.create(net.minecraft.core.registries.Registries.BLOCK_ENTITY_TYPE, ResourceLocation.fromNamespaceAndPath("entangled", "render_blacklist"));
+    public static final TagKey<Block> BLACKLISTED_BLOCKS = TagKey.create(net.minecraft.core.registries.Registries.BLOCK, Identifier.fromNamespaceAndPath("entangled", "render_blacklist"));
+    public static final TagKey<BlockEntityType<?>> BLACKLISTED_ENTITIES = TagKey.create(net.minecraft.core.registries.Registries.BLOCK_ENTITY_TYPE, Identifier.fromNamespaceAndPath("entangled", "render_blacklist"));
     private static final Set<BlockEntityType<?>> ERRORED_BLOCK_ENTITIES = Collections.synchronizedSet(new HashSet<>());
     private static final Set<BlockState> ERRORED_BLOCK_STATES = Collections.synchronizedSet(new HashSet<>());
 
