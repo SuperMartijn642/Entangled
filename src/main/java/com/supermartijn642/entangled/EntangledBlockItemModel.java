@@ -5,8 +5,6 @@ import com.mojang.serialization.MapCodec;
 import com.supermartijn642.core.ClientUtils;
 import com.supermartijn642.core.block.BaseBlock;
 import com.supermartijn642.core.util.Pair;
-import net.minecraft.client.renderer.ItemBlockRenderTypes;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.TextureSlots;
@@ -16,6 +14,7 @@ import net.minecraft.client.renderer.item.BlockModelWrapper;
 import net.minecraft.client.renderer.item.ItemModel;
 import net.minecraft.client.renderer.item.ItemStackRenderState;
 import net.minecraft.client.renderer.item.ModelRenderProperties;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.special.SpecialModelRenderer;
 import net.minecraft.client.renderer.state.CameraRenderState;
 import net.minecraft.client.resources.model.BlockModelRotation;
@@ -23,7 +22,7 @@ import net.minecraft.client.resources.model.ModelBaker;
 import net.minecraft.client.resources.model.ResolvedModel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.ProblemReporter;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
@@ -33,10 +32,11 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.TagValueInput;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
-import org.joml.Vector3f;
+import org.joml.Vector3fc;
 
 import java.util.List;
-import java.util.Set;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
 /**
  * Created 23/12/2024 by SuperMartijn642
@@ -68,7 +68,7 @@ public class EntangledBlockItemModel implements ItemModel.Unbaked {
         }
 
         @Override
-        public void getExtents(Set<Vector3f> set){
+        public void getExtents(Consumer<Vector3fc> set){
         }
 
         @Override
@@ -84,18 +84,19 @@ public class EntangledBlockItemModel implements ItemModel.Unbaked {
 
     @Override
     public ItemModel bake(ItemModel.BakingContext context){
-        Pair<List<BakedQuad>,ModelRenderProperties> unbound = bakeModel(context, ResourceLocation.fromNamespaceAndPath("entangled", "block/unbound"));
-        Pair<List<BakedQuad>,ModelRenderProperties> bound = bakeModel(context, ResourceLocation.fromNamespaceAndPath("entangled", "block/bound"));
-        Vector3f[] unboundExtents = BlockModelWrapper.computeExtents(unbound.left());
-        Vector3f[] boundExtents = BlockModelWrapper.computeExtents(bound.left());
+        Pair<List<BakedQuad>,ModelRenderProperties> unbound = bakeModel(context, Identifier.fromNamespaceAndPath("entangled", "block/unbound"));
+        Pair<List<BakedQuad>,ModelRenderProperties> bound = bakeModel(context, Identifier.fromNamespaceAndPath("entangled", "block/bound"));
+        Vector3fc[] unboundExtents = BlockModelWrapper.computeExtents(unbound.left());
+        Vector3fc[] boundExtents = BlockModelWrapper.computeExtents(bound.left());
+        Function<ItemStack,RenderType> unboundRenderType = BlockModelWrapper.detectRenderType(unbound.left());
+        Function<ItemStack,RenderType> boundRenderType = BlockModelWrapper.detectRenderType(bound.left());
         return (renderState, stack, modelResolver, displayContext, level, entity, someRandomId) -> {
             CompoundTag data = stack.get(BaseBlock.TILE_DATA);
-            RenderType renderType = ItemBlockRenderTypes.getRenderType(stack);
             // If the block is not bound, just render the unbound model
             if(data == null || !data.getBooleanOr("bound", false)){
                 ItemStackRenderState.LayerRenderState layer = renderState.newLayer();
                 layer.setExtents(() -> unboundExtents);
-                layer.setRenderType(renderType);
+                layer.setRenderType(unboundRenderType.apply(stack));
                 unbound.right().applyToLayer(layer, displayContext);
                 layer.prepareQuadList().addAll(unbound.left());
                 renderState.appendModelIdentityElement(Pair.of(this, false));
@@ -105,7 +106,7 @@ public class EntangledBlockItemModel implements ItemModel.Unbaked {
             // Render the bound model
             ItemStackRenderState.LayerRenderState layer = renderState.newLayer();
             layer.setExtents(() -> boundExtents);
-            layer.setRenderType(renderType);
+            layer.setRenderType(boundRenderType.apply(stack));
             bound.right().applyToLayer(layer, displayContext);
             layer.prepareQuadList().addAll(bound.left());
             // Render the block entity
@@ -121,15 +122,15 @@ public class EntangledBlockItemModel implements ItemModel.Unbaked {
 
     @Override
     public void resolveDependencies(Resolver resolver){
-        resolver.markDependency(ResourceLocation.fromNamespaceAndPath("entangled", "block/unbound"));
-        resolver.markDependency(ResourceLocation.fromNamespaceAndPath("entangled", "block/bound"));
+        resolver.markDependency(Identifier.fromNamespaceAndPath("entangled", "block/unbound"));
+        resolver.markDependency(Identifier.fromNamespaceAndPath("entangled", "block/bound"));
     }
 
-    private static Pair<List<BakedQuad>,ModelRenderProperties> bakeModel(ItemModel.BakingContext context, ResourceLocation location){
+    private static Pair<List<BakedQuad>,ModelRenderProperties> bakeModel(ItemModel.BakingContext context, Identifier location){
         ModelBaker modelBaker = context.blockModelBaker();
         ResolvedModel model = modelBaker.getModel(location);
         TextureSlots textureSlots = model.getTopTextureSlots();
-        List<BakedQuad> quads = model.bakeTopGeometry(textureSlots, modelBaker, BlockModelRotation.X0_Y0).getAll();
+        List<BakedQuad> quads = model.bakeTopGeometry(textureSlots, modelBaker, BlockModelRotation.IDENTITY).getAll();
         ModelRenderProperties properties = ModelRenderProperties.fromResolvedModel(modelBaker, model, textureSlots);
         return Pair.of(quads, properties);
     }

@@ -11,8 +11,8 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
@@ -40,7 +40,7 @@ import java.util.function.Consumer;
  */
 public class EntangledBlock extends BaseBlock implements EntityHoldingBlock {
 
-    public static boolean canBindTo(ResourceLocation blockDimension, BlockPos blockPosition, ResourceLocation targetDimension, BlockPos targetPosition){
+    public static boolean canBindTo(Identifier blockDimension, BlockPos blockPosition, Identifier targetDimension, BlockPos targetPosition){
         // Validate dimension exists
         if(CommonUtils.getLevel(ResourceKey.create(Registries.DIMENSION, targetDimension)) == null)
             return false;
@@ -77,14 +77,14 @@ public class EntangledBlock extends BaseBlock implements EntityHoldingBlock {
         }else if(stack.getItem() == Entangled.item){
             if(!level.isClientSide()){
                 if(EntangledBinderItem.isBound(stack)){
-                    ResourceLocation targetDimension = EntangledBinderItem.getBoundDimension(stack);
+                    Identifier targetDimension = EntangledBinderItem.getBoundDimension(stack);
                     BlockPos targetPos = EntangledBinderItem.getBoundPosition(stack);
-                    if(canBindTo(level.dimension().location(), pos, targetDimension, targetPos)){
+                    if(canBindTo(level.dimension().identifier(), pos, targetDimension, targetPos)){
                         ((EntangledBlockEntity)entity).bind(targetPos, targetDimension);
                         player.displayClientMessage(TextComponents.translation("entangled.entangled_block.bind").color(ChatFormatting.YELLOW).get(), true);
                     }else if(CommonUtils.getLevel(ResourceKey.create(Registries.DIMENSION, targetDimension)) == null)
                         player.displayClientMessage(TextComponents.translation("entangled.entangled_binder.unknown_dimension", targetDimension).color(ChatFormatting.RED).get(), true);
-                    else if(!level.dimension().location().equals(targetDimension) && !EntangledConfig.allowDimensional.get())
+                    else if(!level.dimension().identifier().equals(targetDimension) && !EntangledConfig.allowDimensional.get())
                         player.displayClientMessage(TextComponents.translation("entangled.entangled_block.wrong_dimension").color(ChatFormatting.RED).get(), true);
                     else if(pos.equals(targetPos))
                         player.displayClientMessage(TextComponents.translation("entangled.entangled_block.self").color(ChatFormatting.RED).get(), true);
@@ -124,7 +124,7 @@ public class EntangledBlock extends BaseBlock implements EntityHoldingBlock {
         CompoundTag tag = stack.get(BaseBlock.TILE_DATA);
         if(tag != null && tag.contains("bound") && tag.getBooleanOr("bound", false)){
             int x = tag.getIntOr("boundx", 0), y = tag.getIntOr("boundy", 0), z = tag.getIntOr("boundz", 0);
-            Component dimension = TextComponents.dimension(ResourceKey.create(Registries.DIMENSION, ResourceLocation.parse(tag.getStringOr("dimension", "")))).color(ChatFormatting.GOLD).get();
+            Component dimension = TextComponents.dimension(ResourceKey.create(Registries.DIMENSION, Identifier.parse(tag.getStringOr("dimension", "")))).color(ChatFormatting.GOLD).get();
             Component name = TextComponents.blockState(Block.stateById(tag.getIntOr("blockstate", 0))).color(ChatFormatting.GOLD).get();
             Component xText = TextComponents.string(Integer.toString(x)).color(ChatFormatting.GOLD).get();
             Component yText = TextComponents.string(Integer.toString(y)).color(ChatFormatting.GOLD).get();
@@ -138,9 +138,9 @@ public class EntangledBlock extends BaseBlock implements EntityHoldingBlock {
         ItemStack stack = context.getItemInHand();
         CompoundTag compound = stack.get(BaseBlock.TILE_DATA);
         if(compound != null && compound.getBooleanOr("bound", false)){
-            ResourceLocation placeDimension = context.getLevel().dimension().location();
+            Identifier placeDimension = context.getLevel().dimension().identifier();
             BlockPos placePos = context.getClickedPos();
-            ResourceLocation targetDimension = ResourceLocation.parse(compound.getStringOr("dimension", ""));
+            Identifier targetDimension = Identifier.parse(compound.getStringOr("dimension", ""));
             BlockPos targetPos = new BlockPos(compound.getIntOr("boundx", 0), compound.getIntOr("boundy", 0), compound.getIntOr("boundz", 0));
             if(!canBindTo(placeDimension, placePos, targetDimension, targetPos)){
                 Player player = context.getPlayer();

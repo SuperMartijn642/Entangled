@@ -6,8 +6,8 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.SectionPos;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerChunkCache;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.Level;
@@ -28,7 +28,7 @@ import javax.annotation.Nullable;
  */
 public class EntangledBlockEntity extends BaseBlockEntity implements TickableBlockEntity {
 
-    public static final TagKey<Block> BLACKLISTED_BLOCKS = TagKey.create(Registries.BLOCK, ResourceLocation.fromNamespaceAndPath("entangled", "invalid_targets"));
+    public static final TagKey<Block> BLACKLISTED_BLOCKS = TagKey.create(Registries.BLOCK, Identifier.fromNamespaceAndPath("entangled", "invalid_targets"));
 
     /**
      * Whether the block is bound to a position
@@ -188,7 +188,7 @@ public class EntangledBlockEntity extends BaseBlockEntity implements TickableBlo
         return LazyOptional.empty();
     }
 
-    public void bind(BlockPos pos, ResourceLocation dimension){
+    public void bind(BlockPos pos, Identifier dimension){
         this.bound = true;
         this.valid = true;
         this.boundPos = new BlockPos(pos);
@@ -285,7 +285,7 @@ public class EntangledBlockEntity extends BaseBlockEntity implements TickableBlo
             output.putInt("boundx", this.boundPos.getX());
             output.putInt("boundy", this.boundPos.getY());
             output.putInt("boundz", this.boundPos.getZ());
-            output.putString("dimension", this.boundDimension.location().toString());
+            output.putString("dimension", this.boundDimension.identifier().toString());
             output.putInt("blockstate", Block.getId(this.boundBlockState));
             for(Direction direction : Direction.values()){
                 int index = direction.get3DDataValue();
@@ -303,7 +303,7 @@ public class EntangledBlockEntity extends BaseBlockEntity implements TickableBlo
             this.valid = input.getBooleanOr("valid", true);
             this.revalidate = true;
             this.boundPos = new BlockPos(input.getIntOr("boundx", 0), input.getIntOr("boundy", 0), input.getIntOr("boundz", 0));
-            this.boundDimension = ResourceKey.create(Registries.DIMENSION, ResourceLocation.parse(input.getStringOr("dimension", "")));
+            this.boundDimension = ResourceKey.create(Registries.DIMENSION, Identifier.parse(input.getStringOr("dimension", "")));
             this.boundBlockState = Block.stateById(input.getIntOr("blockstate", 0));
             for(Direction direction : Direction.values()){
                 int index = direction.get3DDataValue();
