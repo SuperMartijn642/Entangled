@@ -1,3 +1,7 @@
+### Entangled 1.3.21
+- Added Japanese translations (thanks to Twister716!)
+- Fixed cached block entity not being invalidated when received new entangled block data from server
+
 ### Entangled 1.3.20
 - Fixed the WAILA/Jade/The One Probe showing air when the bound block is far away
 
