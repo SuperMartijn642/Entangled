@@ -9,11 +9,11 @@ import com.supermartijn642.core.render.RenderUtils;
 import com.supermartijn642.core.render.RenderWorldEvent;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.rendering.v1.RenderStateDataKey;
-import net.fabricmc.fabric.api.client.rendering.v1.world.WorldExtractionContext;
-import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderContext;
-import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderEvents;
+import net.fabricmc.fabric.api.client.rendering.v1.level.LevelExtractionContext;
+import net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderContext;
+import net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderEvents;
 import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.client.renderer.state.BlockOutlineRenderState;
+import net.minecraft.client.renderer.state.level.BlockOutlineRenderState;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.InteractionHand;
@@ -37,8 +37,8 @@ public class EntangledClient implements ClientModInitializer {
     @Override
     public void onInitializeClient(){
         RenderWorldEvent.EVENT.register(EntangledClient::onDrawPlayerEvent);
-        WorldRenderEvents.AFTER_BLOCK_OUTLINE_EXTRACTION.register(EntangledClient::onBlockHighlightExtract);
-        WorldRenderEvents.BEFORE_BLOCK_OUTLINE.register(EntangledClient::onBlockHighlightDraw);
+        LevelRenderEvents.AFTER_BLOCK_OUTLINE_EXTRACTION.register(EntangledClient::onBlockHighlightExtract);
+        LevelRenderEvents.BEFORE_BLOCK_OUTLINE.register(EntangledClient::onBlockHighlightDraw);
 
         register();
     }
@@ -50,8 +50,6 @@ public class EntangledClient implements ClientModInitializer {
         handler.registerCustomBlockEntityRenderer(() -> Entangled.tile, EntangledBlockEntityRenderer::new);
         // Entangled block item model
         handler.registerItemModelType("block", EntangledBlockItemModel.CODEC);
-        // Entangled block render type
-        handler.registerBlockModelCutoutRenderType(() -> Entangled.block);
     }
 
     public static void onDrawPlayerEvent(RenderWorldEvent e){
@@ -91,11 +89,11 @@ public class EntangledClient implements ClientModInitializer {
         }
     }
 
-    private static void onBlockHighlightExtract(WorldExtractionContext context, HitResult result){
-        BlockHighlightState state = context.worldState().getData(BLOCK_HIGHLIGHT_DATA);
+    private static void onBlockHighlightExtract(LevelExtractionContext context, HitResult result){
+        BlockHighlightState state = context.levelState().getData(BLOCK_HIGHLIGHT_DATA);
         if(state == null){
             state = new BlockHighlightState();
-            context.worldState().setData(BLOCK_HIGHLIGHT_DATA, state);
+            context.levelState().setData(BLOCK_HIGHLIGHT_DATA, state);
         }
         state.shouldRender = false;
         if(!EntangledConfig.renderBlockHighlight.get())
@@ -104,7 +102,7 @@ public class EntangledClient implements ClientModInitializer {
         if(result instanceof BlockHitResult){
             BlockPos pos = ((BlockHitResult)result).getBlockPos();
             //noinspection resource
-            ClientLevel level = context.world();
+            ClientLevel level = context.level();
             BlockEntity entity = level.getBlockEntity(pos);
             if(entity instanceof EntangledBlockEntity && ((EntangledBlockEntity)entity).isBound() && ((EntangledBlockEntity)entity).getBoundDimensionIdentifier() == level.dimension()){
                 BlockPos boundPos = ((EntangledBlockEntity)entity).getBoundBlockPos();
@@ -118,13 +116,13 @@ public class EntangledClient implements ClientModInitializer {
         }
     }
 
-    private static boolean onBlockHighlightDraw(WorldRenderContext context, BlockOutlineRenderState outlineRenderState){
-        BlockHighlightState state = context.worldState().getData(BLOCK_HIGHLIGHT_DATA);
+    private static boolean onBlockHighlightDraw(LevelRenderContext context, BlockOutlineRenderState outlineRenderState){
+        BlockHighlightState state = context.levelState().getData(BLOCK_HIGHLIGHT_DATA);
         if(state == null || !state.shouldRender)
             return true;
 
         POSE_STACK.pushPose();
-        Vec3 playerPos = context.worldState().cameraRenderState.pos;
+        Vec3 playerPos = context.levelState().cameraRenderState.pos;
         POSE_STACK.translate(-playerPos.x, -playerPos.y, -playerPos.z);
         POSE_STACK.translate(state.pos.getX(), state.pos.getY(), state.pos.getZ());
 

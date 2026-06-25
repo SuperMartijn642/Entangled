@@ -71,7 +71,7 @@ public class EntangledBlock extends BaseBlock implements EntityHoldingBlock {
         if(player.isCrouching() && stack.isEmpty() && ((EntangledBlockEntity)entity).isBound()){
             if(!level.isClientSide()){
                 ((EntangledBlockEntity)entity).unbind();
-                player.displayClientMessage(TextComponents.translation("entangled.entangled_block.unbind").color(ChatFormatting.YELLOW).get(), true);
+                player.sendOverlayMessage(TextComponents.translation("entangled.entangled_block.unbind").color(ChatFormatting.YELLOW).get());
             }
             return InteractionFeedback.SUCCESS;
         }else if(stack.getItem() == Entangled.item){
@@ -81,17 +81,17 @@ public class EntangledBlock extends BaseBlock implements EntityHoldingBlock {
                     BlockPos targetPos = EntangledBinderItem.getBoundPosition(stack);
                     if(canBindTo(level.dimension().identifier(), pos, targetDimension, targetPos)){
                         ((EntangledBlockEntity)entity).bind(targetPos, targetDimension);
-                        player.displayClientMessage(TextComponents.translation("entangled.entangled_block.bind").color(ChatFormatting.YELLOW).get(), true);
+                        player.sendOverlayMessage(TextComponents.translation("entangled.entangled_block.bind").color(ChatFormatting.YELLOW).get());
                     }else if(CommonUtils.getLevel(ResourceKey.create(Registries.DIMENSION, targetDimension)) == null)
-                        player.displayClientMessage(TextComponents.translation("entangled.entangled_binder.unknown_dimension", targetDimension).color(ChatFormatting.RED).get(), true);
+                        player.sendOverlayMessage(TextComponents.translation("entangled.entangled_binder.unknown_dimension", targetDimension).color(ChatFormatting.RED).get());
                     else if(!level.dimension().identifier().equals(targetDimension) && !EntangledConfig.allowDimensional.get())
-                        player.displayClientMessage(TextComponents.translation("entangled.entangled_block.wrong_dimension").color(ChatFormatting.RED).get(), true);
+                        player.sendOverlayMessage(TextComponents.translation("entangled.entangled_block.wrong_dimension").color(ChatFormatting.RED).get());
                     else if(pos.equals(targetPos))
-                        player.displayClientMessage(TextComponents.translation("entangled.entangled_block.self").color(ChatFormatting.RED).get(), true);
+                        player.sendOverlayMessage(TextComponents.translation("entangled.entangled_block.self").color(ChatFormatting.RED).get());
                     else
-                        player.displayClientMessage(TextComponents.translation("entangled.entangled_block.too_far").color(ChatFormatting.RED).get(), true);
+                        player.sendOverlayMessage(TextComponents.translation("entangled.entangled_block.too_far").color(ChatFormatting.RED).get());
                 }else
-                    player.displayClientMessage(TextComponents.translation("entangled.entangled_block.no_selection").color(ChatFormatting.RED).get(), true);
+                    player.sendOverlayMessage(TextComponents.translation("entangled.entangled_block.no_selection").color(ChatFormatting.RED).get());
             }
             return InteractionFeedback.SUCCESS;
         }
@@ -146,13 +146,13 @@ public class EntangledBlock extends BaseBlock implements EntityHoldingBlock {
                 Player player = context.getPlayer();
                 if(player != null){
                     if(CommonUtils.getLevel(ResourceKey.create(Registries.DIMENSION, targetDimension)) == null)
-                        player.displayClientMessage(TextComponents.translation("entangled.entangled_binder.unknown_dimension", targetDimension).color(ChatFormatting.RED).get(), true);
+                        player.sendOverlayMessage(TextComponents.translation("entangled.entangled_binder.unknown_dimension", targetDimension).color(ChatFormatting.RED).get());
                     else if(!placeDimension.equals(targetDimension) && !EntangledConfig.allowDimensional.get())
-                        player.displayClientMessage(TextComponents.translation("entangled.entangled_block.wrong_dimension").color(ChatFormatting.RED).get(), true);
+                        player.sendOverlayMessage(TextComponents.translation("entangled.entangled_block.wrong_dimension").color(ChatFormatting.RED).get());
                     else if(placePos.equals(targetPos))
-                        player.displayClientMessage(TextComponents.translation("entangled.entangled_block.self").color(ChatFormatting.RED).get(), true);
+                        player.sendOverlayMessage(TextComponents.translation("entangled.entangled_block.self").color(ChatFormatting.RED).get());
                     else
-                        player.displayClientMessage(TextComponents.translation("entangled.entangled_block.too_far").color(ChatFormatting.RED).get(), true);
+                        player.sendOverlayMessage(TextComponents.translation("entangled.entangled_block.too_far").color(ChatFormatting.RED).get());
                 }
                 return null;
             }

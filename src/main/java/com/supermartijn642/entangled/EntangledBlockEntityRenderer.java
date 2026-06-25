@@ -4,21 +4,24 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.supermartijn642.core.ClientUtils;
 import com.supermartijn642.core.registry.Registries;
 import com.supermartijn642.core.render.CustomBlockEntityRenderer;
-import net.fabricmc.fabric.api.renderer.v1.render.RenderLayerHelper;
-import net.minecraft.client.Minecraft;
+import it.unimi.dsi.fastutil.ints.IntList;
+import net.fabricmc.fabric.api.client.renderer.v1.mesh.QuadEmitter;
+import net.minecraft.client.color.block.BlockTintSource;
 import net.minecraft.client.renderer.SubmitNodeCollector;
-import net.minecraft.client.renderer.block.model.BlockStateModel;
+import net.minecraft.client.renderer.block.BlockAndTintGetter;
+import net.minecraft.client.renderer.block.BlockModelRenderState;
+import net.minecraft.client.renderer.block.dispatch.BlockStateModel;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
 import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
 import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.client.resources.model.geometry.BakedQuad;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.tags.TagKey;
-import net.minecraft.util.ARGB;
-import net.minecraft.world.level.EmptyBlockAndTintGetter;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -26,6 +29,8 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import org.joml.Matrix4f;
+import org.joml.Matrix4fc;
 import org.joml.Quaternionf;
 
 import java.util.Collections;
@@ -38,6 +43,7 @@ import java.util.Set;
 public class EntangledBlockEntityRenderer implements CustomBlockEntityRenderer<EntangledBlockEntity,EntangledBlockEntityRenderer.State> {
 
     private static final AABB FULL_BLOCK_BOUNDS = new AABB(0, 0, 0, 1, 1, 1);
+    private static final Matrix4fc IDENTITY_MATRIX = new Matrix4f().identity();
 
     public static final TagKey<Block> BLACKLISTED_BLOCKS = TagKey.create(net.minecraft.core.registries.Registries.BLOCK, Identifier.fromNamespaceAndPath("entangled", "render_blacklist"));
     public static final TagKey<BlockEntityType<?>> BLACKLISTED_ENTITIES = TagKey.create(net.minecraft.core.registries.Registries.BLOCK_ENTITY_TYPE, Identifier.fromNamespaceAndPath("entangled", "render_blacklist"));
@@ -60,7 +66,8 @@ public class EntangledBlockEntityRenderer implements CustomBlockEntityRenderer<E
 
         state.isBound = true;
         boolean isSameDimension = entity.getLevel().dimension() == entity.getBoundDimensionIdentifier();
-        BlockEntity boundEntity = isSameDimension ? entity.getLevel().getBlockEntity(entity.getBoundBlockPos()) : null;
+        BlockPos boundPos = entity.getBoundBlockPos();
+        BlockEntity boundEntity = isSameDimension ? entity.getLevel().getBlockEntity(boundPos) : null;
         BlockState boundState = entity.getBoundBlockState();
 
         boolean renderEntity = boundEntity != null
@@ -89,13 +96,24 @@ public class EntangledBlockEntityRenderer implements CustomBlockEntityRenderer<E
         }else
             state.boundEntityRenderer = null;
         if(renderBlock){
-            state.boundBlock = boundState;
-            if(isSameDimension)
-                state.boundBlockTinting = ClientUtils.getMinecraft().getBlockColors().getColor(boundState, entity.getLevel(), entity.getBoundBlockPos(), 0);
-            else
-                state.boundBlockTinting = -1;
-        }
-        state.boundPos = entity.getBoundBlockPos();
+            state.renderBlock = true;
+            state.boundBlockRenderState.clear();
+            BlockAndTintGetter boundLevel = isSameDimension && entity.getLevel() instanceof BlockAndTintGetter clientLevel ? clientLevel : BlockAndTintGetter.EMPTY;
+            try{
+                BlockStateModel model = ClientUtils.getMinecraft().getModelManager().getBlockStateModelSet().get(boundState);
+                QuadEmitter emitter = state.boundBlockRenderState.setupMesh(IDENTITY_MATRIX, model.hasMaterialFlag(BakedQuad.FLAG_TRANSLUCENT));
+                RandomSource random = context.randomSource(boundState.getSeed(boundPos));
+                model.emitQuads(emitter, boundLevel, boundPos, boundState, random, _ -> false);
+            }catch(Exception e){
+                ERRORED_BLOCK_STATES.add(state.boundBlock);
+                Entangled.LOGGER.error("Encountered an exception whilst rendering block '{}'! Please report to Entangled!", boundState, e);
+            }
+
+            IntList tintLayers = state.boundBlockRenderState.tintLayers();
+            for(BlockTintSource tintSource : ClientUtils.getMinecraft().getBlockColors().getTintSources(boundState))
+                tintLayers.add(tintSource.colorInWorld(boundState, boundLevel, boundPos));
+        }else
+            state.renderBlock = false;
 
         // Add bounding box
         if(renderBlock){
@@ -135,32 +153,15 @@ public class EntangledBlockEntityRenderer implements CustomBlockEntityRenderer<E
         }
 
         // Render block
-        if(state.boundBlock != null){
-            try{
-                ModelFeatureRenderer.CrumblingOverlay breakingOverlay = context.breakingOverlay();
-                if(state.boundEntityRenderer == null)
-                    output.submitBlock(poseStack, state.boundBlock, context.packedLight(), breakingOverlay == null ? OverlayTexture.NO_OVERLAY : breakingOverlay.progress(), 0, EmptyBlockAndTintGetter.INSTANCE, state.boundPos);
-                else{
-                    BlockStateModel model = Minecraft.getInstance().getModelManager().getBlockModelShaper().getBlockModel(state.boundBlock);
-                    output.submitBlockStateModel(
-                        poseStack,
-                        RenderLayerHelper::getEntityBlockLayer,
-                        model,
-                        ARGB.redFloat(state.boundBlockTinting),
-                        ARGB.greenFloat(state.boundBlockTinting),
-                        ARGB.blueFloat(state.boundBlockTinting),
-                        context.packedLight(),
-                        breakingOverlay == null ? OverlayTexture.NO_OVERLAY : breakingOverlay.progress(),
-                        0,
-                        EmptyBlockAndTintGetter.INSTANCE,
-                        state.boundPos,
-                        state.boundBlock
-                    );
-                }
-            }catch(Exception e){
-                ERRORED_BLOCK_STATES.add(state.boundBlock);
-                Entangled.LOGGER.error("Encountered an exception whilst rendering block '{}'! Please report to Entangled!", state.boundBlock, e);
-            }
+        if(state.renderBlock){
+            ModelFeatureRenderer.CrumblingOverlay breakingOverlay = context.breakingOverlay();
+            state.boundBlockRenderState.submit(
+                poseStack,
+                output,
+                context.packedLight(),
+                breakingOverlay == null ? OverlayTexture.NO_OVERLAY : breakingOverlay.progress(),
+                0
+            );
         }
         // Render block entity
         if(state.boundEntityRenderer != null){
@@ -183,9 +184,9 @@ public class EntangledBlockEntityRenderer implements CustomBlockEntityRenderer<E
     public static class State {
 
         public boolean isBound;
-        public BlockPos boundPos;
         public BlockState boundBlock;
-        public int boundBlockTinting;
+        public boolean renderBlock;
+        public final BlockModelRenderState boundBlockRenderState = new BlockModelRenderState();
         public AABB boundBlockBounds;
         public BlockEntityType<?> boundEntityType;
         public BlockEntityRenderer<?,BlockEntityRenderState> boundEntityRenderer;

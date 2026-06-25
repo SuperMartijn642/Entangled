@@ -72,7 +72,7 @@ public class EntangledBinderItem extends BaseItem {
         // Bind to clicked position
         if(!level.isClientSide()){
             stack.set(BINDER_TARGET, new BinderTarget(level.dimension().identifier(), hitPos, Optional.of(level.getBlockState(hitPos))));
-            player.displayClientMessage(TextComponents.translation("entangled.entangled_binder.select").color(ChatFormatting.YELLOW).get(), true);
+            player.sendOverlayMessage(TextComponents.translation("entangled.entangled_binder.select").color(ChatFormatting.YELLOW).get());
         }
         return InteractionFeedback.SUCCESS;
     }
@@ -82,7 +82,7 @@ public class EntangledBinderItem extends BaseItem {
         if(player.isCrouching() && stack.has(BINDER_TARGET)){
             if(!level.isClientSide()){
                 stack.remove(BINDER_TARGET);
-                player.displayClientMessage(TextComponents.translation("entangled.entangled_binder.clear").color(ChatFormatting.YELLOW).get(), true);
+                player.sendOverlayMessage(TextComponents.translation("entangled.entangled_binder.clear").color(ChatFormatting.YELLOW).get());
             }
             return ItemUseResult.consume(stack);
         }
