@@ -1,6 +1,5 @@
 package com.supermartijn642.entangled;
 
-import com.supermartijn642.entangled.extensions.BlockCapabilityExtension;
 import net.neoforged.neoforge.capabilities.BlockCapability;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 
@@ -10,10 +9,8 @@ import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 public class EntangledBlockApiProviders {
 
     public static void registerApiProviders(RegisterCapabilitiesEvent event){
-        // TODO use #getAllProxyable once mods start updating to mark their capabilities as such
         for(BlockCapability<?,?> capability : BlockCapability.getAll()){
-            //noinspection DataFlowIssue
-            if(!((BlockCapabilityExtension)(Object)capability).entangled_getProxyableState().isFalse())
+            if(capability.isProxyable())
                 registerApiProvider(event, capability);
         }
     }

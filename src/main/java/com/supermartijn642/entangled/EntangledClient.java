@@ -9,8 +9,8 @@ import com.supermartijn642.core.render.RenderUtils;
 import com.supermartijn642.core.render.RenderWorldEvent;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.state.BlockOutlineRenderState;
-import net.minecraft.client.renderer.state.LevelRenderState;
+import net.minecraft.client.renderer.state.level.BlockOutlineRenderState;
+import net.minecraft.client.renderer.state.level.LevelRenderState;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.Identifier;
@@ -43,8 +43,6 @@ public class EntangledClient {
         handler.registerCustomBlockEntityRenderer(() -> Entangled.tile, EntangledBlockEntityRenderer::new);
         // Entangled block item model
         handler.registerItemModelType("block", EntangledBlockItemModel.CODEC);
-        // Entangled block render type
-        handler.registerBlockModelCutoutRenderType(() -> Entangled.block);
     }
 
     @SubscribeEvent
