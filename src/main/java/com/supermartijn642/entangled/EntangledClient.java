@@ -7,11 +7,11 @@ import com.supermartijn642.core.block.BlockShape;
 import com.supermartijn642.core.registry.ClientRegistrationHandler;
 import com.supermartijn642.core.render.RenderUtils;
 import com.supermartijn642.core.render.RenderWorldEvent;
-import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.state.BlockOutlineRenderState;
-import net.minecraft.client.renderer.state.LevelRenderState;
+import net.minecraft.client.renderer.state.level.BlockOutlineRenderState;
+import net.minecraft.client.renderer.state.level.LevelRenderState;
+import net.minecraft.client.resources.model.geometry.BakedQuad;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.InteractionHand;
@@ -43,8 +43,6 @@ public class EntangledClient {
         handler.registerCustomBlockEntityRenderer(() -> Entangled.tile, EntangledBlockEntityRenderer::new);
         // Entangled block item model
         handler.registerItemModelType("block", EntangledBlockItemModel.CODEC);
-        // Entangled block render type
-        handler.registerBlockModelCutoutRenderType(() -> Entangled.block);
     }
 
     @SubscribeEvent
@@ -105,7 +103,7 @@ public class EntangledClient {
                 //noinspection deprecation
                 BlockOutlineRenderState outlineRenderState = new BlockOutlineRenderState(
                     pos,
-                    ItemBlockRenderTypes.getChunkRenderType(blockState).sortOnUpload(),
+                    ClientUtils.getMinecraft().getModelManager().getBlockStateModelSet().get(blockState).hasMaterialFlag(BakedQuad.FLAG_TRANSLUCENT),
                     ClientUtils.getMinecraft().options.highContrastBlockOutline().get(),
                     blockState.getShape(level, pos, CollisionContext.of(event.getCamera().entity()))
                 );

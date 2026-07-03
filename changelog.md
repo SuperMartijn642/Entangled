@@ -1,3 +1,5 @@
+## Update to Minecraft 26.1
+
 ### Entangled 1.3.21
 - Added Japanese translations (thanks to Twister716!)
 

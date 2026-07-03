@@ -2,13 +2,13 @@
   "parent": "minecraft:recipes/root",
   "display": {
     "icon": {
-      "id": "entangled:block"
+      "id": "entangled:item"
     },
     "title": {
-      "translate": "entangled.advancement.recipes/misc/block.title"
+      "translate": "entangled.advancement.recipes/item.title"
     },
     "description": {
-      "translate": "entangled.advancement.recipes/misc/block.description"
+      "translate": "entangled.advancement.recipes/item.description"
     },
     "frame": "task",
     "show_toast": false,
@@ -19,7 +19,7 @@
     "has_the_recipe": {
       "trigger": "minecraft:recipe_unlocked",
       "conditions": {
-        "recipe": "entangled:block"
+        "recipe": "entangled:item"
       }
     },
     "recipe_condition": {
@@ -41,7 +41,7 @@
   ],
   "rewards": {
     "recipes": [
-      "entangled:block"
+      "entangled:item"
     ]
   }
 }
