@@ -7,8 +7,7 @@ import com.supermartijn642.core.block.BlockShape;
 import com.supermartijn642.core.registry.ClientRegistrationHandler;
 import com.supermartijn642.core.render.RenderUtils;
 import com.supermartijn642.core.render.RenderWorldEvent;
-import net.minecraft.client.renderer.LevelRenderer;
-import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.state.level.BlockOutlineRenderState;
 import net.minecraft.client.renderer.state.level.LevelRenderState;
 import net.minecraft.client.resources.model.geometry.BakedQuad;
@@ -54,31 +53,35 @@ public class EntangledClient {
             CompoundTag compound = stack.get(BaseBlock.TILE_DATA);
             if(compound.getBooleanOr("bound", false) && compound.getStringOr("dimension", "").equals(world.dimension().identifier().toString())){
                 BlockPos pos = new BlockPos(compound.getIntOr("boundx", 0), compound.getIntOr("boundy", 0), compound.getIntOr("boundz", 0));
+                BlockShape shape = BlockShape.create(world.getBlockState(pos).getOcclusionShape());
+                e.submitFeatures((poseStack, output) -> {
+                    poseStack.pushPose();
+                    Vec3 camera = RenderUtils.getCameraPosition();
+                    poseStack.translate(-camera.x, -camera.y, -camera.z);
+                    poseStack.translate(pos.getX(), pos.getY(), pos.getZ());
 
-                e.getPoseStack().pushPose();
-                Vec3 camera = RenderUtils.getCameraPosition();
-                e.getPoseStack().translate(-camera.x, -camera.y, -camera.z);
-                e.getPoseStack().translate(pos.getX(), pos.getY(), pos.getZ());
+                    RenderUtils.submitShape(output, poseStack, shape, 86 / 255f, 0 / 255f, 156 / 255f, 1, false);
+                    RenderUtils.submitShapeSides(output, poseStack, shape, 86 / 255f, 0 / 255f, 156 / 255f, 30 / 255f, false);
 
-                RenderUtils.renderShape(e.getPoseStack(), world.getBlockState(pos).getOcclusionShape(), 86 / 255f, 0 / 255f, 156 / 255f, false);
-                RenderUtils.renderShapeSides(e.getPoseStack(), world.getBlockState(pos).getOcclusionShape(), 86 / 255f, 0 / 255f, 156 / 255f, 30 / 255f, false);
-
-                e.getPoseStack().popPose();
+                    poseStack.popPose();
+                });
             }
         }else if(stack.getItem() == Entangled.item){
             EntangledBinderItem.BinderTarget target = stack.get(EntangledBinderItem.BINDER_TARGET);
             if(target != null && target.dimension().equals(world.dimension().identifier())){
                 BlockPos pos = target.pos();
+                BlockShape shape = BlockShape.create(world.getBlockState(pos).getOcclusionShape());
+                e.submitFeatures((poseStack, output) -> {
+                    poseStack.pushPose();
+                    Vec3 camera = RenderUtils.getCameraPosition();
+                    poseStack.translate(-camera.x, -camera.y, -camera.z);
+                    poseStack.translate(pos.getX(), pos.getY(), pos.getZ());
 
-                e.getPoseStack().pushPose();
-                Vec3 camera = RenderUtils.getCameraPosition();
-                e.getPoseStack().translate(-camera.x, -camera.y, -camera.z);
-                e.getPoseStack().translate(pos.getX(), pos.getY(), pos.getZ());
+                    RenderUtils.submitShape(output, poseStack, shape, 235 / 255f, 210 / 255f, 52 / 255f, 1, false);
+                    RenderUtils.submitShapeSides(output, poseStack, shape, 235 / 255f, 210 / 255f, 52 / 255f, 30 / 255f, false);
 
-                RenderUtils.renderShape(e.getPoseStack(), world.getBlockState(pos).getOcclusionShape(), 235 / 255f, 210 / 255f, 52 / 255f, false);
-                RenderUtils.renderShapeSides(e.getPoseStack(), world.getBlockState(pos).getOcclusionShape(), 235 / 255f, 210 / 255f, 52 / 255f, 30 / 255f, false);
-
-                e.getPoseStack().popPose();
+                    poseStack.popPose();
+                });
             }
         }
     }
@@ -100,20 +103,18 @@ public class EntangledClient {
                 state.pos = boundPos;
                 state.shape = BlockShape.create(shape);
                 BlockState blockState = level.getBlockState(pos);
-                //noinspection deprecation
                 BlockOutlineRenderState outlineRenderState = new BlockOutlineRenderState(
                     pos,
                     ClientUtils.getMinecraft().getModelManager().getBlockStateModelSet().get(blockState).hasMaterialFlag(BakedQuad.FLAG_TRANSLUCENT),
                     ClientUtils.getMinecraft().options.highContrastBlockOutline().get(),
                     blockState.getShape(level, pos, CollisionContext.of(event.getCamera().entity()))
                 );
-                LevelRenderer levelRenderer = event.getLevelRenderer();
-                event.setCustomRenderer((source, stack, translucent, levelRenderState) -> onBlockHighlightDraw(outlineRenderState, source, stack, translucent, levelRenderState, levelRenderer, state));
+                event.setCustomRenderer((output, poseStack, levelRenderState) -> onBlockHighlightDraw(outlineRenderState, output, poseStack, levelRenderState, state));
             }
         }
     }
 
-    private static boolean onBlockHighlightDraw(BlockOutlineRenderState outlineRenderState, MultiBufferSource.BufferSource bufferSource, PoseStack poseStack, boolean translucentPass, LevelRenderState levelRenderState, LevelRenderer levelRenderer, BlockHighlightState state){
+    private static boolean onBlockHighlightDraw(BlockOutlineRenderState outlineRenderState, SubmitNodeCollector output, PoseStack poseStack, LevelRenderState levelRenderState, BlockHighlightState state){
         if(state == null || !state.shouldRender)
             return true;
 
@@ -122,15 +123,15 @@ public class EntangledClient {
         POSE_STACK.translate(-playerPos.x, -playerPos.y, -playerPos.z);
         POSE_STACK.translate(state.pos.getX(), state.pos.getY(), state.pos.getZ());
 
-        RenderUtils.renderShape(POSE_STACK, state.shape, 86 / 255f, 0 / 255f, 156 / 255f, false);
-        RenderUtils.renderShapeSides(POSE_STACK, state.shape, 86 / 255f, 0 / 255f, 156 / 255f, 30 / 255f, false);
+        RenderUtils.submitShape(output, POSE_STACK, state.shape, 86 / 255f, 0 / 255f, 156 / 255f, 1, false);
+        RenderUtils.submitShapeSides(output, POSE_STACK, state.shape, 86 / 255f, 0 / 255f, 156 / 255f, 30 / 255f, false);
 
         POSE_STACK.popPose();
 
         // Render original outline
         BlockOutlineRenderState temp = levelRenderState.blockOutlineRenderState;
         levelRenderState.blockOutlineRenderState = outlineRenderState;
-        levelRenderer.renderBlockOutline(bufferSource, poseStack, translucentPass, levelRenderState);
+        ClientUtils.getMinecraft().levelRenderer.submitBlockOutline(poseStack, output, levelRenderState);
         levelRenderState.blockOutlineRenderState = temp;
         return true;
     }
