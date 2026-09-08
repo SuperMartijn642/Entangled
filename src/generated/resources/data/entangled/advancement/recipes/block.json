@@ -19,7 +19,7 @@
     "has_the_recipe": {
       "trigger": "minecraft:recipe_unlocked",
       "conditions": {
-        "recipe": "entangled:block"
+        "recipes": "entangled:block"
       }
     },
     "recipe_condition": {

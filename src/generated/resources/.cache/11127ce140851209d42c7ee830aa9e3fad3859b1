@@ -6,9 +6,9 @@ a4757ef9e6a3e8191d9296da402c2d7f37b92611 assets/entangled/lang/en_us.json
 664cab40e1d9a351f0397c17e06f050a1eba1075 assets/entangled/models/block/unbound.json
 769b1c358ac225e266e6c77130bac04f67e53bdb assets/entangled/models/item/item.json
 de19abd6f5d7148b13dc4e02d1c694c7bc2950fb assets/minecraft/atlases/blocks.json
-c2b6a582e891085f9d067bef45edc5a8b81ff61e data/entangled/advancement/recipes/block.json
-0c63903d444070f3a689d5ac11565116fd874384 data/entangled/advancement/recipes/item.json
-304967c3bd2249b12e7a926ed54ac9cf2dcae8ad data/entangled/loot_table/blocks/block.json
+37c229dfb169293bdb6fe0bd34d63b51d73e0c71 data/entangled/advancement/recipes/block.json
+c6b2db78e3e1dffa9072a6fa83bd6c3e56e33d8b data/entangled/advancement/recipes/item.json
+6f5a462de38b9ac77de5cf291dc3693b8a741065 data/entangled/loot_table/blocks/block.json
 6e1ac723a0c61631d7c8484fb057a499d45fbae4 data/entangled/recipe/block.json
 eae7e6e7939b641d8b80a72cc49cf6147dbd2d54 data/entangled/recipe/entangled_clear_nbt.json
 396ec909ccfd379c037360a342c174b95bb81190 data/entangled/recipe/item.json

@@ -62,7 +62,7 @@ public class EntangledClient implements ClientModInitializer {
             CompoundTag compound = stack.get(BaseBlock.TILE_DATA);
             if(compound.getBooleanOr("bound", false) && compound.getStringOr("dimension", "").equals(world.dimension().identifier().toString())){
                 BlockPos pos = new BlockPos(compound.getIntOr("boundx", 0), compound.getIntOr("boundy", 0), compound.getIntOr("boundz", 0));
-                BlockShape shape = BlockShape.create(world.getBlockState(pos).getOcclusionShape());
+                BlockShape shape = BlockShape.create(world.getBlockState(pos).getShape(world, pos));
                 e.submitFeatures((poseStack, output) -> {
                     poseStack.pushPose();
                     Vec3 camera = RenderUtils.getCameraPosition();
@@ -79,7 +79,7 @@ public class EntangledClient implements ClientModInitializer {
             EntangledBinderItem.BinderTarget target = stack.get(EntangledBinderItem.BINDER_TARGET);
             if(target != null && target.dimension().equals(world.dimension().identifier())){
                 BlockPos pos = target.pos();
-                BlockShape shape = BlockShape.create(world.getBlockState(pos).getOcclusionShape());
+                BlockShape shape = BlockShape.create(world.getBlockState(pos).getShape(world, pos));
                 e.submitFeatures((poseStack, output) -> {
                     poseStack.pushPose();
                     Vec3 camera = RenderUtils.getCameraPosition();

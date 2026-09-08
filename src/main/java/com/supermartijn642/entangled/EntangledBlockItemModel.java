@@ -18,6 +18,7 @@ import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.client.resources.model.ModelBaker;
 import net.minecraft.client.resources.model.ResolvedModel;
 import net.minecraft.client.resources.model.geometry.BakedQuad;
+import net.minecraft.client.resources.model.geometry.ItemQuads;
 import net.minecraft.client.resources.model.sprite.TextureSlots;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -83,8 +84,12 @@ public class EntangledBlockItemModel implements ItemModel.Unbaked {
     @Override
     public ItemModel bake(ItemModel.BakingContext context, Matrix4fc transformation){
         Pair<List<BakedQuad>,ModelRenderProperties> unbound = bakeModel(context, Identifier.fromNamespaceAndPath("entangled", "block/unbound"));
-        Pair<List<BakedQuad>,ModelRenderProperties> bound = bakeModel(context, Identifier.fromNamespaceAndPath("entangled", "block/bound"));
+        ItemQuads unboundQuads = ItemQuads.split(unbound.left());
+        ModelRenderProperties unboundProperties = unbound.right();
         Vector3fc[] unboundExtents = CuboidItemModelWrapper.computeExtents(unbound.left());
+        Pair<List<BakedQuad>,ModelRenderProperties> bound = bakeModel(context, Identifier.fromNamespaceAndPath("entangled", "block/bound"));
+        ItemQuads boundQuads = ItemQuads.split(bound.left());
+        ModelRenderProperties boundProperties = bound.right();
         Vector3fc[] boundExtents = CuboidItemModelWrapper.computeExtents(bound.left());
         return (renderState, stack, modelResolver, displayContext, level, entity, someRandomId) -> {
             renderState.appendModelIdentityElement(this);
@@ -94,8 +99,8 @@ public class EntangledBlockItemModel implements ItemModel.Unbaked {
                 ItemStackRenderState.LayerRenderState layer = renderState.newLayer();
                 layer.setExtents(() -> unboundExtents);
                 layer.setLocalTransform(transformation);
-                unbound.right().applyToLayer(layer, displayContext);
-                layer.prepareQuadList().addAll(unbound.left());
+                unboundProperties.applyToLayer(layer, displayContext);
+                layer.setQuads(unboundQuads);
                 renderState.appendModelIdentityElement(false);
                 return;
             }
@@ -104,12 +109,12 @@ public class EntangledBlockItemModel implements ItemModel.Unbaked {
             ItemStackRenderState.LayerRenderState layer = renderState.newLayer();
             layer.setExtents(() -> boundExtents);
             layer.setLocalTransform(transformation);
-            bound.right().applyToLayer(layer, displayContext);
-            layer.prepareQuadList().addAll(bound.left());
+            boundProperties.applyToLayer(layer, displayContext);
+            layer.setQuads(boundQuads);
             // Render the block entity
             layer = renderState.newLayer();
             layer.setLocalTransform(transformation);
-            layer.setItemTransform(bound.right().transforms().getTransform(displayContext));
+            layer.setItemTransform(boundProperties.transforms().getTransform(displayContext));
             layer.setupSpecialModel(ENTITY_RENDERER, data);
 
             BlockState state = Block.stateById(data.getIntOr("blockstate", 0));
