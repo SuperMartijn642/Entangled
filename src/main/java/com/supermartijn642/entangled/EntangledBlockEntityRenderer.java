@@ -1,6 +1,7 @@
 package com.supermartijn642.entangled;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.math.Axis;
 import com.supermartijn642.core.ClientUtils;
 import com.supermartijn642.core.registry.Registries;
 import com.supermartijn642.core.render.CustomBlockEntityRenderer;
@@ -31,7 +32,6 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.joml.Matrix4f;
 import org.joml.Matrix4fc;
-import org.joml.Quaternionf;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -139,9 +139,9 @@ public class EntangledBlockEntityRenderer implements CustomBlockEntityRenderer<E
             float angleX = System.currentTimeMillis() % 10000 / 10000f * 2 * (float)Math.PI;
             float angleY = System.currentTimeMillis() % 11000 / 11000f * 2 * (float)Math.PI;
             float angleZ = System.currentTimeMillis() % 12000 / 12000f * 2 * (float)Math.PI;
-            poseStack.mulPose(new Quaternionf().setAngleAxis(angleX, 1, 0, 0));
-            poseStack.mulPose(new Quaternionf().setAngleAxis(angleY, 0, 1, 0));
-            poseStack.mulPose(new Quaternionf().setAngleAxis(angleZ, 0, 0, 1));
+            poseStack.rotate(Axis.XP, angleX);
+            poseStack.rotate(Axis.YP, angleY);
+            poseStack.rotate(Axis.ZP, angleZ);
         }
         if(state.boundBlockBounds != null){
             AABB bounds = state.boundBlockBounds;

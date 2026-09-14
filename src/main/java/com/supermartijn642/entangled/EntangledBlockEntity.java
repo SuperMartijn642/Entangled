@@ -183,7 +183,7 @@ public class EntangledBlockEntity extends BaseBlockEntity implements TickableBlo
     public void bind(BlockPos pos, Identifier dimension){
         this.bound = true;
         this.valid = true;
-        this.boundPos = new BlockPos(pos);
+        this.boundPos = pos;
         this.boundDimension = ResourceKey.create(Registries.DIMENSION, dimension);
         this.boundBlockState = null;
         this.boundBlockEntity = null;
