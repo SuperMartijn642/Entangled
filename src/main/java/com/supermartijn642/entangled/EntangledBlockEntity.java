@@ -169,6 +169,11 @@ public class EntangledBlockEntity extends BaseBlockEntity implements TickableBlo
         return this.boundBlockState;
     }
 
+    @Nullable
+    public BlockEntity getBoundBlockEntity(){
+        return this.boundBlockEntity;
+    }
+
     public <A, C> A getCapability(BlockCapability<A,C> capability, C context){
         if(this.isBoundAndValid() && this.callDepth < 10){
             if(this.boundBlockEntity == null ? this.boundBlockState == null || this.boundBlockState.hasBlockEntity() : this.boundBlockEntity.isRemoved())

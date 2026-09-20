@@ -7,6 +7,7 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.Nameable;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import snownee.jade.api.*;
@@ -33,8 +34,17 @@ public class EntangledWailaPlugin implements IBlockComponentProvider, IWailaPlug
         BlockEntity tile = accessor.getBlockEntity();
         if(tile instanceof EntangledBlockEntity){
             if(((EntangledBlockEntity)tile).isBound()){
-                BlockState boundBlockState = ((EntangledBlockEntity)tile).getBoundBlockState();
-                Component boundBlock = (boundBlockState == null ? TextComponents.string("Block") : TextComponents.blockState(boundBlockState)).color(ChatFormatting.GOLD).get();
+                EntangledBlockEntity entangled = (EntangledBlockEntity)tile;
+                BlockState boundBlockState = entangled.getBoundBlockState();
+                BlockEntity boundBlockEntity = entangled.getBoundBlockEntity();
+                Component boundBlock;
+                if(boundBlockEntity instanceof Nameable nameable)
+                    boundBlock = nameable.getDisplayName();
+                else if(boundBlockState == null)
+                    boundBlock = TextComponents.string("Block").get();
+                else
+                    boundBlock = TextComponents.blockState(boundBlockState).get();
+                boundBlock = boundBlock.copy().withStyle(ChatFormatting.GOLD);
                 BlockPos boundPos = ((EntangledBlockEntity)tile).getBoundBlockPos();
                 Component x = TextComponents.string(Integer.toString(boundPos.getX())).color(ChatFormatting.GOLD).get();
                 Component y = TextComponents.string(Integer.toString(boundPos.getY())).color(ChatFormatting.GOLD).get();

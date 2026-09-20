@@ -7,6 +7,7 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.Nameable;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -44,8 +45,17 @@ public class TheOneProbePlugin {
             BlockEntity tile = world.getBlockEntity(probeHitData.getPos());
             if(tile instanceof EntangledBlockEntity){
                 if(((EntangledBlockEntity)tile).isBound()){
-                    BlockState boundBlockState = ((EntangledBlockEntity)tile).getBoundBlockState();
-                    Component boundBlock = TextComponents.string(TextStyleClass.HIGHLIGHTED.toString()).append(boundBlockState == null ? TextComponents.string("Block").get() : TextComponents.blockState(boundBlockState).get()).append(TextComponents.string(TextStyleClass.INFO.toString()).get()).get();
+                    EntangledBlockEntity entangled = (EntangledBlockEntity)tile;
+                    BlockState boundBlockState = entangled.getBoundBlockState();
+                    BlockEntity boundBlockEntity = entangled.getBoundBlockEntity();
+                    Component boundBlockName;
+                    if(boundBlockEntity instanceof Nameable nameable)
+                        boundBlockName = nameable.getDisplayName();
+                    else if(boundBlockState == null)
+                        boundBlockName = TextComponents.string("Block").get();
+                    else
+                        boundBlockName = TextComponents.blockState(boundBlockState).get();
+                    Component boundBlock = TextComponents.string(TextStyleClass.HIGHLIGHTED.toString()).append(boundBlockName.copy()).append(TextComponents.string(TextStyleClass.INFO.toString()).get()).get();
                     BlockPos boundPos = ((EntangledBlockEntity)tile).getBoundBlockPos();
                     String x = TextStyleClass.HIGHLIGHTED.toString() + boundPos.getX() + TextStyleClass.INFO;
                     String y = TextStyleClass.HIGHLIGHTED.toString() + boundPos.getY() + TextStyleClass.INFO;
