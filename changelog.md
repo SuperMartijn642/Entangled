@@ -1,3 +1,6 @@
+### Entangled 1.3.21a
+- Fixed pipes next to Entangled Blocks staying disconnected when the bound block only becomes available later, e.g. Mekanism multiblocks after a restart
+
 ## Update to Minecraft 26.2
 
 ## Update to Minecraft 26.1
