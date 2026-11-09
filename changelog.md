@@ -1,3 +1,6 @@
+### Entangled 1.3.21b
+- Fixed the mod loading with outdated versions of NeoForge instead of asking to update it
+
 ### Entangled 1.3.21a
 - Added icon and banner images for new NeoForge 26.2.0.50-beta mod list
 
