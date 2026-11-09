@@ -1,3 +1,7 @@
+### Entangled 1.3.21a
+- Fixed the mod loading on Minecraft 26.2
+- Fixed the mod loading with outdated versions of NeoForge instead of asking to update it
+
 ## Update to Minecraft 26.3
 
 ### Entangled 1.3.21a
