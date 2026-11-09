@@ -23,6 +23,8 @@ import net.minecraftforge.common.util.LazyOptional;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created 2/6/2020 by SuperMartijn642
@@ -49,6 +51,11 @@ public class EntangledBlockEntity extends BaseBlockEntity implements TickableBlo
     private int analogOutputSignal = -1;
     // Make sure we don't get in infinite loop when entangled blocks are linked to each other
     private int callDepth = 0;
+    /**
+     * Capabilities neighbors asked for and whether the bound block had them, such that neighbors can be notified when that changes
+     */
+    private final Map<Capability<?>,Map<Direction,Boolean>> queriedCapabilities = new HashMap<>();
+    private int capabilityCheckCooldown = 0;
 
     public EntangledBlockEntity(BlockPos pos, BlockState state){
         super(Entangled.tile, pos, state);
@@ -117,6 +124,8 @@ public class EntangledBlockEntity extends BaseBlockEntity implements TickableBlo
                 || this.analogOutputSignal == -1
         );
         this.updateBoundBlockData(forceLoad);
+        if(!this.level.isClientSide)
+            this.checkQueriedCapabilities();
         if(!this.level.isClientSide && this.revalidate){
             if(this.bound){
                 this.valid = this.boundBlockState != null && this.isValidBlock(this.boundBlockState);
@@ -185,10 +194,42 @@ public class EntangledBlockEntity extends BaseBlockEntity implements TickableBlo
                 this.callDepth++;
                 LazyOptional<T> value = this.boundBlockEntity.getCapability(capability, facing);
                 this.callDepth--;
+                this.rememberQueriedCapability(capability, facing, value.isPresent());
                 return value;
             }
+            this.rememberQueriedCapability(capability, facing, false);
         }
         return LazyOptional.empty();
+    }
+
+    private void rememberQueriedCapability(Capability<?> capability, @Nullable Direction side, boolean present){
+        if(this.level != null && !this.level.isClientSide)
+            this.queriedCapabilities.computeIfAbsent(capability, c -> new HashMap<>()).put(side, present);
+    }
+
+    private void checkQueriedCapabilities(){
+        if(--this.capabilityCheckCooldown > 0)
+            return;
+        this.capabilityCheckCooldown = 20;
+        if(this.queriedCapabilities.isEmpty() || !this.isBoundAndValid() || this.boundBlockEntity == null || this.boundBlockEntity.isRemoved() || this.callDepth >= 10)
+            return;
+        boolean changed = false;
+        this.callDepth++;
+        for(Map.Entry<Capability<?>,Map<Direction,Boolean>> capability : this.queriedCapabilities.entrySet()){
+            for(Map.Entry<Direction,Boolean> side : capability.getValue().entrySet()){
+                boolean present = this.boundBlockEntity.getCapability(capability.getKey(), side.getKey()).isPresent();
+                if(present != side.getValue()){
+                    side.setValue(present);
+                    changed = true;
+                }
+            }
+        }
+        this.callDepth--;
+        // Neighbors such as pipes check the capabilities again when notified
+        if(changed){
+            this.level.updateNeighbourForOutputSignal(this.worldPosition, this.getBlockState().getBlock());
+            this.level.updateNeighborsAt(this.worldPosition, this.getBlockState().getBlock());
+        }
     }
 
     public void bind(BlockPos pos, ResourceLocation dimension){
@@ -198,6 +239,7 @@ public class EntangledBlockEntity extends BaseBlockEntity implements TickableBlo
         this.boundDimension = ResourceKey.create(Registries.DIMENSION, dimension);
         this.boundBlockState = null;
         this.boundBlockEntity = null;
+        this.queriedCapabilities.clear();
         this.updateStateAndNeighbors();
         this.dataChanged();
     }
@@ -209,6 +251,7 @@ public class EntangledBlockEntity extends BaseBlockEntity implements TickableBlo
         this.boundDimension = null;
         this.boundBlockState = null;
         this.boundBlockEntity = null;
+        this.queriedCapabilities.clear();
         this.updateStateAndNeighbors();
         this.dataChanged();
     }
